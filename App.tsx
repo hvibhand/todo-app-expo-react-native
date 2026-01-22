@@ -1,24 +1,32 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Image, Button } from 'react-native';
+import { TouchableOpacity, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
+
+  const handlePressablePress = () => {
+    alert('Pressable Pressed!');
+  }
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.titleText} >Title</Text>
-      <Text
-        style={styles.textStyle}
-      >
-        <Text
-          style={styles.linkText}
-          numberOfLines={3}
-          onPress={() => alert('Text Pressed!')}
-        >
-          Press Here
-        </Text>
-        consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-      </Text>
-
+      <StatusBar style="auto" />
+      <Pressable onPress={handlePressablePress}>
+        <Image
+          source={require('./assets/icon.png')}
+          style={styles.image1}
+        />
+      </Pressable>
+      <TouchableOpacity onPress={() => alert('TouchableOpacity Pressed!')}>
+        <Image
+          source={{ uri: 'https://reactnative.dev/img/tiny_logo.png' }}
+          style={styles.image2}
+        />
+      </TouchableOpacity>
+      <Button
+        title="Press Me"
+        onPress={() => alert('Button Pressed!')}
+      />
     </SafeAreaView>
   );
 }
@@ -28,22 +36,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  titleText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#333',
-    marginTop: 20,
+  image1: {
+    width: 200,
+    height: 200,
+    alignSelf: 'center',
+    marginTop: 20
   },
-  textStyle: {
-    fontSize: 16,
-    fontWeight: 'normal',
-    textAlign: 'justify',
-    color: '#333',
+  image2: {
+    width: 200,
+    height: 200,
+    alignSelf: 'center',
     marginTop: 20,
-  },
-  linkText: {
-    color: 'blue',
-    textDecorationLine: 'underline',
+    borderRadius: 100
   },
 });
