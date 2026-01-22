@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Image, Button } from 'react-native';
-import { TouchableOpacity, Pressable } from 'react-native';
+import { StyleSheet, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
@@ -11,22 +10,53 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
-      <Pressable onPress={handlePressablePress}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{alignItems: 'center'}}
+      >
         <Image
           source={require('./assets/icon.png')}
           style={styles.image1}
         />
-      </Pressable>
-      <TouchableOpacity onPress={() => alert('TouchableOpacity Pressed!')}>
         <Image
-          source={{ uri: 'https://reactnative.dev/img/tiny_logo.png' }}
-          style={styles.image2}
+          source={require('./assets/icon.png')}
+          style={styles.image1}
         />
-      </TouchableOpacity>
-      <Button
-        title="Press Me"
-        onPress={() => alert('Button Pressed!')}
-      />
+        <Image
+          source={require('./assets/icon.png')}
+          style={styles.image1}
+        />
+        <Image
+          source={require('./assets/icon.png')}
+          style={styles.image1}
+        />
+        <Image
+          source={require('./assets/icon.png')}
+          style={styles.image1}
+        />
+        <Image
+          source={require('./assets/icon.png')}
+          style={styles.image1}
+        />
+        <Image
+          source={require('./assets/icon.png')}
+          style={styles.image1}
+        />
+        <Image
+          source={require('./assets/icon.png')}
+          style={styles.image1}
+        />
+        <Image
+          source={require('./assets/icon.png')}
+          style={styles.image1}
+        />
+        <Image
+          source={require('./assets/icon.png')}
+          style={styles.image1}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -40,7 +70,7 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     alignSelf: 'center',
-    marginTop: 20
+    margin: 20
   },
   image2: {
     width: 200,
