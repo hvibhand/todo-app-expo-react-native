@@ -1,19 +1,20 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Platform} from 'react-native';
+import { StyleSheet, Text, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>This is {Platform.OS === "android" ? "Android" : "iOS"} Device</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <ActivityIndicator />
+      <ActivityIndicator size="large" color="#0000ff" />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Platform.OS === "android" ? "#f0f8ff" : "#fff",
+    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
