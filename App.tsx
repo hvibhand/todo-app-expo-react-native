@@ -3,18 +3,41 @@ import { StyleSheet, Text, View } from 'react-native';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+    // Flex
+    /*
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
+      <View style={{ flex: 2, backgroundColor: 'tomato' }}/>
+      <View style={{ flex: 1, backgroundColor: 'blue' }}/>
+      <View style={{ flex: 1, backgroundColor: 'gold' }}/>
+    </View>
+    */
+    
+    // Flex Direction - space evenly
+    /*
+    <View style={{ 
+      flex: 1, 
+      flexDirection: 'column', 
+      backgroundColor: 'white',
+      justifyContent: 'space-evenly',
+      alignItems: 'center'
+    }}>
+      <View style={{ width: 100, height: 100, backgroundColor: 'tomato' }}/>
+      <View style={{ width: 100, height: 100, backgroundColor: 'blue' }}/>
+      <View style={{ width: 100, height: 100, backgroundColor: 'gold' }}/>
+    </View>
+    */
+
+    // Flex Direction - space evenly
+    <View style={{ 
+      flex: 1, 
+      flexDirection: 'row', 
+      backgroundColor: 'white',
+      justifyContent: 'center',
+      alignItems: 'center'
+    }}>
+      <View style={{ width: 100, height: 100, backgroundColor: 'tomato' }}/>
+      <View style={{ width: 100, height: 100, backgroundColor: 'blue' }}/>
+      <View style={{ width: 100, height: 100, backgroundColor: 'gold' }}/>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
