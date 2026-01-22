@@ -27,7 +27,8 @@ export default function App() {
     </View>
     */
 
-    // Flex Direction - space evenly
+    // Flex Direction - row center
+    /*
     <View style={{ 
       flex: 1, 
       flexDirection: 'row', 
@@ -37,6 +38,23 @@ export default function App() {
     }}>
       <View style={{ width: 100, height: 100, backgroundColor: 'tomato' }}/>
       <View style={{ width: 100, height: 100, backgroundColor: 'blue' }}/>
+      <View style={{ width: 100, height: 100, backgroundColor: 'gold' }}/>
+    </View>
+    */
+
+    // Flex Wrap
+    <View style={{ 
+      flex: 1, 
+      flexDirection: 'row', 
+      backgroundColor: 'white',
+      justifyContent: 'center',
+      alignItems: 'center',
+      flexWrap: 'wrap'
+    }}>
+      <View style={{ width: 100, height: 100, backgroundColor: 'tomato' }}/>
+      <View style={{ width: 100, height: 100, backgroundColor: 'gray' }}/>
+      <View style={{ width: 100, height: 100, backgroundColor: 'blue' }}/>
+      <View style={{ width: 100, height: 100, backgroundColor: 'green' }}/>
       <View style={{ width: 100, height: 100, backgroundColor: 'gold' }}/>
     </View>
   );
