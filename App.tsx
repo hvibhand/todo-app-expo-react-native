@@ -1,28 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, Button, TextInput } from 'react-native';
-import { useState } from 'react';
+import { StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AppLogoImage from './src/components/AppLogoImage';
+import WelcomeText from './src/components/WelcomeText';
 
 export default function App() {
-
-  var [myName, setMyName] = useState("");
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
-      <TextInput 
-        placeholder="Enter your name here..." 
-        style={{ 
-            height: 40, 
-            borderColor: 'gray', 
-            borderWidth: 1, 
-            width: '80%', 
-            marginBottom: 20, 
-            paddingHorizontal: 10 
-          }}
-        editable
-        onChangeText={(text) => setMyName(text)}
-        />
-      <Text style={{ fontSize: 20, padding: 20 }}>My name is {myName}</Text>
+      <AppLogoImage />
+      <WelcomeText />
+      <Text style={styles.descriptionText}>The Best App You Can Use!</Text>
     </SafeAreaView>
   );
 }
@@ -33,5 +21,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  descriptionText: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#666',
   },
 });
