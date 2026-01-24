@@ -19,6 +19,11 @@ export const MainStackNavigator = () => {
                     fontWeight: 'bold',
                 },
             }}*/
+
+            screenOptions={{ 
+                headerShown: false 
+            }}
+            initialRouteName='Gold'
         >
             <Stack.Screen
                 name="Tomato"
