@@ -1,26 +1,29 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, Button, View } from 'react-native';
+import { StyleSheet, Text, Button, TextInput } from 'react-native';
 import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
 
-  var [counter, setCounter] = useState(0);
-  const handleCounterIncrease = () => {
-    // Increase counter logic here
-    setCounter(counter + 1);
-  }
-  const handleCounterDecrease = () => {
-    // Decrease counter logic here
-    setCounter(counter - 1);
-  }
+  var [myName, setMyName] = useState("");
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
-      <Button title="Increase" onPress={handleCounterIncrease} />
-      <Text style={{ fontSize: 50, padding: 20 }}>{counter}</Text>
-      <Button title="Decrease" onPress={handleCounterDecrease} />
-    </View>
+      <TextInput 
+        placeholder="Enter your name here..." 
+        style={{ 
+            height: 40, 
+            borderColor: 'gray', 
+            borderWidth: 1, 
+            width: '80%', 
+            marginBottom: 20, 
+            paddingHorizontal: 10 
+          }}
+        editable
+        onChangeText={(text) => setMyName(text)}
+        />
+      <Text style={{ fontSize: 20, padding: 20 }}>My name is {myName}</Text>
+    </SafeAreaView>
   );
 }
 
