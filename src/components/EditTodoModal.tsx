@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Modal, View, Text, TextInput, StyleSheet, Button } from "react-native";
+import { Modal, View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import type { Todo } from "../domain/entities/Todo";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type Props = {
   visible: boolean;
@@ -20,17 +21,34 @@ export default function EditTodoModal({ visible, todo, onSave, onCancel }: Props
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onCancel}>
       <View style={styles.overlay}>
         <View style={styles.container}>
-          <Text style={styles.heading}>Edit Todo</Text>
+          <View style={styles.header}>
+            <Text style={styles.heading}>Edit Todo</Text>
+            <TouchableOpacity onPress={onCancel} style={styles.closeBtn}>
+              <MaterialIcons name="close" size={22} color="#444" />
+            </TouchableOpacity>
+          </View>
+
           <TextInput
             value={title}
             onChangeText={setTitle}
             placeholder="Title"
             style={styles.input}
             testID="edit-input"
+            returnKeyType="done"
           />
-          <View style={styles.buttons}>
-            <Button title="Cancel" onPress={onCancel} />
-            <Button title="Save" onPress={() => todo && onSave(todo.id, title)} testID="save-edit" />
+
+          <View style={styles.footer}>
+            <TouchableOpacity onPress={onCancel} style={[styles.actionBtn, styles.cancelBtn]}>
+              <Text style={styles.cancelText}>Cancel</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => todo && onSave(todo.id, title)}
+              style={[styles.actionBtn, styles.saveBtn]}
+              testID="save-edit"
+            >
+              <MaterialIcons name="save" size={18} color="#fff" />
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -39,9 +57,71 @@ export default function EditTodoModal({ visible, todo, onSave, onCancel }: Props
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.4)" },
-  container: { width: "90%", backgroundColor: "#fff", padding: 16, borderRadius: 8 },
-  heading: { fontSize: 18, fontWeight: "600", marginBottom: 8 },
-  input: { borderWidth: 1, borderColor: "#ddd", padding: 8, borderRadius: 4, marginBottom: 12 },
-  buttons: { flexDirection: "row", justifyContent: "space-between" }
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  container: {
+    width: "90%",
+    backgroundColor: "#fff",
+    padding: 18,
+    borderRadius: 12,
+    // shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 6
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12
+  },
+  heading: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#222"
+  },
+  closeBtn: {
+    padding: 6,
+    borderRadius: 8
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 15,
+    backgroundColor: "#FAFAFA"
+  },
+  footer: {
+    marginTop: 14,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 8
+  },
+  actionBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  cancelBtn: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    marginRight: 8
+  },
+  cancelText: {
+    color: "#444",
+    fontWeight: "600"
+  },
+  saveBtn: {
+    backgroundColor: "#1976D2"
+  }
 });
