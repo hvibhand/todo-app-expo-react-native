@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import { View, Text, ActivityIndicator, StyleSheet, TextInput, Button } from "react-native";
 import TodoList from "../../components/TodoList";
 import EditTodoModal from "../../components/EditTodoModal";
-import { InMemoryTodoRepository } from "../../data/repositories/InMemoryTodoRepository";
+import { ApiTodoRepository } from "../../data/repositories/ApiTodoRepository";
 import { GetTodosUseCase } from "../../domain/usecases/GetTodosUseCase";
 import { CreateTodoUseCase } from "../../domain/usecases/CreateTodoUseCase";
 import { UpdateTodoUseCase } from "../../domain/usecases/UpdateTodoUseCase";
 import { DeleteTodoUseCase } from "../../domain/usecases/DeleteTodoUseCase";
 import { useHomeViewModel } from "../viewmodels/HomeViewModel";
 
-const repo = new InMemoryTodoRepository();
+// instantiate API repo and use-cases
+const repo = new ApiTodoRepository();
 const getUseCase = new GetTodosUseCase(repo as any);
 const createUseCase = new CreateTodoUseCase(repo as any);
 const updateUseCase = new UpdateTodoUseCase(repo as any);
