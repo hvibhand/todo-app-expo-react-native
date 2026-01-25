@@ -9,7 +9,8 @@ const Stack = createStackNavigator();
 export const MainStackNavigator = () => {
     return (
         <Stack.Navigator
-            /*screenOptions={{
+            /*
+            screenOptions={{
                 headerShown: true,
                 headerStyle: {
                     backgroundColor: '#f4511e',
@@ -18,12 +19,13 @@ export const MainStackNavigator = () => {
                 headerTitleStyle: {
                     fontWeight: 'bold',
                 },
-            }}*/
+            }}
+            */
 
             screenOptions={{ 
                 headerShown: false 
             }}
-            initialRouteName='Gold'
+            initialRouteName='Tomato'
         >
             <Stack.Screen
                 name="Tomato"

@@ -15,10 +15,22 @@ const TomatoScreen = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.text}>Tomato Screen</Text>
-            <Button 
-                title="Go to Gold Screen" 
-                onPress={() => navigation.navigate("Gold")} 
-            />
+            <View style={styles.button}>
+                <Button 
+                    title="Go to Gold Screen" 
+                    onPress={() => navigation.navigate("Gold")} 
+                />
+            </View>
+            
+            <Text 
+                style={styles.description}
+                onPress={() => navigation.navigate("Gold", {name: "Harshal Vibhandik"})} 
+            >Name: Harshal Vibhandik</Text>
+            
+            <Text 
+                style={styles.description}
+                onPress={() => navigation.navigate("Gold", {name: "Priyanka Vibhandik"})} 
+            >Name: Priyanka Vibhandik</Text>
         </View>
     );
 };
@@ -30,10 +42,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    button: {
+        marginTop: 20,
+    },
     text: {
         fontSize: 32,
         fontWeight: 'bold',
         color: '#000',
+    },
+    description: {
+        fontSize: 20,
+        color: '#000',
+        marginTop: 20,
     },
 });
 
