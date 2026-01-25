@@ -1,4 +1,4 @@
-# Expo + TypeScript + MVVM (Clean Architecture) Starter
+# Expo + TypeScript + MVVM (Clean Architecture)
 
 ### Overview
 - Expo-managed TypeScript starter
