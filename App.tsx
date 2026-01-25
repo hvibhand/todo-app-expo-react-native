@@ -1,16 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet } from 'react-native';
 import { useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { MainStackNavigator } from './src/nacigation/MainStackNavigator';
 import { NavigationContainer } from '@react-navigation/native';
+import MyTabs from './src/nacigation/BottomTabs';
 
 export default function App() {
 
   var [myName, setMyName] = useState("");
   return (
     <NavigationContainer>
-      <MainStackNavigator />
+      <MyTabs />
     </NavigationContainer>
   );
 }
