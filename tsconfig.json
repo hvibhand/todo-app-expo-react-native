@@ -1,6 +1,40 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
-  }
+    /* Language & module */
+    "target": "ES2021",
+    "module": "ESNext",
+    "moduleResolution": "node",
+
+    /* React / JSX */
+    "jsx": "react-jsx",
+
+    /* Type safety & interop */
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+
+    /* Libs available in RN + Web dev */
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
+
+    /* Paths / aliases */
+    "baseUrl": "./",
+    "paths": {
+      "@app/*": ["src/*"]
+    },
+
+    /* Make Jest & Node globals available in tests */
+    "types": ["jest", "node"]
+  },
+  "include": [
+    "src",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ],
+  "exclude": ["node_modules", "babel.config.js", "metro.config.js", "e2e"]
 }
