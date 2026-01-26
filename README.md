@@ -23,8 +23,7 @@ development using Clean Architecture and MVVM pattern.
 - **Language**: [TypeScript](https://www.typescript.org/)
 - **Navigation**: [React Navigation](https://reactnavigation.org/)
 - **Icons**: [Expo Vector Icons](https://docs.expo.dev/guides/icons/)
-- **Testing
-  **: [Jest](https://jestjs.io/) + [@testing-library/react-native](https://testing-library.com/docs/react-native-testing-library/intro/)
+- **Testing**: [Jest](https://jestjs.io/) + [@testing-library/react-native](https://testing-library.com/docs/react-native-testing-library/intro/)
 - **E2E Testing**: [Detox](https://wix.github.io/Detox/)
 
 ## 📁 Project Structure
