@@ -1,24 +1,15 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet } from 'react-native';
-import { useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import MyTabs from './src/nacigation/BottomTabs';
+import { NavigationContainer } from "@react-navigation/native";
+import MyTabs from "./src/navigation/BottomTabs";
+import { Provider } from "react-redux";
+import { store } from "./src/store/store";
+import React from "react";
 
 export default function App() {
-
-  var [myName, setMyName] = useState("");
   return (
-    <NavigationContainer>
-      <MyTabs />
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <MyTabs />
+      </NavigationContainer>
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
