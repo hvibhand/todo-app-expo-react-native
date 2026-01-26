@@ -23,7 +23,8 @@ development using a Clean Architecture and MVVM pattern.
 - **Language**: [TypeScript](https://www.typescript.org/)
 - **Navigation**: [React Navigation](https://reactnavigation.org/)
 - **Icons**: [Expo Vector Icons](https://docs.expo.dev/guides/icons/)
-- **Testing**: [Jest](https://jestjs.io/) + [@testing-library/react-native](https://testing-library.com/docs/react-native-testing-library/intro/)
+- **Testing
+  **: [Jest](https://jestjs.io/) + [@testing-library/react-native](https://testing-library.com/docs/react-native-testing-library/intro/)
 - **E2E Testing**: [Detox](https://wix.github.io/Detox/)
 
 ## 📁 Project Structure
@@ -103,7 +104,7 @@ maintainable and testable codebase.
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/hvibhand/todo-app-expo-react-native.git
    cd todo-app-expo-react-native
    ```
 
@@ -112,9 +113,9 @@ maintainable and testable codebase.
    npm install
    ```
 
-3. **Start the development server**
+3. **Start the expo server**
    ```bash
-   npm start
+   npx expo start
    ```
 
 4. **Run on device/simulator**
@@ -161,10 +162,9 @@ and [Expo documentation](https://docs.expo.dev/workflow/prebuild/) for detailed 
 
 ## 📸 Screenshots
 
-| List & Search Todo                          | Add & Edit Todo                         |
-|---------------------------------------------|-----------------------------------------|
-| ![Todo List](screenshots/List_Todo.jpg)     | ![Todo Add](screenshots/Add_Todo.jpg)   |
-| ![Todo Search](screenshots/Search_Todo.jpg) | ![Todo Edit](screenshots/Edit_Todo.jpg) |
+| Todo List                               | Search Todo                                 | Add Todo                              | Edit Todo                               |
+|-----------------------------------------|---------------------------------------------|---------------------------------------|-----------------------------------------|
+| ![Todo List](screenshots/List_Todo.jpg) | ![Todo Search](screenshots/Search_Todo.jpg) | ![Todo Add](screenshots/Add_Todo.jpg) | ![Todo Edit](screenshots/Edit_Todo.jpg) |
 
 ## 📚 Learning Resources
 
