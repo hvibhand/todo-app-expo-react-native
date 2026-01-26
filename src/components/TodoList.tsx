@@ -2,7 +2,7 @@ import React from "react";
 import {FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import type {Todo} from "../domain/entities/Todo";
 import {Feather, MaterialIcons} from "@expo/vector-icons";
-import {s} from "react-native-size-matters";
+import {ms, s, vs} from "react-native-size-matters";
 
 type Props = {
   todos: Todo[];
@@ -50,19 +50,20 @@ export default function TodoList({todos, onToggle, onEdit, onDelete}: Props) {
 
 const styles = StyleSheet.create({
   listContainer: {
-    paddingBottom: s(64),
+    paddingBottom: vs(64),
   },
   card: {
     backgroundColor: "#fff",
     borderRadius: s(12),
-    padding: s(8),
+    paddingHorizontal: s(8),
+    paddingVertical: vs(8),
     marginHorizontal: s(4),
-    marginVertical: s(6),
+    marginVertical: vs(6),
     flexDirection: "row",
     alignItems: "center",
     // shadow (iOS)
     shadowColor: "#000",
-    shadowOffset: {width: s(0), height: s(2)},
+    shadowOffset: {width: s(0), height: vs(2)},
     shadowOpacity: 0.08,
     shadowRadius: s(6),
     // elevation (Android)
@@ -77,19 +78,19 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   title: {
-    fontSize: s(16),
+    fontSize: ms(16),
     fontWeight: "600",
     color: "#222",
     flex: 1,
     marginRight: s(8)
   },
   dateText: {
-    fontSize: s(12),
+    fontSize: ms(12),
     color: "#888"
   },
   subtitle: {
-    marginTop: s(6),
-    fontSize: s(13),
+    marginTop: vs(6),
+    fontSize: ms(13),
     color: "#666"
   },
   done: {
@@ -102,7 +103,8 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   iconBtn: {
-    padding: s(8),
+    paddingHorizontal: s(8),
+    paddingVertical: vs(8),
     marginLeft: s(6),
     borderRadius: s(8)
   }

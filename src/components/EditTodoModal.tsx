@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Modal, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import type {Todo} from "../domain/entities/Todo";
 import {MaterialIcons} from "@expo/vector-icons";
-import {s} from "react-native-size-matters";
+import {ms, s, vs} from "react-native-size-matters";
 
 type Props = {
   visible: boolean;
@@ -77,11 +77,12 @@ const styles = StyleSheet.create({
   container: {
     width: "90%",
     backgroundColor: "#fff",
-    padding: s(18),
+    paddingHorizontal: s(18),
+    paddingVertical: vs(18),
     borderRadius: s(12),
     // shadow
     shadowColor: "#000",
-    shadowOffset: {width: s(0), height: s(4)},
+    shadowOffset: {width: s(0), height: vs(4)},
     shadowOpacity: 0.12,
     shadowRadius: s(8),
     elevation: 6
@@ -90,34 +91,36 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: s(12)
+    marginBottom: vs(12)
   },
   heading: {
-    fontSize: s(18),
+    fontSize: ms(18),
     fontWeight: "700",
     color: "#222"
   },
   closeBtn: {
-    padding: s(6),
+    paddingHorizontal: s(6),
+    paddingVertical: vs(6),
     borderRadius: s(8)
   },
   input: {
     borderWidth: s(1),
     borderColor: "#E0E0E0",
     borderRadius: s(10),
-    padding: s(12),
-    fontSize: s(15),
+    paddingHorizontal: s(12),
+    paddingVertical: vs(12),
+    fontSize: ms(15),
     backgroundColor: "#FAFAFA"
   },
   footer: {
-    marginTop: s(14),
+    marginTop: vs(14),
     flexDirection: "row",
     justifyContent: "flex-end",
-    gap: s(8)
+    gap: vs(8)
   },
   actionBtn: {
-    paddingVertical: s(10),
     paddingHorizontal: s(14),
+    paddingVertical: vs(10),
     borderRadius: s(10),
     alignItems: "center",
     justifyContent: "center"
@@ -131,7 +134,7 @@ const styles = StyleSheet.create({
   cancelText: {
     color: "#444",
     fontWeight: "600",
-    fontSize: s(15)
+    fontSize: ms(15)
   },
   saveBtn: {
     backgroundColor: "#1976D2"
