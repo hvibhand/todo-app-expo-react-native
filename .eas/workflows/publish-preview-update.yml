@@ -1,0 +1,15 @@
+name: Publish Preview Update
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish_preview_update:
+    name: Publish Preview Update
+    type: update
+    params:
+      branch: ${{ github.ref_name }}
+      message: "Preview update from EAS Workflow"
+      platform: all
