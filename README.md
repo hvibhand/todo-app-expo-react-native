@@ -4,7 +4,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescript.org/)
 [![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
 
-A modern, well-structured Todo application built with React Native and Expo, demonstrating best practices in mobile app development using Clean Architecture and MVVM pattern.
+A modern, well-structured Todo application built with React Native and Expo, demonstrating best practices in mobile app
+development using Clean Architecture and MVVM pattern.
 
 ## ✨ Features
 
@@ -22,7 +23,8 @@ A modern, well-structured Todo application built with React Native and Expo, dem
 - **Language**: [TypeScript](https://www.typescript.org/)
 - **Navigation**: [React Navigation](https://reactnavigation.org/)
 - **Icons**: [Expo Vector Icons](https://docs.expo.dev/guides/icons/)
-- **Testing**: [Jest](https://jestjs.io/) + [@testing-library/react-native](https://testing-library.com/docs/react-native-testing-library/intro/)
+- **Testing
+  **: [Jest](https://jestjs.io/) + [@testing-library/react-native](https://testing-library.com/docs/react-native-testing-library/intro/)
 - **E2E Testing**: [Detox](https://wix.github.io/Detox/)
 
 ## 📁 Project Structure
@@ -51,28 +53,29 @@ todo-app-expo-react-native/
 
 ## 🏛️ Architecture Overview
 
-This project follows **Clean Architecture** principles and **MVVM (Model-View-ViewModel)** pattern to create a maintainable and testable codebase.
+This project follows **Clean Architecture** principles and **MVVM (Model-View-ViewModel)** pattern to create a
+maintainable and testable codebase.
 
 ### Clean Architecture Layers
 
 1. **Domain Layer** (`src/domain/`)
-   - Contains business logic independent of any framework
-   - **Entities**: Core business objects (e.g., `Todo`)
-   - **Use Cases**: Application-specific business rules (e.g., `CreateTodoUseCase`)
+    - Contains business logic independent of any framework
+    - **Entities**: Core business objects (e.g., `Todo`)
+    - **Use Cases**: Application-specific business rules (e.g., `CreateTodoUseCase`)
 
 2. **Data Layer** (`src/data/`)
-   - Implements data access logic
-   - **Repositories**: Abstract data operations (e.g., `ITodoRepository`)
-   - Handles API calls, local storage, etc.
+    - Implements data access logic
+    - **Repositories**: Abstract data operations (e.g., `ITodoRepository`)
+    - Handles API calls, local storage, etc.
 
 3. **Presentation Layer** (`src/presentation/`)
-   - UI-related code
-   - **Screens**: Main UI components
-   - **Components**: Reusable UI pieces
-   - **ViewModels**: Bridge between UI and business logic
+    - UI-related code
+    - **Screens**: Main UI components
+    - **Components**: Reusable UI pieces
+    - **ViewModels**: Bridge between UI and business logic
 
 4. **Services Layer** (`src/services/`)
-   - External integrations (API clients, utilities)
+    - External integrations (API clients, utilities)
 
 ### MVVM Pattern
 
@@ -116,20 +119,22 @@ This project follows **Clean Architecture** principles and **MVVM (Model-View-Vi
    ```
 
 4. **Run on device/simulator**
-   - Press `i` for iOS simulator
-   - Press `a` for Android emulator
-   - Scan QR code with Expo Go app on physical device
+    - Press `i` for iOS simulator
+    - Press `a` for Android emulator
+    - Scan QR code with Expo Go app on physical device
 
 ## 🧪 Testing
 
 ### Unit & UI Tests
 
 Run all tests:
+
 ```bash
 npm test
 ```
 
 Run tests in watch mode:
+
 ```bash
 npm run test:watch
 ```
@@ -139,25 +144,28 @@ npm run test:watch
 E2E testing requires a native build. For Expo managed projects, you need to use `expo prebuild` or EAS Build.
 
 #### iOS (macOS only)
+
 ```bash
 npm run e2e:build:ios
 npm run e2e:test:ios
 ```
 
 #### Android
+
 ```bash
 npm run e2e:build:android
 npm run e2e:test:android
 ```
 
-**Note**: See [Detox documentation](https://wix.github.io/Detox/) and [Expo documentation](https://docs.expo.dev/workflow/prebuild/) for detailed setup instructions.
+**Note**: See [Detox documentation](https://wix.github.io/Detox/)
+and [Expo documentation](https://docs.expo.dev/workflow/prebuild/) for detailed setup instructions.
 
 ## 📸 Screenshots
 
-| Todo List | Add/Edit Todo |
-|-----------|---------------|
-| ![Todo List](screenshots/Todo_List.jpg) | ![Todo Add](screenshots/Todo_Add.jpg) |
-| ![Todo Search](screenshots/Todo_Search.jpg) | ![Todo Edit](screenshots/Todo_Edit.jpg) |
+| List & Search Todo                          | Add & Edit Todo                         |
+|---------------------------------------------|-----------------------------------------|
+| ![Todo List](screenshots/List_Todo.jpg)     | ![Todo Add](screenshots/Add_Todo.jpg)   |
+| ![Todo Search](screenshots/Search_Todo.jpg) | ![Todo Edit](screenshots/Edit_Todo.jpg) |
 
 ## 📚 Learning Resources
 
