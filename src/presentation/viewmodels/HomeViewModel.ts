@@ -1,9 +1,9 @@
-import { useEffect, useState, useCallback } from "react";
-import type { Todo } from "../../domain/entities/Todo";
-import type { GetTodosUseCase } from "../../domain/usecases/GetTodosUseCase";
-import type { CreateTodoUseCase } from "../../domain/usecases/CreateTodoUseCase";
-import type { UpdateTodoUseCase } from "../../domain/usecases/UpdateTodoUseCase";
-import type { DeleteTodoUseCase } from "../../domain/usecases/DeleteTodoUseCase";
+import {useCallback, useEffect, useState} from "react";
+import type {Todo} from "@app/domain/entities/Todo";
+import type {GetTodosUseCase} from "@app/domain/usecases/GetTodosUseCase";
+import type {CreateTodoUseCase} from "@app/domain/usecases/CreateTodoUseCase";
+import type {UpdateTodoUseCase} from "@app/domain/usecases/UpdateTodoUseCase";
+import type {DeleteTodoUseCase} from "@app/domain/usecases/DeleteTodoUseCase";
 
 /**
  * ViewModel implemented as a hook.
@@ -17,7 +17,7 @@ type Deps = {
 };
 
 export function useHomeViewModel(deps: Deps) {
-  const { getTodosUseCase, createTodoUseCase, updateTodoUseCase, deleteTodoUseCase } = deps;
+  const {getTodosUseCase, createTodoUseCase, updateTodoUseCase, deleteTodoUseCase} = deps;
 
   const [loading, setLoading] = useState<boolean>(true);
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -54,7 +54,7 @@ export function useHomeViewModel(deps: Deps) {
       try {
         const todo = todos.find((t) => t.id === id);
         if (!todo) throw new Error("Not found");
-        const updated = await updateTodoUseCase.execute({ ...todo, title });
+        const updated = await updateTodoUseCase.execute({...todo, title});
         setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
       } catch (err: any) {
         setError(err?.message ?? "Update failed");
@@ -82,10 +82,10 @@ export function useHomeViewModel(deps: Deps) {
     async (id: string) => {
       try {
         // optimistic toggle locally
-        setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)));
+        setTodos((prev) => prev.map((t) => (t.id === id ? {...t, completed: !t.completed} : t)));
         const todo = todos.find((t) => t.id === id);
         if (!todo) throw new Error("Not found");
-        await updateTodoUseCase.execute({ ...todo, completed: !todo.completed });
+        await updateTodoUseCase.execute({...todo, completed: !todo.completed});
       } catch {
         // on failure reload
         await load();
@@ -98,5 +98,5 @@ export function useHomeViewModel(deps: Deps) {
     load();
   }, [load]);
 
-  return { todos, loading, error, reload: load, add, edit, remove, toggle };
+  return {todos, loading, error, reload: load, add, edit, remove, toggle};
 }

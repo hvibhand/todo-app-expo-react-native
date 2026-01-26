@@ -5,7 +5,7 @@
 [![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
 
 A modern, well-structured Todo application built with React Native and Expo, demonstrating best practices in mobile app
-development using Clean Architecture and MVVM pattern.
+development using a Clean Architecture and MVVM pattern.
 
 ## ✨ Features
 
@@ -13,7 +13,7 @@ development using Clean Architecture and MVVM pattern.
 - 🔍 Search todos by title
 - 📱 Responsive UI with Material Design icons
 - 🧪 Comprehensive testing (Unit, UI, E2E)
-- 🏗️ Clean Architecture with MVVM pattern
+- 🏗️ Clean Architecture with an MVVM pattern
 - 📦 TypeScript for type safety
 - 🚀 Expo for easy development and deployment
 
@@ -23,8 +23,7 @@ development using Clean Architecture and MVVM pattern.
 - **Language**: [TypeScript](https://www.typescript.org/)
 - **Navigation**: [React Navigation](https://reactnavigation.org/)
 - **Icons**: [Expo Vector Icons](https://docs.expo.dev/guides/icons/)
-- **Testing
-  **: [Jest](https://jestjs.io/) + [@testing-library/react-native](https://testing-library.com/docs/react-native-testing-library/intro/)
+- **Testing**: [Jest](https://jestjs.io/) + [@testing-library/react-native](https://testing-library.com/docs/react-native-testing-library/intro/)
 - **E2E Testing**: [Detox](https://wix.github.io/Detox/)
 
 ## 📁 Project Structure
@@ -121,7 +120,7 @@ maintainable and testable codebase.
 4. **Run on device/simulator**
     - Press `i` for iOS simulator
     - Press `a` for Android emulator
-    - Scan QR code with Expo Go app on physical device
+    - Scan QR code with Expo Go app on a physical device
 
 ## 🧪 Testing
 
@@ -196,7 +195,7 @@ This project is perfect for beginners learning:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
 
 ---
 
