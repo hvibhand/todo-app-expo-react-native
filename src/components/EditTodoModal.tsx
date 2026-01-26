@@ -5,24 +5,34 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 type Props = {
   visible: boolean;
+  mode: 'add' | 'edit';
   todo?: Todo | null;
-  onSave: (id: string, title: string) => void;
+  onSaveAdd?: (title: string) => void;
+  onSaveEdit?: (id: string, title: string) => void;
   onCancel: () => void;
 };
 
-export default function EditTodoModal({ visible, todo, onSave, onCancel }: Props) {
+export default function EditTodoModal({ visible, mode, todo, onSaveAdd, onSaveEdit, onCancel }: Props) {
   const [title, setTitle] = useState<string>("");
 
   useEffect(() => {
     setTitle(todo?.title ?? "");
   }, [todo]);
 
+  const handleSave = () => {
+    if (mode === 'add') {
+      onSaveAdd?.(title);
+    } else {
+      onSaveEdit?.(todo!.id, title);
+    }
+  };
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onCancel}>
       <View style={styles.overlay}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.heading}>Edit Todo</Text>
+            <Text style={styles.heading}>{mode === 'add' ? 'Add Todo' : 'Edit Todo'}</Text>
             <TouchableOpacity onPress={onCancel} style={styles.closeBtn}>
               <MaterialIcons name="close" size={22} color="#444" />
             </TouchableOpacity>
@@ -43,7 +53,7 @@ export default function EditTodoModal({ visible, todo, onSave, onCancel }: Props
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => todo && onSave(todo.id, title)}
+              onPress={handleSave}
               style={[styles.actionBtn, styles.saveBtn]}
               testID="save-edit"
             >

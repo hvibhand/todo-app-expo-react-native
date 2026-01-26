@@ -49,14 +49,14 @@ export default function TodoList({ todos, onToggle, onEdit, onDelete }: Props) {
 
 const styles = StyleSheet.create({
   listContainer: {
-    paddingBottom: 16
+    paddingBottom: 64,
   },
   card: {
     backgroundColor: "#fff",
     borderRadius: 12,
     padding: 8,
     marginHorizontal: 4,
-    marginBottom: 12,
+    marginVertical: 6,
     flexDirection: "row",
     alignItems: "center",
     // shadow (iOS)
