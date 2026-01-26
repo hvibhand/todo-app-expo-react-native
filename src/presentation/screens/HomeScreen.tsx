@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, ActivityIndicator, StyleSheet, TextInput, TouchableOpacity, Platform } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TodoList from "../../components/TodoList";
 import EditTodoModal from "../../components/EditTodoModal";
@@ -49,14 +49,14 @@ export default function HomeScreen() {
 
   const handleAdd = async (title: string) => {
     if (!title.trim()) return;
-    await vm.add(title);
     setModalVisible(false);
+    await vm.add(title);
   };
 
   const handleSaveEdit = async (id: string, title: string) => {
     if (!title.trim()) return;
-    await vm.edit(id, title);
     setModalVisible(false);
+    await vm.edit(id, title);
   };
 
   const filteredTodos = searchQuery
