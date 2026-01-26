@@ -21,14 +21,16 @@ jobs:
   submit_android:
     name: Submit Android
     type: submit
-    needs: build_android
+    needs:
+      - build_android
     params:
       platform: android
       profile: production
   submit_ios:
     name: Submit iOS
     type: submit
-    needs: build_ios
+    needs:
+      - build_ios
     params:
       platform: ios
       profile: production
