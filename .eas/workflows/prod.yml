@@ -1,0 +1,15 @@
+name: Production Build
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    steps:
+      - checkout
+      - run: npm ci
+      - run: eas build --profile production --platform all --non-interactive
