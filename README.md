@@ -156,7 +156,8 @@ npm run e2e:test:android
 
 | Todo List | Add/Edit Todo |
 |-----------|---------------|
-| ![Todo List](screenshots/TODO_List.jpg) | ![Todo Edit](screenshots/TODO_Edit.jpg) |
+| ![Todo List](screenshots/Todo_List.jpg) | ![Todo Add](screenshots/Todo_Add.jpg) |
+| ![Todo Search](screenshots/Todo_Search.jpg) | ![Todo Edit](screenshots/Todo_Edit.jpg) |
 
 ## 📚 Learning Resources
 
