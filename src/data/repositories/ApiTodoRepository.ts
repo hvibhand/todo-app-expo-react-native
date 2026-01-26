@@ -1,6 +1,6 @@
-import { apiClient } from "../../services/api";
-import type { ITodoRepository } from "./ITodoRepository";
-import type { Todo } from "../../domain/entities/Todo";
+import {apiClient} from "@app/services/api";
+import type {ITodoRepository} from "./ITodoRepository";
+import type {Todo} from "@app/domain/entities/Todo";
 
 export class ApiTodoRepository implements ITodoRepository {
   // GET /todos
@@ -65,12 +65,12 @@ export class ApiTodoRepository implements ITodoRepository {
     }
   }
 
-  // Toggle uses GET + PUT (to know current completed state)
+  // Toggle uses GET + PUT (to know the current completed state)
   async toggleTodo(id: string): Promise<Todo> {
     try {
       const getRes = await apiClient.get(`/todos/${id}`);
       const current = getRes.data;
-      const updated = { ...current, completed: !current.completed };
+      const updated = {...current, completed: !current.completed};
       const res = await apiClient.put(`/todos/${id}`, updated);
       return {
         id: String(res.data.id),

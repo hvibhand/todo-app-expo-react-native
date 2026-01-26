@@ -1,23 +1,23 @@
-import { GetTodosUseCase } from "../../domain/usecases/GetTodosUseCase";
-import { CreateTodoUseCase } from "../../domain/usecases/CreateTodoUseCase";
-import { UpdateTodoUseCase } from "../../domain/usecases/UpdateTodoUseCase";
-import { DeleteTodoUseCase } from "../../domain/usecases/DeleteTodoUseCase";
-import { useHomeViewModel } from "../../presentation/viewmodels/HomeViewModel";
-import { renderHook, waitFor } from "@testing-library/react-native";
-import { act } from "react-test-renderer"; // React 19-compatible act
-import type { Todo } from "../../domain/entities/Todo";
+import {GetTodosUseCase} from "@app/domain/usecases/GetTodosUseCase";
+import {CreateTodoUseCase} from "@app/domain/usecases/CreateTodoUseCase";
+import {UpdateTodoUseCase} from "@app/domain/usecases/UpdateTodoUseCase";
+import {DeleteTodoUseCase} from "@app/domain/usecases/DeleteTodoUseCase";
+import {useHomeViewModel} from "@app/presentation/viewmodels/HomeViewModel";
+import {renderHook, waitFor} from "@testing-library/react-native";
+import {act} from "react-test-renderer"; // React 19-compatible act
+import type {Todo} from "@app/domain/entities/Todo";
 
 const mockTodos: Todo[] = [
-  { id: "1", title: "t1", completed: false },
-  { id: "2", title: "t2", completed: true }
+  {id: "1", title: "t1", completed: false},
+  {id: "2", title: "t2", completed: true}
 ];
 
 describe("HomeViewModel CRUD", () => {
   it("loads, creates, updates and deletes", async () => {
     const repo = {
       getTodos: jest.fn().mockResolvedValue(mockTodos.slice()),
-      createTodo: jest.fn().mockImplementation(async (title: string) => ({ id: "3", title, completed: false })),
-      updateTodo: jest.fn().mockImplementation(async (todo: Todo) => ({ ...todo })),
+      createTodo: jest.fn().mockImplementation(async (title: string) => ({id: "3", title, completed: false})),
+      updateTodo: jest.fn().mockImplementation(async (todo: Todo) => ({...todo})),
       deleteTodo: jest.fn().mockResolvedValue(undefined)
     } as any;
 
@@ -26,7 +26,7 @@ describe("HomeViewModel CRUD", () => {
     const updateUseCase = new UpdateTodoUseCase(repo);
     const deleteUseCase = new DeleteTodoUseCase(repo);
 
-    const { result } = renderHook(() =>
+    const {result} = renderHook(() =>
       useHomeViewModel({
         getTodosUseCase: getUseCase,
         createTodoUseCase: createUseCase,
@@ -38,7 +38,7 @@ describe("HomeViewModel CRUD", () => {
     // Initial state: loading true
     expect(result.current.loading).toBe(true);
 
-    // Wait for load to complete
+    // Wait for a load to complete
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     expect(repo.getTodos).toHaveBeenCalled();
@@ -79,7 +79,7 @@ describe("HomeViewModel CRUD", () => {
     const updateUseCase = new UpdateTodoUseCase(repo);
     const deleteUseCase = new DeleteTodoUseCase(repo);
 
-    const { result } = renderHook(() =>
+    const {result} = renderHook(() =>
       useHomeViewModel({
         getTodosUseCase: getUseCase,
         createTodoUseCase: createUseCase,
@@ -105,7 +105,7 @@ describe("HomeViewModel CRUD", () => {
     const updateUseCase = new UpdateTodoUseCase(repo);
     const deleteUseCase = new DeleteTodoUseCase(repo);
 
-    const { result } = renderHook(() =>
+    const {result} = renderHook(() =>
       useHomeViewModel({
         getTodosUseCase: getUseCase,
         createTodoUseCase: createUseCase,
@@ -126,7 +126,7 @@ describe("HomeViewModel CRUD", () => {
     const repo = {
       getTodos: jest.fn().mockResolvedValue(mockTodos.slice()),
       createTodo: jest.fn(),
-      updateTodo: jest.fn().mockImplementation(async (todo: Todo) => ({ ...todo })),
+      updateTodo: jest.fn().mockImplementation(async (todo: Todo) => ({...todo})),
       deleteTodo: jest.fn()
     } as any;
 
@@ -135,7 +135,7 @@ describe("HomeViewModel CRUD", () => {
     const updateUseCase = new UpdateTodoUseCase(repo);
     const deleteUseCase = new DeleteTodoUseCase(repo);
 
-    const { result } = renderHook(() =>
+    const {result} = renderHook(() =>
       useHomeViewModel({
         getTodosUseCase: getUseCase,
         createTodoUseCase: createUseCase,

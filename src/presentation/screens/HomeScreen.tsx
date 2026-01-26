@@ -1,15 +1,15 @@
-import React, { useState } from "react";
-import { View, Text, ActivityIndicator, StyleSheet, TextInput, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React, {useState} from "react";
+import {ActivityIndicator, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {SafeAreaView} from "react-native-safe-area-context";
 import TodoList from "../../components/TodoList";
 import EditTodoModal from "../../components/EditTodoModal";
-import { ApiTodoRepository } from "../../data/repositories/ApiTodoRepository";
-import { GetTodosUseCase } from "../../domain/usecases/GetTodosUseCase";
-import { CreateTodoUseCase } from "../../domain/usecases/CreateTodoUseCase";
-import { UpdateTodoUseCase } from "../../domain/usecases/UpdateTodoUseCase";
-import { DeleteTodoUseCase } from "../../domain/usecases/DeleteTodoUseCase";
-import { useHomeViewModel } from "../viewmodels/HomeViewModel";
-import { MaterialIcons } from "@expo/vector-icons";
+import {ApiTodoRepository} from "@app/data/repositories/ApiTodoRepository";
+import {GetTodosUseCase} from "@app/domain/usecases/GetTodosUseCase";
+import {CreateTodoUseCase} from "@app/domain/usecases/CreateTodoUseCase";
+import {UpdateTodoUseCase} from "@app/domain/usecases/UpdateTodoUseCase";
+import {DeleteTodoUseCase} from "@app/domain/usecases/DeleteTodoUseCase";
+import {useHomeViewModel} from "../viewmodels/HomeViewModel";
+import {MaterialIcons} from "@expo/vector-icons";
 
 const repo = new ApiTodoRepository();
 const getUseCase = new GetTodosUseCase(repo as any);
@@ -70,7 +70,7 @@ export default function HomeScreen() {
           <>
             <Text style={styles.title}>Todos</Text>
             <TouchableOpacity onPress={() => setSearchVisible(true)} testID="search-btn">
-              <MaterialIcons name="search" size={24} color="#1976D2" />
+              <MaterialIcons name="search" size={24} color="#1976D2"/>
             </TouchableOpacity>
           </>
         ) : (
@@ -83,8 +83,11 @@ export default function HomeScreen() {
               autoFocus
               testID="search-input"
             />
-            <TouchableOpacity onPress={() => { setSearchVisible(false); setSearchQuery(""); }} testID="close-search">
-              <MaterialIcons name="close" size={24} color="#1976D2" />
+            <TouchableOpacity onPress={() => {
+              setSearchVisible(false);
+              setSearchQuery("");
+            }} testID="close-search">
+              <MaterialIcons name="close" size={24} color="#1976D2"/>
             </TouchableOpacity>
           </>
         )}
@@ -92,13 +95,13 @@ export default function HomeScreen() {
 
       <View style={styles.content}>
         {vm.loading ? (
-          <ActivityIndicator size="large" style={{ marginTop: 32 }} />
+          <ActivityIndicator size="large" style={{marginTop: 32}}/>
         ) : vm.error ? (
           <Text testID="error-text" style={styles.errorText}>
             Error: {vm.error}
           </Text>
         ) : (
-          <TodoList todos={filteredTodos} onToggle={vm.toggle} onEdit={startEdit} onDelete={vm.remove} />
+          <TodoList todos={filteredTodos} onToggle={vm.toggle} onEdit={startEdit} onDelete={vm.remove}/>
         )}
       </View>
 
@@ -111,15 +114,15 @@ export default function HomeScreen() {
         onCancel={() => setModalVisible(false)}
       />
 
-      <TouchableOpacity style={styles.fab} onPress={ startAdd } testID="add-fab">
-        <MaterialIcons name="add" size={24} color="#fff" />
+      <TouchableOpacity style={styles.fab} onPress={startAdd} testID="add-fab">
+        <MaterialIcons name="add" size={24} color="#fff"/>
       </TouchableOpacity>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F7FB" },
+  container: {flex: 1, backgroundColor: "#F5F7FB"},
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -129,7 +132,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     // shadow for action bar look
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 4,
@@ -169,7 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     // shadow
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.12,
     shadowRadius: 4,
     elevation: 3

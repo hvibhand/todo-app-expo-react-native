@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Modal, View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
-import type { Todo } from "../domain/entities/Todo";
-import { MaterialIcons } from "@expo/vector-icons";
+import React, {useEffect, useState} from "react";
+import {Modal, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import type {Todo} from "../domain/entities/Todo";
+import {MaterialIcons} from "@expo/vector-icons";
 
 type Props = {
   visible: boolean;
@@ -12,7 +12,7 @@ type Props = {
   onCancel: () => void;
 };
 
-export default function EditTodoModal({ visible, mode, todo, onSaveAdd, onSaveEdit, onCancel }: Props) {
+export default function EditTodoModal({visible, mode, todo, onSaveAdd, onSaveEdit, onCancel}: Props) {
   const [title, setTitle] = useState<string>("");
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function EditTodoModal({ visible, mode, todo, onSaveAdd, onSaveEd
           <View style={styles.header}>
             <Text style={styles.heading}>{mode === 'add' ? 'Add Todo' : 'Edit Todo'}</Text>
             <TouchableOpacity onPress={onCancel} style={styles.closeBtn}>
-              <MaterialIcons name="close" size={22} color="#444" />
+              <MaterialIcons name="close" size={22} color="#444"/>
             </TouchableOpacity>
           </View>
 
@@ -57,7 +57,7 @@ export default function EditTodoModal({ visible, mode, todo, onSaveAdd, onSaveEd
               style={[styles.actionBtn, styles.saveBtn]}
               testID="save-edit"
             >
-              <MaterialIcons name="save" size={18} color="#fff" />
+              <MaterialIcons name="save" size={18} color="#fff"/>
             </TouchableOpacity>
           </View>
         </View>
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     // shadow
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.12,
     shadowRadius: 8,
     elevation: 6

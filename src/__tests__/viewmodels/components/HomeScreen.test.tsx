@@ -1,16 +1,16 @@
 import React from "react";
-import { ActivityIndicator } from "react-native";
-import { render, fireEvent, waitFor } from "@testing-library/react-native";
+import {ActivityIndicator} from "react-native";
+import {fireEvent, render, waitFor} from "@testing-library/react-native";
 import HomeScreen from "../../../presentation/screens/HomeScreen";
-import { useHomeViewModel } from "../../../presentation/viewmodels/HomeViewModel";
+import {useHomeViewModel} from "@app/presentation/viewmodels/HomeViewModel";
 
 jest.mock("../../../presentation/viewmodels/HomeViewModel");
 
 const mockUseHomeViewModel = useHomeViewModel as jest.MockedFunction<typeof useHomeViewModel>;
 
 const baseTodos = [
-  { id: "1", title: "Write tests", completed: false, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "2", title: "Ship app", completed: true, createdAt: "2024-01-02T00:00:00Z" }
+  {id: "1", title: "Write tests", completed: false, createdAt: "2024-01-01T00:00:00Z"},
+  {id: "2", title: "Ship app", completed: true, createdAt: "2024-01-02T00:00:00Z"}
 ];
 
 const setupMock = (overrides: Partial<ReturnType<typeof useHomeViewModel>> = {}) => {
@@ -32,20 +32,20 @@ beforeEach(() => {
 });
 
 test("shows loading state", () => {
-  setupMock({ loading: true, todos: [] });
-  const { UNSAFE_getByType } = render(<HomeScreen />);
+  setupMock({loading: true, todos: []});
+  const {UNSAFE_getByType} = render(<HomeScreen/>);
   expect(UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
 });
 
 test("shows error state", () => {
-  setupMock({ error: "Boom", todos: [] });
-  const { getByText } = render(<HomeScreen />);
+  setupMock({error: "Boom", todos: []});
+  const {getByText} = render(<HomeScreen/>);
   expect(getByText("Error: Boom")).toBeTruthy();
 });
 
 test("toggles search input", () => {
   setupMock();
-  const { getByTestId, queryByTestId } = render(<HomeScreen />);
+  const {getByTestId, queryByTestId} = render(<HomeScreen/>);
 
   fireEvent.press(getByTestId("search-btn"));
   expect(getByTestId("search-input")).toBeTruthy();
@@ -56,7 +56,7 @@ test("toggles search input", () => {
 
 test("renders todos and calls handlers", async () => {
   setupMock();
-  const { getByTestId, getByText, getByDisplayValue } = render(<HomeScreen />);
+  const {getByTestId, getByText, getByDisplayValue} = render(<HomeScreen/>);
   const vm = mockUseHomeViewModel.mock.results[0].value;
 
   expect(getByText("Write tests")).toBeTruthy();
@@ -77,7 +77,7 @@ test("renders todos and calls handlers", async () => {
 
 test("adds a todo via the add modal", () => {
   setupMock();
-  const { getByTestId } = render(<HomeScreen />);
+  const {getByTestId} = render(<HomeScreen/>);
   const vm = mockUseHomeViewModel.mock.results[0].value;
 
   fireEvent.press(getByTestId("add-fab"));

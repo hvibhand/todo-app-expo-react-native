@@ -1,9 +1,9 @@
-import type { ITodoRepository } from "./ITodoRepository";
-import type { Todo } from "../../domain/entities/Todo";
+import type {ITodoRepository} from "./ITodoRepository";
+import type {Todo} from "@app/domain/entities/Todo";
 
 const DUMMY: Todo[] = [
-  { id: "1", title: "Write MVP", completed: false },
-  { id: "2", title: "Ship starter", completed: false }
+  {id: "1", title: "Write MVP", completed: false},
+  {id: "2", title: "Ship starter", completed: false}
 ];
 
 function generateId() {
@@ -19,7 +19,7 @@ export class InMemoryTodoRepository implements ITodoRepository {
   }
 
   async createTodo(title: string): Promise<Todo> {
-    const todo: Todo = { id: generateId(), title, completed: false };
+    const todo: Todo = {id: generateId(), title, completed: false};
     this.todos = [todo, ...this.todos];
     await new Promise((r) => setTimeout(r, 50));
     return todo;
@@ -28,7 +28,7 @@ export class InMemoryTodoRepository implements ITodoRepository {
   async updateTodo(todo: Todo): Promise<Todo> {
     const idx = this.todos.findIndex((t) => t.id === todo.id);
     if (idx === -1) throw new Error("Not found");
-    this.todos[idx] = { ...todo };
+    this.todos[idx] = {...todo};
     await new Promise((r) => setTimeout(r, 50));
     return this.todos[idx];
   }
@@ -43,7 +43,7 @@ export class InMemoryTodoRepository implements ITodoRepository {
   async toggleTodo(id: string): Promise<Todo> {
     const idx = this.todos.findIndex((t) => t.id === id);
     if (idx === -1) throw new Error("Not found");
-    this.todos[idx] = { ...this.todos[idx], completed: !this.todos[idx].completed };
+    this.todos[idx] = {...this.todos[idx], completed: !this.todos[idx].completed};
     await new Promise((r) => setTimeout(r, 50));
     return this.todos[idx];
   }

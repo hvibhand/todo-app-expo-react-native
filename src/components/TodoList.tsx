@@ -1,7 +1,7 @@
 import React from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
-import type { Todo } from "../domain/entities/Todo";
-import { MaterialIcons, Feather } from "@expo/vector-icons";
+import {FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import type {Todo} from "../domain/entities/Todo";
+import {Feather, MaterialIcons} from "@expo/vector-icons";
 
 type Props = {
   todos: Todo[];
@@ -10,13 +10,13 @@ type Props = {
   onDelete: (id: string) => void;
 };
 
-export default function TodoList({ todos, onToggle, onEdit, onDelete }: Props) {
+export default function TodoList({todos, onToggle, onEdit, onDelete}: Props) {
   return (
     <FlatList
       data={todos}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.listContainer}
-      renderItem={({ item }) => (
+      renderItem={({item}) => (
         <View style={styles.card} testID={`card-${item.id}`}>
           <TouchableOpacity
             style={styles.cardContent}
@@ -35,10 +35,10 @@ export default function TodoList({ todos, onToggle, onEdit, onDelete }: Props) {
 
           <View style={styles.actions}>
             <TouchableOpacity onPress={() => onEdit(item)} style={styles.iconBtn} testID={`edit-${item.id}`}>
-              <MaterialIcons name="edit" size={20} color="#1976D2" />
+              <MaterialIcons name="edit" size={20} color="#1976D2"/>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => onDelete(item.id)} style={styles.iconBtn} testID={`delete-${item.id}`}>
-              <Feather name="trash-2" size={20} color="#D32F2F" />
+              <Feather name="trash-2" size={20} color="#D32F2F"/>
             </TouchableOpacity>
           </View>
         </View>
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // shadow (iOS)
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.08,
     shadowRadius: 6,
     // elevation (Android)
