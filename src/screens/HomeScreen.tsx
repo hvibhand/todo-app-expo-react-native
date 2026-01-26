@@ -1,20 +1,27 @@
 import { Button, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { increaseTotalLikesByAmount, increaseTotalLikesByOne } from "../store/reducers/dataReducer";
+import {useSelector, useDispatch} from "react-redux"
+import { increaseTotalLikes, increaseTotalLikesByAmount } from "../store/actions/dataActions";
+import { RootState } from "../store/store";
 
 const HomeScreen = () => {
-  const totalLikes = useSelector(state => state.dataReducer.totalLikes)
+
+  const totalLikes = useSelector((state: RootState) => state.dataReducer.totalLikes)
+  const userName = useSelector((state: RootState) => state.dataReducer.userName)
+
   const dispatch = useDispatch()
 
-  console.log('====================================');
-  console.log(totalLikes); 
-  console.log('====================================');
+
   return (
     <View style={styles.container}>
+      <Text style={styles.text}>Home Screen</Text>
       <Text style={styles.text}>Total Likes: {totalLikes}</Text>
-      <Button title="Increase By One" onPress={() => dispatch(increaseTotalLikesByOne())}/>
-      <Button title="Increase By Amount" onPress={() => dispatch(increaseTotalLikesByAmount(8)) }/>
+      <Text style={styles.text}>User Name: {userName}</Text>
+      <Button title="+" onPress={() => dispatch(increaseTotalLikes())}/>
+
+      <Button title="Increase Likes By Amount" 
+              onPress={() => dispatch(increaseTotalLikesByAmount(80))}
+              
+              />
     </View>
   );
 };
