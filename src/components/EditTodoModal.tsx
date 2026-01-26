@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Modal, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import type {Todo} from "../domain/entities/Todo";
 import {MaterialIcons} from "@expo/vector-icons";
+import {s} from "react-native-size-matters";
 
 type Props = {
   visible: boolean;
@@ -34,7 +35,7 @@ export default function EditTodoModal({visible, mode, todo, onSaveAdd, onSaveEdi
           <View style={styles.header}>
             <Text style={styles.heading}>{mode === 'add' ? 'Add Todo' : 'Edit Todo'}</Text>
             <TouchableOpacity onPress={onCancel} style={styles.closeBtn}>
-              <MaterialIcons name="close" size={22} color="#444"/>
+              <MaterialIcons name="close" size={s(22)} color="#444"/>
             </TouchableOpacity>
           </View>
 
@@ -57,7 +58,7 @@ export default function EditTodoModal({visible, mode, todo, onSaveAdd, onSaveEdi
               style={[styles.actionBtn, styles.saveBtn]}
               testID="save-edit"
             >
-              <MaterialIcons name="save" size={18} color="#fff"/>
+              <MaterialIcons name="save" size={s(18)} color="#fff"/>
             </TouchableOpacity>
           </View>
         </View>
@@ -76,60 +77,61 @@ const styles = StyleSheet.create({
   container: {
     width: "90%",
     backgroundColor: "#fff",
-    padding: 18,
-    borderRadius: 12,
+    padding: s(18),
+    borderRadius: s(12),
     // shadow
     shadowColor: "#000",
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: {width: s(0), height: s(4)},
     shadowOpacity: 0.12,
-    shadowRadius: 8,
+    shadowRadius: s(8),
     elevation: 6
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 12
+    marginBottom: s(12)
   },
   heading: {
-    fontSize: 18,
+    fontSize: s(18),
     fontWeight: "700",
     color: "#222"
   },
   closeBtn: {
-    padding: 6,
-    borderRadius: 8
+    padding: s(6),
+    borderRadius: s(8)
   },
   input: {
-    borderWidth: 1,
+    borderWidth: s(1),
     borderColor: "#E0E0E0",
-    borderRadius: 10,
-    padding: 12,
-    fontSize: 15,
+    borderRadius: s(10),
+    padding: s(12),
+    fontSize: s(15),
     backgroundColor: "#FAFAFA"
   },
   footer: {
-    marginTop: 14,
+    marginTop: s(14),
     flexDirection: "row",
     justifyContent: "flex-end",
-    gap: 8
+    gap: s(8)
   },
   actionBtn: {
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 10,
+    paddingVertical: s(10),
+    paddingHorizontal: s(14),
+    borderRadius: s(10),
     alignItems: "center",
     justifyContent: "center"
   },
   cancelBtn: {
     backgroundColor: "#fff",
-    borderWidth: 1,
+    borderWidth: s(1),
     borderColor: "#E0E0E0",
-    marginRight: 8
+    marginRight: s(8)
   },
   cancelText: {
     color: "#444",
-    fontWeight: "600"
+    fontWeight: "600",
+    fontSize: s(15)
   },
   saveBtn: {
     backgroundColor: "#1976D2"

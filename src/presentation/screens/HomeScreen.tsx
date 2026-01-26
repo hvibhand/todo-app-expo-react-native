@@ -10,6 +10,7 @@ import {UpdateTodoUseCase} from "@app/domain/usecases/UpdateTodoUseCase";
 import {DeleteTodoUseCase} from "@app/domain/usecases/DeleteTodoUseCase";
 import {useHomeViewModel} from "../viewmodels/HomeViewModel";
 import {MaterialIcons} from "@expo/vector-icons";
+import {s} from "react-native-size-matters";
 
 const repo = new ApiTodoRepository();
 const getUseCase = new GetTodosUseCase(repo as any);
@@ -70,7 +71,7 @@ export default function HomeScreen() {
           <>
             <Text style={styles.title}>Todos</Text>
             <TouchableOpacity onPress={() => setSearchVisible(true)} testID="search-btn">
-              <MaterialIcons name="search" size={24} color="#1976D2"/>
+              <MaterialIcons name="search" size={s(24)} color="#222"/>
             </TouchableOpacity>
           </>
         ) : (
@@ -87,7 +88,7 @@ export default function HomeScreen() {
               setSearchVisible(false);
               setSearchQuery("");
             }} testID="close-search">
-              <MaterialIcons name="close" size={24} color="#1976D2"/>
+              <MaterialIcons name="close" size={s(24)} color="#222"/>
             </TouchableOpacity>
           </>
         )}
@@ -115,7 +116,7 @@ export default function HomeScreen() {
       />
 
       <TouchableOpacity style={styles.fab} onPress={startAdd} testID="add-fab">
-        <MaterialIcons name="add" size={24} color="#fff"/>
+        <MaterialIcons name="add" size={s(24)} color="#fff"/>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -127,54 +128,56 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: s(12),
+    paddingHorizontal: s(16),
     backgroundColor: '#fff',
     // shadow for action bar look
     shadowColor: "#000",
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: {width: s(0), height: s(2)},
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: s(4),
     elevation: 4,
   },
   title: {
-    fontSize: 20,
+    fontSize: s(24),
     fontWeight: 'bold',
-    color: '#222'
+    color: '#222',
+    padding: s(3)
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
+    fontSize: s(16),
     color: '#222',
-    borderWidth: 1,
+    borderWidth: s(1),
     borderColor: '#E0E0E0',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    borderRadius: s(8),
+    paddingHorizontal: s(12),
+    paddingVertical: s(8),
     backgroundColor: '#fff',
-    marginRight: 8
+    marginRight: s(8)
   },
   content: {
     flex: 1,
-    padding: 12
+    padding: s(12)
   },
   errorText: {
     color: "#D32F2F",
-    marginTop: 24,
+    marginTop: s(24),
     textAlign: "center"
   },
   fab: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
+    position: "absolute",
+    bottom: s(20),
+    right: s(20),
     backgroundColor: '#1976D2',
-    padding: 16,
-    borderRadius: 28,
+    padding: s(16),
+    borderRadius: s(28),
+    zIndex: 10,
     // shadow
     shadowColor: "#000",
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: {width: s(0), height: s(2)},
     shadowOpacity: 0.12,
-    shadowRadius: 4,
+    shadowRadius: s(4),
     elevation: 3
   }
 });
