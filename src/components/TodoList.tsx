@@ -2,6 +2,7 @@ import React from "react";
 import {FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import type {Todo} from "../domain/entities/Todo";
 import {Feather, MaterialIcons} from "@expo/vector-icons";
+import {s} from "react-native-size-matters";
 
 type Props = {
   todos: Todo[];
@@ -35,10 +36,10 @@ export default function TodoList({todos, onToggle, onEdit, onDelete}: Props) {
 
           <View style={styles.actions}>
             <TouchableOpacity onPress={() => onEdit(item)} style={styles.iconBtn} testID={`edit-${item.id}`}>
-              <MaterialIcons name="edit" size={20} color="#1976D2"/>
+              <MaterialIcons name="edit" size={s(20)} color="#1976D2"/>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => onDelete(item.id)} style={styles.iconBtn} testID={`delete-${item.id}`}>
-              <Feather name="trash-2" size={20} color="#D32F2F"/>
+              <Feather name="trash-2" size={s(20)} color="#D32F2F"/>
             </TouchableOpacity>
           </View>
         </View>
@@ -49,21 +50,21 @@ export default function TodoList({todos, onToggle, onEdit, onDelete}: Props) {
 
 const styles = StyleSheet.create({
   listContainer: {
-    paddingBottom: 64,
+    paddingBottom: s(64),
   },
   card: {
     backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 8,
-    marginHorizontal: 4,
-    marginVertical: 6,
+    borderRadius: s(12),
+    padding: s(8),
+    marginHorizontal: s(4),
+    marginVertical: s(6),
     flexDirection: "row",
     alignItems: "center",
     // shadow (iOS)
     shadowColor: "#000",
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: {width: s(0), height: s(2)},
     shadowOpacity: 0.08,
-    shadowRadius: 6,
+    shadowRadius: s(6),
     // elevation (Android)
     elevation: 3
   },
@@ -76,19 +77,19 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   title: {
-    fontSize: 16,
+    fontSize: s(16),
     fontWeight: "600",
     color: "#222",
     flex: 1,
-    marginRight: 8
+    marginRight: s(8)
   },
   dateText: {
-    fontSize: 12,
+    fontSize: s(12),
     color: "#888"
   },
   subtitle: {
-    marginTop: 6,
-    fontSize: 13,
+    marginTop: s(6),
+    fontSize: s(13),
     color: "#666"
   },
   done: {
@@ -96,13 +97,13 @@ const styles = StyleSheet.create({
     color: "#9E9E9E"
   },
   actions: {
-    marginLeft: 12,
+    marginLeft: s(12),
     flexDirection: "row",
     alignItems: "center"
   },
   iconBtn: {
-    padding: 8,
-    marginLeft: 6,
-    borderRadius: 8
+    padding: s(8),
+    marginLeft: s(6),
+    borderRadius: s(8)
   }
 });
