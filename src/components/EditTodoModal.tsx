@@ -26,6 +26,7 @@ export default function EditTodoModal({visible, mode, todo, onSaveAdd, onSaveEdi
     } else {
       onSaveEdit?.(todo!.id, title);
     }
+    setTitle("")
   };
 
   return (
