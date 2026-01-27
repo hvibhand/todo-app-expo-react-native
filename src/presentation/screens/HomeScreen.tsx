@@ -10,7 +10,7 @@ import {UpdateTodoUseCase} from "@app/domain/usecases/UpdateTodoUseCase";
 import {DeleteTodoUseCase} from "@app/domain/usecases/DeleteTodoUseCase";
 import {useHomeViewModel} from "../viewmodels/HomeViewModel";
 import {MaterialIcons} from "@expo/vector-icons";
-import {s} from "react-native-size-matters";
+import {s, vs} from "react-native-size-matters";
 
 const repo = new ApiTodoRepository();
 const getUseCase = new GetTodosUseCase(repo as any);
@@ -96,7 +96,7 @@ export default function HomeScreen() {
 
       <View style={styles.content}>
         {vm.loading ? (
-          <ActivityIndicator size="large" style={{marginTop: 32}}/>
+          <ActivityIndicator size="large" style={{marginTop: vs(32)}}/>
         ) : vm.error ? (
           <Text testID="error-text" style={styles.errorText}>
             Error: {vm.error}
@@ -128,12 +128,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: s(12),
     paddingHorizontal: s(16),
+    paddingVertical: vs(12),
     backgroundColor: '#fff',
     // shadow for action bar look
     shadowColor: "#000",
-    shadowOffset: {width: s(0), height: s(2)},
+    shadowOffset: {width: s(0), height: vs(2)},
     shadowOpacity: 0.1,
     shadowRadius: s(4),
     elevation: 4,
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     fontSize: s(24),
     fontWeight: 'bold',
     color: '#222',
-    padding: s(3)
+    paddingVertical: vs(4)
   },
   searchInput: {
     flex: 1,
@@ -152,17 +152,18 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     borderRadius: s(8),
     paddingHorizontal: s(12),
-    paddingVertical: s(8),
+    paddingVertical: vs(8),
     backgroundColor: '#fff',
     marginRight: s(8)
   },
   content: {
     flex: 1,
-    padding: s(12)
+    paddingHorizontal: s(12),
+    paddingVertical: vs(12)
   },
   errorText: {
     color: "#D32F2F",
-    marginTop: s(24),
+    marginTop: vs(24),
     textAlign: "center"
   },
   fab: {
