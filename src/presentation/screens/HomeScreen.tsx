@@ -10,7 +10,7 @@ import {UpdateTodoUseCase} from "@app/domain/usecases/UpdateTodoUseCase";
 import {DeleteTodoUseCase} from "@app/domain/usecases/DeleteTodoUseCase";
 import {useHomeViewModel} from "../viewmodels/HomeViewModel";
 import {MaterialIcons} from "@expo/vector-icons";
-import {ms, s, vs} from "react-native-size-matters";
+import {s, vs} from "react-native-size-matters";
 
 const repo = new ApiTodoRepository();
 const getUseCase = new GetTodosUseCase(repo as any);
@@ -139,14 +139,14 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   title: {
-    fontSize: ms(24),
+    fontSize: s(24),
     fontWeight: 'bold',
     color: '#222',
     paddingVertical: vs(4)
   },
   searchInput: {
     flex: 1,
-    fontSize: ms(16),
+    fontSize: s(16),
     color: '#222',
     borderWidth: s(1),
     borderColor: '#E0E0E0',

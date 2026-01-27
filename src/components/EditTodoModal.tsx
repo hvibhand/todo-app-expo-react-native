@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Modal, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import type {Todo} from "../domain/entities/Todo";
 import {MaterialIcons} from "@expo/vector-icons";
-import {ms, s, vs} from "react-native-size-matters";
+import {s, vs} from "react-native-size-matters";
 
 type Props = {
   visible: boolean;
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     marginBottom: vs(12)
   },
   heading: {
-    fontSize: ms(18),
+    fontSize: s(18),
     fontWeight: "700",
     color: "#222"
   },
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     borderRadius: s(10),
     paddingHorizontal: s(12),
     paddingVertical: vs(12),
-    fontSize: ms(15),
+    fontSize: s(15),
     backgroundColor: "#FAFAFA"
   },
   footer: {
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   cancelText: {
     color: "#444",
     fontWeight: "600",
-    fontSize: ms(15)
+    fontSize: s(15)
   },
   saveBtn: {
     backgroundColor: "#1976D2"

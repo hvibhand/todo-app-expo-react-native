@@ -2,7 +2,7 @@ import React from "react";
 import {FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import type {Todo} from "../domain/entities/Todo";
 import {Feather, MaterialIcons} from "@expo/vector-icons";
-import {ms, s, vs} from "react-native-size-matters";
+import {s, vs} from "react-native-size-matters";
 
 type Props = {
   todos: Todo[];
@@ -78,19 +78,19 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   title: {
-    fontSize: ms(16),
+    fontSize: s(16),
     fontWeight: "600",
     color: "#222",
     flex: 1,
     marginRight: s(8)
   },
   dateText: {
-    fontSize: ms(12),
+    fontSize: s(12),
     color: "#888"
   },
   subtitle: {
     marginTop: vs(6),
-    fontSize: ms(13),
+    fontSize: s(13),
     color: "#666"
   },
   done: {
