@@ -7,9 +7,9 @@
 <details>
   <summary>JavaScript &amp; TypeScript — Core + Advanced (12)</summary>
 
-  <details><summary>1. Explain <code>var</code>, <code>let</code>, <code>const</code> and hoisting (TDZ).</summary>
+***
 
-Great—let’s keep this crisp, developer-friendly, and example-driven.
+  <details><summary>1. Explain <code>var</code>, <code>let</code>, <code>const</code> and hoisting (TDZ).</summary>
 
 ## 1) `var`, `let`, `const` + Hoisting & TDZ (Temporal Dead Zone)
 
@@ -124,9 +124,9 @@ function f(a = 1) { return a; } // Safe
 
   </details>
 
-  <details><summary>2. How do closures work? Example of stale state in React hooks.</summary>
+***
 
-Great question—let’s keep it concise and practical.
+  <details><summary>2. How do closures work? Example of stale state in React hooks.</summary>
 
 ## Closures (Quick Refresher)
 
@@ -316,7 +316,7 @@ function Balances() {
 
 ***
 
-## TL;DR (Interview Soundbite)
+## (Interview Soundbite)
 
 *   Closures capture variables from their defining render.
 *   **Stale state** happens when long-lived callbacks (timers, async, subscriptions) use **old captured values**.
@@ -324,12 +324,9 @@ function Balances() {
 
   </details>
 
-  <details><summary>3. Explain event loop, microtasks vs macrotasks using Promises and setTimeout.</summary>
-
-Here’s a **simple, interview-friendly, developer-focused** explanation of the **event loop, microtasks, and macrotasks**, with **clear diagrams and code examples**.  
-No external search is needed since this is core JavaScript knowledge.
-
 ***
+
+  <details><summary>3. Explain event loop, microtasks vs macrotasks using Promises and setTimeout.</summary>
 
 # ✅ **3. Explain Event Loop, Microtasks vs Macrotasks using Promises and setTimeout**
 
@@ -520,9 +517,9 @@ updates the UI **before** any timer callbacks.
 
   </details>
 
-  <details><summary>4. Deep vs shallow copy — how do you update deeply nested state safely?</summary>
+***
 
-Great one—this comes up a lot in React/React Native code reviews.
+  <details><summary>4. Deep vs shallow copy — how do you update deeply nested state safely?</summary>
 
 ## 4) Deep vs Shallow Copy — Safely Updating Deeply Nested State
 
@@ -741,7 +738,7 @@ setState(prev => ({
 
 ***
 
-## TL;DR (Interview Answer)
+## (Interview Answer)
 
 *   **Shallow copy** copies the first level; nested references remain shared.
 *   **Deep copy** recursively copies all levels.
@@ -750,11 +747,9 @@ setState(prev => ({
 
   </details>
 
-  <details><summary>5. What is debouncing vs throttling? Give real RN use cases.</summary>
-
-Here’s a clean, interview-ready explanation with React Native–focused examples—simple enough for juniors, solid enough for seniors.
-
 ***
+
+  <details><summary>5. What is debouncing vs throttling? Give real RN use cases.</summary>
 
 # ✅ **5. What is Debouncing vs Throttling? (With Real React Native Use Cases)**
 
@@ -875,9 +870,9 @@ function debounce(fn, delay) {
 
   </details>
 
-  <details><summary>6. How does tree-shaking work? How does it impact RN bundle size?</summary>
+***
 
-Absolutely—here’s a crisp, interview-ready explanation with practical React Native angles and copy‑paste examples.
+  <details><summary>6. How does tree-shaking work? How does it impact RN bundle size?</summary>
 
 ***
 
@@ -1049,13 +1044,13 @@ import Button from '@ui-kit/components/Button';
 
   </details>
 
-  <details><summary>7. When to use <code>unknown</code> vs <code>any</code> vs <code>never</code> in TypeScript?</summary>
+***
 
-Great question—this one comes up a lot in TypeScript code reviews.
+  <details><summary>7. When to use <code>unknown</code> vs <code>any</code> vs <code>never</code> in TypeScript?</summary>
 
 ## 7) When to use `unknown` vs `any` vs `never` in TypeScript
 
-### TL;DR (Interview soundbite)
+### (Interview soundbite)
 
 *   **`any`**: “Skip type checking.” Avoid it—unsafe, spreads bugs.
 *   **`unknown`**: “Type-safe `any`.” You **must** narrow/refine before using.
@@ -1215,11 +1210,9 @@ function next(state: AuthState, event: { type: string }) {
 
   </details>
 
-  <details><summary>8. Explain TypeScript utility types: Partial, Pick, Omit, Record.</summary>
-
-Absolutely—here’s a concise, interview-ready guide to the **TypeScript utility types** you’ll use every day: **`Partial`**, **`Pick`**, **`Omit`**, and **`Record`**. I’ll include short examples and common RN use cases.
-
 ***
+
+  <details><summary>8. Explain TypeScript utility types: Partial, Pick, Omit, Record.</summary>
 
 ## 8) TypeScript Utility Types: `Partial`, `Pick`, `Omit`, `Record`
 
@@ -1431,12 +1424,9 @@ const txns: TxnMap = {
 
   </details>
 
-  <details><summary>9. How do you type custom React hooks?</summary>
-
-Awesome—let’s make this **practical, short, and copy‑paste friendly**.  
-Here’s how to **type custom React/React Native hooks in TypeScript** with the most common patterns you’ll use daily.
-
 ***
+
+  <details><summary>9. How do you type custom React hooks?</summary>
 
 ## ✅ Core Principles
 
@@ -1729,9 +1719,9 @@ export function useSafeAsync<T>(fn: () => Promise<T>) {
 
   </details>
 
-  <details><summary>10. How to structure a scalable TS project for a large RN app?</summary>
+***
 
-Awesome—this is where “senior” signals show up in interviews. Here’s a **battle‑tested structure** for large, TypeScript‑first React Native apps that scales across teams, features, and years of maintenance.
+  <details><summary>10. How to structure a scalable TS project for a large RN app?</summary>
 
 > **Goals:** clear boundaries, fast builds, easy refactors, testability, security (banking‑grade), and developer productivity.
 
@@ -2096,11 +2086,9 @@ import { TransferScreen } from '@features/transfer';
 
   </details>
 
-  <details><summary>11. How to manage typings for native modules without @types?</summary>
-
-Great topic—this comes up a lot when integrating untyped native modules or JS-only RN libraries. Here’s a **practical, interview‑ready** guide with **copy‑paste** patterns.
-
 ***
+
+  <details><summary>11. How to manage typings for native modules without @types?</summary>
 
 ## ✅ Goals
 
@@ -2434,11 +2422,9 @@ declare module 'some-lib' {
 
   </details>
 
-  <details><summary>12. How do you avoid floating-point issues when dealing with currency?</summary>
-
-Here’s a **clear, interview‑ready** explanation with practical RN/TS examples, perfect for financial‑app discussions.
-
 ***
+
+  <details><summary>12. How do you avoid floating-point issues when dealing with currency?</summary>
 
 # ✅ 12. How do you avoid floating‑point issues when dealing with currency?
 
@@ -2681,11 +2667,9 @@ const emi = principal.times(rate).times((1 + rate) ** n)
 <details>
   <summary>React Native Core Concepts (12)</summary>
 
-  <details><summary>13. Explain RN Architecture (Bridge, JSI, TurboModules, Fabric).</summary>
-
-Absolutely—here’s a crisp, developer‑friendly overview of **React Native architecture** and how it evolved: **Bridge → JSI → TurboModules → Fabric**. I’ll explain what each is, why it matters for performance, and what you should do in real apps.
-
 ***
+
+  <details><summary>13. Explain RN Architecture (Bridge, JSI, TurboModules, Fabric).</summary>
 
 ## 🧱 The Big Picture
 
@@ -2816,11 +2800,9 @@ Reanimated uses **worklets** and **JSI** to run animations on the UI thread, avo
 
   </details>
 
-  <details><summary>14. How does Hermes improve startup performance?</summary>
-
-Great one—Hermes is a big lever for **cold start** and **memory** in React Native apps. Here’s an interview‑ready, RN‑practical answer.
-
 ***
+
+  <details><summary>14. How does Hermes improve startup performance?</summary>
 
 ## ✅ How Hermes Improves Startup Performance
 
@@ -2937,9 +2919,9 @@ console.log('TTI(ms)=', Date.now() - start);
 
   </details>
 
-  <details><summary>15. JS thread vs UI thread — what runs where?</summary>
+***
 
-Great question—this is foundational for diagnosing performance in React Native.
+  <details><summary>15. JS thread vs UI thread — what runs where?</summary>
 
 ## 15) JS thread vs UI thread — what runs where?
 
@@ -3133,11 +3115,9 @@ setInterval(() => setX(x => x + 1), 16);
 
   </details>
 
-  <details><summary>16. How to optimize re-renders using memo, useMemo, useCallback?</summary>
-
-Absolutely—let’s keep this practical and RN‑focused with clear rules, examples, and pitfalls.
-
 ***
+
+  <details><summary>16. How to optimize re-renders using memo, useMemo, useCallback?</summary>
 
 ## 16) How to optimize re‑renders using `React.memo`, `useMemo`, `useCallback`
 
@@ -3405,7 +3385,7 @@ Start with a clear **perf issue** (e.g., list stutter) → profile → apply tar
 
 ***
 
-## TL;DR (Interview answer)
+## (Interview answer)
 
 *   Use **`React.memo`** to skip re-renders when props don’t change.
 *   Use **`useCallback`** to keep **function props stable**.
@@ -3415,11 +3395,9 @@ Start with a clear **perf issue** (e.g., list stutter) → profile → apply tar
 
   </details>
 
-  <details><summary>17. Best practices for FlatList performance (windowing, keys, memoization).</summary>
-
-Absolutely—here’s a **practical, interview‑ready** checklist to get buttery‑smooth **FlatList** performance in React Native, with copy‑paste snippets and explanations.
-
 ***
+
+  <details><summary>17. Best practices for FlatList performance (windowing, keys, memoization).</summary>
 
 ## 17) Best practices for **FlatList** performance (windowing, keys, memoization)
 
@@ -3701,11 +3679,9 @@ export function ItemsList({ data, onPressRow }: { data: Item[]; onPressRow: (id:
 
   </details>
 
-  <details><summary>18. How to handle responsive UI across multiple screen sizes?</summary>
-
-Here’s a clean, **interview‑ready**, RN‑focused guide on building **responsive UI across multiple screen sizes**—Android & iOS, small to large devices, tablets, notch devices, dynamic type, etc.
-
 ***
+
+  <details><summary>18. How to handle responsive UI across multiple screen sizes?</summary>
 
 # ✅ **18. How to handle responsive UI across multiple screen sizes?**
 
@@ -4002,13 +3978,9 @@ const SHEET_HEIGHT = height * 0.5;   // half screen
 
   </details>
 
-  <details><summary>19. Explain RN navigation stacks & how you prevent memory leaks.</summary>
-
-Great topic—navigation architecture and leak‑proofing go hand in hand in React Native apps.
-
-Below is a concise, **interview‑ready** guide covering **navigation stacks** (how they work, how to structure them) and **practical patterns to prevent memory leaks** (timers, subscriptions, async work, and navigator listeners).
-
 ***
+
+  <details><summary>19. Explain RN navigation stacks & how you prevent memory leaks.</summary>
 
 ## ✅ 19) React Native navigation stacks & preventing memory leaks
 
@@ -4317,9 +4289,9 @@ useEffect(() => {
 
   </details>
 
-  <details><summary>20. What are Error Boundaries and how to implement one?</summary>
+***
 
-Great question—this is a must‑know for shipping resilient RN apps.
+  <details><summary>20. What are Error Boundaries and how to implement one?</summary>
 
 ## 20) What are Error Boundaries and how to implement one?
 
@@ -4538,11 +4510,9 @@ const defaultHandler = (ErrorUtils as any).getGlobalHandler?.();
 
   </details>
 
-  <details><summary>21. Explain deep linking & universal links.</summary>
-
-Absolutely—here’s a clear, interview‑ready guide to **Deep Linking** and **Universal/App Links** in React Native, with copy‑paste configs and practical testing tips.
-
 ***
+
+  <details><summary>21. Explain deep linking & universal links.</summary>
 
 ## ✅ What are Deep Links, Universal Links, and App Links?
 
@@ -4820,11 +4790,9 @@ If a user taps a link without the app installed, you may want to open the **inte
 
   </details>
 
-  <details><summary>22. How do push notifications work (APNs, FCM)?</summary>
-
-Absolutely—let’s keep this **interview‑ready** and **practical** for React Native, with clear flows, payload examples, and gotchas for **APNs (iOS)** and **FCM (Android/iOS)**.
-
 ***
+
+  <details><summary>22. How do push notifications work (APNs, FCM)?</summary>
 
 ## ✅ What are Push Notifications—High Level
 
@@ -5091,12 +5059,9 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 
   </details>
 
-  <details><summary>23. RN accessibility best practices (TalkBack/VoiceOver).</summary>
-
-Absolutely — here is a **clean, interview‑ready**, React Native–focused guide on **Accessibility (A11y)** with **TalkBack (Android)** and **VoiceOver (iOS)** best practices.  
-This is practical, easy for developers to apply, and strong enough for senior‑level interviews in banking/FinTech.
-
 ***
+
+  <details><summary>23. RN accessibility best practices (TalkBack/VoiceOver).</summary>
 
 # ✅ **23. React Native Accessibility Best Practices (TalkBack / VoiceOver)**
 
@@ -5395,12 +5360,9 @@ Custom swipe/drag gestures (like carousels or sliders) must have:
 
   </details>
 
-  <details><summary>24. When to use CodePush, and why banking apps may restrict it?</summary>
-
-Here’s a **clean, interview‑ready**, React Native–specific answer explaining **when to use CodePush** and **why banking/financial apps often restrict or forbid it**.  
-No search needed because this is conceptual knowledge.
-
 ***
+
+  <details><summary>24. When to use CodePush, and why banking apps may restrict it?</summary>
 
 # ✅ **24. When to use CodePush, and why banking apps may restrict it?**
 
@@ -5619,16 +5581,14 @@ But **keep all logic inside the shipped binary**.
 
 ***
 
-### ****
+### 3) Expo vs React Native CLI (6 questions)
 
 <details>
   <summary>Expo vs React Native CLI (6)</summary>
 
-  <details><summary>25. When to choose Expo Managed vs Bare workflows?</summary>
-
-Here’s a **concise, interview‑ready answer** with clarity and practical guidance:
-
 ***
+
+  <details><summary>25. When to choose Expo Managed vs Bare workflows?</summary>
 
 ## ✅ **25. When to choose Expo Managed vs Bare Workflows?**
 
@@ -5731,11 +5691,9 @@ NativeModules.FraudDetection.startDetection();
 
   </details>
 
-  <details><summary>26. Limitations of Expo for banking apps (background tasks, pinning).</summary>
-
-Here’s a **concise, interview‑ready summary** of Expo’s **limitations for banking apps**, especially around **background tasks and certificate pinning** — the two areas banking clients often care about most.
-
 ***
+
+  <details><summary>26. Limitations of Expo for banking apps (background tasks, pinning).</summary>
 
 ## ✅ **26. Limitations of Expo for Banking Apps (Background Tasks, Pinning)**
 
@@ -5849,11 +5807,9 @@ Below are quick bullets useful in interviews:
 
   </details>
 
-  <details><summary>27. How to migrate from Expo Managed to Bare?</summary>
-
-Here’s a **clear, concise, interview‑ready answer** explaining **how to migrate from Expo Managed to Bare**, with the steps developers actually follow in real projects.
-
 ***
+
+  <details><summary>27. How to migrate from Expo Managed to Bare?</summary>
 
 # ✅ **27. How to migrate from Expo Managed to Bare?**
 
@@ -6007,11 +5963,9 @@ Expo Go will **no longer** work—now you use a **custom dev client** or device 
 
   </details>
 
-  <details><summary>28. What are Expo config plugins?</summary>
-
-Here’s a **clean, short, interview‑friendly** explanation of **Expo Config Plugins**, with examples so developers can easily understand.
-
 ***
+
+  <details><summary>28. What are Expo config plugins?</summary>
 
 # ✅ **28. What are Expo Config Plugins?**
 
@@ -6114,11 +6068,9 @@ e.g., biometrics, background tasks.
 
   </details>
 
-  <details><summary>29. How Expo Updates differ from CodePush?</summary>
-
-Here’s a **concise, interview‑ready comparison** of **Expo Updates vs CodePush**, specifically from a **React Native Banking App** perspective.
-
 ***
+
+  <details><summary>29. How Expo Updates differ from CodePush?</summary>
 
 # ✅ **29. How Expo Updates differ from CodePush?**
 
@@ -6291,11 +6243,9 @@ codePush.sync({
 
   </details>
 
-  <details><summary>30. EAS Build vs Fastlane — when to prefer each?</summary>
-
-Here’s a **crisp, interview‑ready comparison** of **EAS Build vs Fastlane**, tailored for React Native + Banking/Enterprise scenarios.
-
 ***
+
+  <details><summary>30. EAS Build vs Fastlane — when to prefer each?</summary>
 
 # ✅ **30. EAS Build vs Fastlane — When to Prefer Each?**
 
@@ -6450,11 +6400,9 @@ end
 <details>
   <summary>Native Modules & Platform APIs (8)</summary>
 
-  <details><summary>31. When do you create a native module? Explain bridging.</summary>
-
-Here’s a **short, crisp, interview‑ready answer** with clean examples — perfect for React Native banking app interviews.
-
 ***
+
+  <details><summary>31. When do you create a native module? Explain bridging.</summary>
 
 # ✅ **31. When do you create a Native Module? Explain Bridging.**
 
@@ -6579,11 +6527,9 @@ JS calls it the same way.
 
   </details>
 
-  <details><summary>32. How does certificate pinning work in RN?</summary>
-
-Here’s a **concise, interview‑ready explanation** of **how certificate pinning works in React Native**, with practical steps and code you can quote.
-
 ***
+
+  <details><summary>32. How does certificate pinning work in RN?</summary>
 
 ## ✅ 32. How does certificate pinning work in React Native?
 
@@ -6760,11 +6706,9 @@ Create a `URLSession` with this delegate and use it for sensitive calls, exposed
 
   </details>
 
-  <details><summary>33. How to implement secure biometric authentication (FaceID/TouchID)?</summary>
-
-Here’s a **clean, interview‑ready answer** on secure biometric authentication in React Native, tailored for **banking/financial apps**. Short, crisp, and includes the minimal code required.
-
 ***
+
+  <details><summary>33. How to implement secure biometric authentication (FaceID/TouchID)?</summary>
 
 # ✅ **33. How to implement secure biometric authentication (Face ID / Touch ID)?**
 
@@ -6914,11 +6858,9 @@ const result = await LocalAuthentication.authenticateAsync({
 
   </details>
 
-  <details><summary>34. How do you securely store tokens using Keychain/Keystore?</summary>
-
-Here’s a **clear, interview‑ready**, security‑focused answer explaining how to **securely store tokens** using **Keychain (iOS)** and **Keystore (Android)** in React Native — ideal for **banking/financial apps**.
-
 ***
+
+  <details><summary>34. How do you securely store tokens using Keychain/Keystore?</summary>
 
 # ✅ **34. How do you securely store tokens using Keychain / Keystore?**
 
@@ -7098,11 +7040,9 @@ Banks expect these answers:
 
   </details>
 
-  <details><summary>35. How to handle app links/universal links in Android/iOS?</summary>
-
-Here’s a **short, crisp, interview‑ready explanation** of handling **App Links (Android)** and **Universal Links (iOS)** in React Native — includes code and the exact steps banks expect.
-
 ***
+
+  <details><summary>35. How to handle app links/universal links in Android/iOS?</summary>
 
 # ✅ **35. How to handle App Links / Universal Links in Android & iOS?**
 
@@ -7282,11 +7222,9 @@ xcrun simctl openurl booted "https://mybank.com/auth/reset?id=123"
 
   </details>
 
-  <details><summary>36. How to handle native crashes & symbolication (dSYM/ProGuard)?</summary>
-
-Here’s a **short, interview‑ready**, banking‑grade explanation of **Native Crash Handling & Symbolication** in React Native, covering **iOS (dSYM), Android (ProGuard/R8), and tools like Sentry/Firebase Crashlytics**.
-
 ***
+
+  <details><summary>36. How to handle native crashes & symbolication (dSYM/ProGuard)?</summary>
 
 # ✅ **36. How to handle native crashes & symbolication (dSYM / ProGuard)?**
 
@@ -7444,12 +7382,9 @@ Add to CI or EAS Build hooks.
 
   </details>
 
-  <details><summary>37. How to expose high-performance functions via JSI?</summary>
-
-Here’s a **short, crisp, interview‑ready** explanation of **JSI (JavaScript Interface)** and how to expose **high‑performance native functions** to React Native using JSI.  
-This is the modern replacement for the old React Native Bridge (TurboModules).
-
 ***
+
+  <details><summary>37. How to expose high-performance functions via JSI?</summary>
 
 # ✅ **37. How to expose high‑performance functions via JSI?**
 
@@ -7625,11 +7560,9 @@ Runs **100x faster** than JS or old-bridge solutions.
 
   </details>
 
-  <details><summary>38. What’s Play Integrity / DeviceCheck / App Attest?</summary>
-
-Here’s a **clean, short, interview‑ready explanation** of **Play Integrity, DeviceCheck, and App Attest** — exactly how they relate to **banking‑grade mobile security**.
-
 ***
+
+  <details><summary>38. What’s Play Integrity / DeviceCheck / App Attest?</summary>
 
 # ✅ **38. What’s Play Integrity / DeviceCheck / App Attest?**
 
@@ -7761,11 +7694,9 @@ Requires a **JSI/native module** because App Attest uses:
 <details>
   <summary>Architecture &amp; State Management (12)</summary>
 
-  <details><summary>39. Compare Redux Toolkit, Zustand, Recoil, MobX for large apps.</summary>
-
-Here’s a **clean, interview‑ready comparison** of **Redux Toolkit, Zustand, Recoil, MobX** with a focus on **large‑scale enterprise/banking apps**, scalability, performance, DX, and architecture.
-
 ***
+
+  <details><summary>39. Compare Redux Toolkit, Zustand, Recoil, MobX for large apps.</summary>
 
 # ✅ **39. Compare Redux Toolkit, Zustand, Recoil, MobX for large apps**
 
@@ -7938,13 +7869,13 @@ Good in theory, but **not widely adopted** in highly regulated domains.
 
   </details>
 
-  <details><summary>40. When to use React Query vs Redux?</summary>
+***
 
-Here’s a **short, interview‑friendly**, and **developer‑clear** answer for:
+  <details><summary>40. When to use React Query vs Redux?</summary>
 
 ## **40. When to use React Query vs Redux?**
 
-### ✅ **TL;DR Answer**
+### ✅ **Answer**
 
 Use **React Query** for **server state**.  
 Use **Redux** for **client state**.
@@ -8012,11 +7943,9 @@ dispatch(setTheme('dark'));
 
   </details>
 
-  <details><summary>41. How to structure a scalable feature-first RN architecture?</summary>
-
-Below is a **short, clean, interview‑friendly** answer with a practical folder structure and explanation tailored for **React Native + Banking apps + scalability**.
-
 ***
+
+  <details><summary>41. How to structure a scalable feature-first RN architecture?</summary>
 
 # **41. How to structure a scalable feature-first React Native architecture?**
 
@@ -8172,11 +8101,9 @@ Each feature exports its own screens → plugged into root navigator.
 
   </details>
 
-  <details><summary>42. What is a domain layer? Why is it useful?</summary>
-
-Here’s a **short, interview‑friendly**, super clear explanation suited for React Native + banking domain apps.
-
 ***
+
+  <details><summary>42. What is a domain layer? Why is it useful?</summary>
 
 # **42. What is a Domain Layer? Why is it useful?**
 
@@ -8287,11 +8214,9 @@ const emi = calculateEMI({ principal: 500000, interestRate: 8.5, tenure: 60 });
 
   </details>
 
-  <details><summary>43. How to handle normalized data & selectors?</summary>
-
-Here’s a **short, interview‑friendly** guide with **code you can reuse**:
-
 ***
+
+  <details><summary>43. How to handle normalized data & selectors?</summary>
 
 ## **43. How to handle normalized data & selectors?**
 
@@ -8524,11 +8449,9 @@ export const TransactionRow = React.memo(({ id }: { id: string }) => {
 
   </details>
 
-  <details><summary>44. How do you design loading/error states elegantly?</summary>
-
-Here’s a **short, clean, interview‑friendly answer** with **examples** (perfect for React Native + banking apps):
-
 ***
+
+  <details><summary>44. How do you design loading/error states elegantly?</summary>
 
 # **44. How do you design loading/error states elegantly?**
 
@@ -8705,11 +8628,9 @@ mutate(paymentData, {
 
   </details>
 
-  <details><summary>45. Persisting state securely using redux-persist + MMKV.</summary>
-
-Here’s a **short, interview‑ready** answer with **secure, production‑grade code** for React Native banking apps.
-
 ***
+
+  <details><summary>45. Persisting state securely using redux-persist + MMKV.</summary>
 
 ## **45. Persisting state securely using `redux-persist` + `MMKV`**
 
@@ -9031,9 +8952,9 @@ export async function logout() {
 
   </details>
 
-  <details><summary>46. Handling global authentication state across navigation.</summary>
+***
 
-Here’s a **short, interview‑friendly**, production‑ready explanation on:
+  <details><summary>46. Handling global authentication state across navigation.</summary>
 
 # **46. Handling global authentication state across navigation**
 
@@ -9238,9 +9159,9 @@ navigation.reset({ index: 0, routes: [{ name: "Login" }] });
 
   </details>
 
-  <details><summary>47. Implementing feature flags safely.</summary>
+***
 
-Here’s a **short, interview‑ready**, safe, and production‑grade explanation for:
+  <details><summary>47. Implementing feature flags safely.</summary>
 
 # **47. Implementing Feature Flags Safely (React Native + Banking Apps)**
 
@@ -9466,11 +9387,9 @@ Never trust only local flags for sensitive transactions.
 
   </details>
 
-  <details><summary>48. How to enforce separation of concerns for clean architecture?</summary>
-
-Here’s a **short, clean, interview‑friendly** explanation tailored for **React Native + banking apps**, exactly how clean‑architecture separation of concerns should be explained in interviews.
-
 ***
+
+  <details><summary>48. How to enforce separation of concerns for clean architecture?</summary>
 
 # **48. How to enforce separation of concerns for clean architecture?**
 
@@ -9664,9 +9583,9 @@ If rules change (limit increased), only **Domain** updates — not UI.
 
   </details>
 
-  <details><summary>49. Approaches for multi-brand / white-label apps.</summary>
+***
 
-Here’s a **short, interview‑ready**, and **practical** explanation of:
+  <details><summary>49. Approaches for multi-brand / white-label apps.</summary>
 
 # **49. Approaches for Multi‑Brand / White‑Label React Native Apps**
 
@@ -9849,9 +9768,9 @@ This is how **HDFC, SBI, ICICI, Paytm white‑label partners** typically do it.
 
   </details>
 
-  <details><summary>50. Strategy for refactoring legacy Redux to RTK.</summary>
+***
 
-Here’s a **short, interview‑friendly**, and **practical real‑world strategy** for:
+  <details><summary>50. Strategy for refactoring legacy Redux to RTK.</summary>
 
 # **50. Strategy for Refactoring Legacy Redux → Redux Toolkit (RTK)**
 
@@ -10083,10 +10002,9 @@ This sequence ensures **safe**, **non‑breaking**, **incremental** migration.
 <details>
   <summary>API Integration &amp; Networking (12)</summary>
 
-  <details><summary>51. How to design an API layer using Axios/Fetch wrappers?</summary>
-Here’s a **short, interview‑friendly** answer with **production‑grade patterns** and **copy‑pasteable code** for React Native banking apps.
-
 ***
+
+  <details><summary>51. How to design an API layer using Axios/Fetch wrappers?</summary>
 
 ## **51. How to design an API layer using Axios/Fetch wrappers?**
 
@@ -10403,11 +10321,9 @@ export function useCreatePayment() {
 
   </details>
 
-  <details><summary>52. Explain OAuth2/OIDC PKCE flow for mobile apps.</summary>
-
-Below is a **short, interview‑friendly**, super clear explanation of the **OAuth2 / OIDC PKCE flow for mobile apps**, specifically tailored for **React Native + Banking** use cases.
-
 ***
+
+  <details><summary>52. Explain OAuth2/OIDC PKCE flow for mobile apps.</summary>
 
 # **52. Explain OAuth2/OIDC PKCE flow for mobile apps.**
 
@@ -10605,9 +10521,9 @@ Very common in banking because identity is critical.
 
   </details>
 
-  <details><summary>53. How to handle token refresh safely?</summary>
+***
 
-Here’s a **short, interview-ready**, *production-grade* explanation for:
+  <details><summary>53. How to handle token refresh safely?</summary>
 
 # **53. How to handle token refresh safely? (Mobile + Banking Apps)**
 
@@ -10853,13 +10769,11 @@ Before expiry (e.g., using `react-native-background-timer` or AppState listeners
 
   </details>
 
+***
+
   <details><summary>54. Handling retries with exponential backoff.</summary>
 
-Here’s a **short, interview‑friendly** explanation with **production‑grade patterns** for:
-
 # **54. Handling retries with exponential backoff**
-
-***
 
 # ✅ **Short Interview Answer**
 
@@ -11011,9 +10925,9 @@ Useful for reliability metrics & debugging issues.
 
   </details>
 
-  <details><summary>55. Cursor-based vs offset-based pagination.</summary>
+***
 
-Here’s a **short, crisp, interview‑ready** explanation of:
+  <details><summary>55. Cursor-based vs offset-based pagination.</summary>
 
 # **55. Cursor-based vs Offset-based pagination**
 
@@ -11129,9 +11043,9 @@ Super smooth infinite scrolling.
 
   </details>
 
-  <details><summary>56. GraphQL basics: caching, persisted queries.</summary>
+***
 
-Here’s a **short, crisp, interview‑friendly** explanation of:
+  <details><summary>56. GraphQL basics: caching, persisted queries.</summary>
 
 # **56. GraphQL basics: caching, persisted queries**
 
@@ -11311,9 +11225,9 @@ Together → extremely fast and low‑latency mobile API performance.
 
   </details>
 
-  <details><summary>57. How do you validate API response schemas (zod/yup)?</summary>
+***
 
-Here’s a **short, crisp, interview‑ready** answer on:
+  <details><summary>57. How do you validate API response schemas (zod/yup)?</summary>
 
 # **57. How do you validate API response schemas (zod / yup)?**
 
@@ -11478,9 +11392,9 @@ Your screens now receive **strict, typed, sanitized** data.
 
   </details>
 
-  <details><summary>58. Normalizing API errors for consistent UX.</summary>
+***
 
-Here’s a **short, crisp, interview‑ready** explanation for:
+  <details><summary>58. Normalizing API errors for consistent UX.</summary>
 
 # **58. Normalizing API errors for consistent UX**
 
@@ -11675,9 +11589,9 @@ Again — **UI only deals with normalized errors**.
 
   </details>
 
-  <details><summary>59. Secure network logging without exposing PII.</summary>
+***
 
-Here’s a **short, crisp, interview‑ready** explanation for:
+  <details><summary>59. Secure network logging without exposing PII.</summary>
 
 # **59. Secure network logging without exposing PII**
 
@@ -11862,9 +11776,9 @@ Mention **PII Redaction Middleware** + **Zero Trust Logging**.
 
   </details>
 
-  <details><summary>60. Rate limiting & retry policies.</summary>
+***
 
-Here’s a **short, crisp, interview‑ready** answer for:
+  <details><summary>60. Rate limiting & retry policies.</summary>
 
 # **60. Rate limiting & retry policies (API best practices for mobile apps)**
 
@@ -12058,11 +11972,9 @@ So retries don’t duplicate items.
 
   </details>
 
-  <details><summary>61. WebSockets vs polling vs SSE in RN.</summary>
-
-Here’s a **short, interview‑friendly**, practical comparison tailored for **React Native** (banking/fintech apps):
-
 ***
+
+  <details><summary>61. WebSockets vs polling vs SSE in RN.</summary>
 
 ## **61. WebSockets vs Polling vs SSE (Server‑Sent Events) in React Native**
 
@@ -12306,9 +12218,9 @@ export function usePolling(fetchFn: (signal: AbortSignal) => Promise<void>, base
 
   </details>
 
-  <details><summary>62. Time sync issues when signing financial transactions.</summary>
+***
 
-Here’s a **short, crisp, interview‑ready**, banking‑grade answer for:
+  <details><summary>62. Time sync issues when signing financial transactions.</summary>
 
 # **62. Time sync issues when signing financial transactions**
 
@@ -12514,13 +12426,11 @@ Mask or sanitize logs.
 <details>
   <summary>Data Storage & Offline Strategy (6)</summary>
 
-  <details><summary>63. Compare AsyncStorage, MMKV, SQLite, Realm.</summary>
-
-Great topic. In banking apps we care about **speed**, **consistency**, **encryption**, **migrations**, and **debuggability**. Here’s a crisp, interview-ready comparison of **AsyncStorage vs MMKV vs SQLite vs Realm**, with when-to-use, trade‑offs, and tiny code snippets.
-
 ***
 
-## TL;DR Decision Guide
+  <details><summary>63. Compare AsyncStorage, MMKV, SQLite, Realm.</summary>
+
+## Decision Guide
 
 *   **Feature flags, tokens, small JSON, preferences:** **MMKV** (fastest, robust) → fallback **AsyncStorage** for simplest setups.
 *   **Relational data, complex queries, reports, pagination:** **SQLite** (deterministic, ACID, SQL you know).
@@ -12734,11 +12644,9 @@ txns.addListener((collection, changes) => {
 
   </details>
 
-  <details><summary>64. Encrypt-at-rest strategies for mobile storage.</summary>
-
-Here’s a clean, interview‑ready explanation of **Encrypt-at-Rest strategies for mobile storage**, tailored for **React Native in banking/financial apps**.
-
 ***
+
+  <details><summary>64. Encrypt-at-rest strategies for mobile storage.</summary>
 
 # **64. Encrypt‑at‑Rest Strategies for Mobile Storage (Banking‑Grade)**
 
@@ -12960,11 +12868,9 @@ Reduces exposure and allows key rotation.
 
   </details>
 
-  <details><summary>65. How to design offline-first workflows with conflict resolution?</summary>
-
-Here’s a **clean, interview‑ready, banking‑grade explanation** of **offline‑first workflows + conflict resolution**, with patterns, flowcharts, and code examples (Realm/SQLite).
-
 ***
+
+  <details><summary>65. How to design offline-first workflows with conflict resolution?</summary>
 
 # **65. How to Design Offline‑First Workflows with Conflict Resolution**
 
@@ -13221,9 +13127,9 @@ if (local.updatedAt > server.updatedAt) {
 
   </details>
 
-  <details><summary>66. How to manage large lists or caches efficiently?</summary>
+***
 
-Here’s a **clear, interview‑ready**, React Native + banking-focused answer for:
+  <details><summary>66. How to manage large lists or caches efficiently?</summary>
 
 # **66. How to Manage Large Lists or Caches Efficiently?**
 
@@ -13442,9 +13348,9 @@ Result → Smooth, memory efficient, stable.
 
   </details>
 
-  <details><summary>67. Securely caching user/session data.</summary>
+***
 
-Here’s a **sharp, interview‑ready**, React Native + banking‑grade answer for:
+  <details><summary>67. Securely caching user/session data.</summary>
 
 # **67. Securely Caching User / Session Data**
 
@@ -13656,9 +13562,9 @@ api.defaults.headers.Authorization = `Bearer ${token.password}`;
 
   </details>
 
-  <details><summary>68. How to detect rooted/jailbroken devices?</summary>
+***
 
-Here’s a **clean, interview‑ready** answer for:
+  <details><summary>68. How to detect rooted/jailbroken devices?</summary>
 
 # **68. How to Detect Rooted / Jailbroken Devices?**
 
@@ -13870,11 +13776,9 @@ export async function isDeviceCompromised() {
 <details>
   <summary>Security, Compliance &amp; Privacy (14)</summary>
 
-  <details><summary>69. Overview of OWASP MASVS for secure mobile apps.</summary>
-
-Here’s a **clean, interview‑ready overview** of **OWASP MASVS** tailored for **React Native + financial/banking apps**. Short, crisp, and perfect for quick prep.
-
 ***
+
+  <details><summary>69. Overview of OWASP MASVS for secure mobile apps.</summary>
 
 # **69. Overview of OWASP MASVS (Mobile Application Security Verification Standard)**
 
@@ -14070,11 +13974,9 @@ For banking apps → **L2 + R** is REQUIRED.
 
   </details>
 
-  <details><summary>70. PCI-DSS rules for financial mobile apps.</summary>
-
-Here is a **clear, interview‑ready summary of PCI‑DSS requirements for financial mobile apps**, aligned to **PCI‑DSS v4.0.1 (2024–2025)** and using insights from verified sources.
-
 ***
+
+  <details><summary>70. PCI-DSS rules for financial mobile apps.</summary>
 
 # **70. PCI‑DSS Rules for Financial Mobile Apps (Developer‑Friendly Overview)**
 
@@ -14256,12 +14158,9 @@ PCI requires:
 
   </details>
 
-  <details><summary>71. Threat modeling basics (STRIDE) for RN banking apps.</summary>
-
-Here’s a **clean, interview‑ready explanation** of **Threat Modeling Basics (STRIDE)** specifically tailored for **React Native banking apps**.  
-No need for a web search here — this is conceptual content.
-
 ***
+
+  <details><summary>71. Threat modeling basics (STRIDE) for RN banking apps.</summary>
 
 # **71. Threat Modeling Basics (STRIDE) for React Native Banking Apps**
 
@@ -14425,9 +14324,9 @@ Below is the **banking‑focused** explanation of each with React Native example
 
   </details>
 
-  <details><summary>72. Root/jailbreak detection techniques.</summary>
+***
 
-Here is a **clean, interview‑ready answer** for:
+  <details><summary>72. Root/jailbreak detection techniques.</summary>
 
 # **72. Root/Jailbreak Detection Techniques (React Native Banking Apps)**
 
@@ -14647,8 +14546,9 @@ Many banks fully **block** app usage.
 
   </details>
 
+***
+
   <details><summary>73. Anti-tamper measures (anti-hooking, anti-debug).</summary>
-Here is a **crisp, interview‑ready**, banking‑grade answer for:
 
 # **73. Anti‑Tamper Measures (Anti‑Hooking, Anti‑Debugging) for React Native Banking Apps**
 
@@ -14879,9 +14779,9 @@ setInterval(() => {
 
   </details>
 
-  <details><summary>74. Secure screenshot prevention (FLAG_SECURE).</summary>
+***
 
-Here’s a **short, crisp, interview‑ready answer** for:
+  <details><summary>74. Secure screenshot prevention (FLAG_SECURE).</summary>
 
 # **74. Secure Screenshot Prevention (FLAG\_SECURE) in React Native Banking Apps**
 
@@ -15033,9 +14933,9 @@ Banks often require:
 
   </details>
 
-  <details><summary>75. Certificate pinning best practices.</summary>
+***
 
-Here’s a **clean, interview‑ready, banking‑grade answer** for:
+  <details><summary>75. Certificate pinning best practices.</summary>
 
 # **75. Certificate Pinning – Best Practices (React Native Banking Apps)**
 
@@ -15207,9 +15107,9 @@ const api = axios.create({
 
   </details>
 
-  <details><summary>76. Secure session timeout + token invalidation.</summary>
+***
 
-Here is a **crisp, interview‑ready, banking‑grade** answer for:
+  <details><summary>76. Secure session timeout + token invalidation.</summary>
 
 # **76. Secure Session Timeout + Token Invalidation (React Native Banking Apps)**
 
@@ -15415,9 +15315,9 @@ If backend flags risk:
 
   </details>
 
-  <details><summary>77. How to handle sensitive logs & prevent PII leaks.</summary>
+***
 
-Here is a **clean, interview‑ready**, banking‑grade explanation for:
+  <details><summary>77. How to handle sensitive logs & prevent PII leaks.</summary>
 
 # **77. How to Handle Sensitive Logs & Prevent PII Leaks (React Native Banking Apps)**
 
@@ -15611,9 +15511,9 @@ You should mention process-level controls:
 
   </details>
 
-  <details><summary>78. Secure biometric fallback flows.</summary>
+***
 
-Here is a **crisp, interview‑ready, banking‑grade explanation** for:
+  <details><summary>78. Secure biometric fallback flows.</summary>
 
 # **78. Secure Biometric Fallback Flows (React Native Banking Apps)**
 
@@ -15796,9 +15696,9 @@ For payments > threshold:
 
   </details>
 
-  <details><summary>79. Risks of WebViews & how to harden them.</summary>
+***
 
-Here’s a **clean, interview‑ready answer** for:
+  <details><summary>79. Risks of WebViews & how to harden them.</summary>
 
 # **79. Risks of WebViews & How to Harden Them (React Native Banking Apps)**
 
@@ -16086,9 +15986,9 @@ When loading WebView content:
 
   </details>
 
-  <details><summary>80. GDPR/CPRA compliance basics.</summary>
+***
 
-Here’s a **short, crisp, interview‑ready** explanation for:
+  <details><summary>80. GDPR/CPRA compliance basics.</summary>
 
 # **80. GDPR / CPRA Compliance Basics (For Mobile Banking Apps)**
 
@@ -16299,9 +16199,9 @@ You must maintain:
 
   </details>
 
-  <details><summary>81. Permissions hardening (least privilege).</summary>
+***
 
-Here’s a **short, crisp, interview‑ready answer** for:
+  <details><summary>81. Permissions hardening (least privilege).</summary>
 
 # **81. Permissions Hardening (Least Privilege) for React Native Banking Apps**
 
@@ -16465,9 +16365,9 @@ Most banks enforce:
 
   </details>
 
-  <details><summary>82. Secure cryptography usage (don’t roll your own).</summary>
+***
 
-Here is a **short, crisp, interview‑ready**, banking‑grade explanation for:
+  <details><summary>82. Secure cryptography usage (don’t roll your own).</summary>
 
 # **82. Secure Cryptography Usage (Don’t Roll Your Own)**
 
@@ -16684,9 +16584,9 @@ Classify data:
 <details>
   <summary>Performance &amp; Optimization (10)</summary>
 
-  <details><summary>83. How to measure app startup time & TTI?</summary>
+***
 
-Here’s a **short, interview‑ready** explanation with **clear steps + code examples** on:
+  <details><summary>83. How to measure app startup time & TTI?</summary>
 
 ## **83. How to measure app startup time & TTI (Time‑to‑Interactive) in React Native?**
 
@@ -16831,11 +16731,9 @@ Because:
 
   </details>
 
-  <details><summary>84. Reducing bundle size — practical strategies.</summary>
-
-Here’s a **short, crisp, interview‑ready** answer with **practical + code‑based strategies** used in real React Native banking apps.
-
 ***
+
+  <details><summary>84. Reducing bundle size — practical strategies.</summary>
 
 # ✅ **84. Reducing Bundle Size — Practical Strategies**
 
@@ -17021,11 +16919,9 @@ Good ✔️
 
   </details>
 
-  <details><summary>85. Preventing heavy operations on JS thread.</summary>
-
-Here’s a **concise, interview‑ready** guide with **practical patterns + code** to ensure heavy work doesn’t block the **JS thread** (so gestures, animations, and navigation stay smooth).
-
 ***
+
+  <details><summary>85. Preventing heavy operations on JS thread.</summary>
 
 ## **85. Preventing heavy operations on the JS thread**
 
@@ -17253,9 +17149,9 @@ useEffect(() => {
 
   </details>
 
-  <details><summary>86. Image optimization techniques.</summary>
+***
 
-Here’s a **clean, concise, and interview‑ready** answer on:
+  <details><summary>86. Image optimization techniques.</summary>
 
 # **86. Image Optimization Techniques in React Native**
 
@@ -17460,11 +17356,9 @@ const resized = await ImageResizer.createResizedImage(uri, 1024, 1024, 'JPEG', 8
 
   </details>
 
-  <details><summary>87. Jank-free animations using Reanimated.</summary>
-
-Here’s a **concise, interview‑ready** guide with **practical patterns + code** to build **jank‑free animations** in React Native using **Reanimated (v2/v3)**.
-
 ***
+
+  <details><summary>87. Jank-free animations using Reanimated.</summary>
 
 ## 🎯 Core Principle
 
@@ -17718,9 +17612,9 @@ const flip = () => {
 
   </details>
 
-  <details><summary>88. Memory leaks debugging tools (Flipper/Instruments).</summary>
+***
 
-Here’s a **short, interview‑ready** answer for:
+  <details><summary>88. Memory leaks debugging tools (Flipper/Instruments).</summary>
 
 # **88. Memory Leaks Debugging Tools (Flipper / Instruments)**
 
@@ -17938,9 +17832,9 @@ Instruments detects such cycles instantly.
 
   </details>
 
-  <details><summary>89. Performance budgets & CI enforcement.</summary>
+***
 
-Here’s a **clean, short, interview‑ready** answer for:
+  <details><summary>89. Performance budgets & CI enforcement.</summary>
 
 # **89. Performance Budgets & CI Enforcement (React Native)**
 
@@ -18128,9 +18022,9 @@ Any breach → CI failure → PR blocked.
 
   </details>
 
-  <details><summary>90. Avoiding unnecessary re-renders in complex forms.</summary>
+***
 
-Here’s a **short, crisp, interview‑ready answer** with **practical patterns + code** for:
+  <details><summary>90. Avoiding unnecessary re-renders in complex forms.</summary>
 
 # **90. Avoiding Unnecessary Re-renders in Complex Forms**
 
@@ -18322,11 +18216,9 @@ Memory usage ↓ | Re-renders ↓ | Fast typing ↑
 
   </details>
 
-  <details><summary>91. List virtualization strategies.</summary>
-
-Here’s a **clean, interview‑ready answer** with **practical list virtualization strategies** used in real React Native banking apps (transactions, statements, offers, notifications, etc.).
-
 ***
+
+  <details><summary>91. List virtualization strategies.</summary>
 
 # **91. List Virtualization Strategies**
 
@@ -18548,9 +18440,9 @@ Improves:
 
   </details>
 
-  <details><summary>92. Hermes bytecode preloading advantages.</summary>
+***
 
-Here’s a **short, crisp, interview‑ready answer** on:
+  <details><summary>92. Hermes bytecode preloading advantages.</summary>
 
 # **92. Hermes Bytecode Preloading — Advantages**
 
@@ -18709,20 +18601,2052 @@ hermes_bytecode_precompile => true
 <details>
   <summary>Build, Release &amp; CI/CD (8)</summary>
 
-  <details><summary>93. Android build flavors + iOS schemes for multiple envs.</summary></details>
+***
 
-  <details><summary>94. R8/ProGuard rules for safe obfuscation.</summary></details>
+  <details><summary>93. Android build flavors + iOS schemes for multiple envs.</summary>
 
-  <details><summary>95. Handling iOS provisioning, certificates & entitlements.</summary></details>
+# **93. Android Build Flavors + iOS Schemes for Multiple Envs (DEV/STAGE/PROD)**
 
-  <details><summary>96. Secure handling of CI secrets.</summary></details>
+Goal: Ship the **same codebase** to multiple environments (e.g., **dev**, **staging**, **prod**) with **different bundle IDs, icons, API endpoints, Firebase configs, and feature flags**—cleanly and repeatably via CI/CD.
 
-  <details><summary>97. Fastlane basics (build, sign, upload).</summary></details>
+***
 
-  <details><summary>98. Handling store rejections (App Store & Play Store).</summary></details>
+## ✅ ANDROID — **Product Flavors** (+ Build Types)
 
-  <details><summary>99. Phased rollout strategy & kill switches.</summary></details>
+### 1) **Define flavors** (app/build.gradle)
 
-  <details><summary>100. Automated testing + build pipelines with GitHub Actions/Bitrise.</summary></details>
+```gradle
+android {
+  defaultConfig {
+    applicationId "com.mybank.mobile"
+    // ...
+  }
+
+  signingConfigs {
+    release { /* prod keystore */ }
+    staging { /* staging keystore */ }
+    debug   { /* debug keystore */ }
+  }
+
+  buildTypes {
+    debug {
+      applicationIdSuffix ".debug"
+      versionNameSuffix "-debug"
+    }
+    release {
+      minifyEnabled true
+      shrinkResources true
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+      signingConfig signingConfigs.release
+    }
+  }
+
+  flavorDimensions "env"
+
+  productFlavors {
+    dev {
+      dimension "env"
+      applicationIdSuffix ".dev"
+      versionNameSuffix "-dev"
+      resValue "string", "app_name", "MyBank Dev"
+      manifestPlaceholders = [appAuthRedirectScheme: "mybank-dev"]
+    }
+    staging {
+      dimension "env"
+      applicationIdSuffix ".staging"
+      versionNameSuffix "-staging"
+      resValue "string", "app_name", "MyBank Staging"
+      manifestPlaceholders = [appAuthRedirectScheme: "mybank-staging"]
+      signingConfig signingConfigs.staging
+    }
+    prod {
+      dimension "env"
+      resValue "string", "app_name", "MyBank"
+      manifestPlaceholders = [appAuthRedirectScheme: "mybank"]
+      signingConfig signingConfigs.release
+    }
+  }
+}
+```
+
+**What this gives you**
+
+*   Unique **applicationId** per env (`com.mybank.mobile.dev`), so all three can be installed side‑by‑side.
+*   Different **app name**, **deep link scheme**, **keystore**, **icons** (below), **Google Services**, etc.
+
+### 2) **Per‑flavor resources & configs**
+
+Create flavor folders:
+
+    android/app/src/dev/
+    android/app/src/staging/
+    android/app/src/prod/
+
+Typical files per flavor:
+
+    src/dev/google-services.json
+    src/staging/google-services.json
+    src/prod/google-services.json
+
+    src/dev/res/mipmap-*/ic_launcher.png   (dev icon)
+    src/staging/res/mipmap-*/ic_launcher.png
+    src/prod/res/mipmap-*/ic_launcher.png
+
+### 3) **Env variables in JS (react-native-config)**
+
+Install `react-native-config` and create:
+
+    .env.dev
+    API_URL=https://api.dev.mybank.com
+    CODEPUSH_KEY=XXXX
+
+    .env.staging
+    API_URL=https://api.staging.mybank.com
+    CODEPUSH_KEY=YYYY
+
+    .env.prod
+    API_URL=https://api.mybank.com
+    CODEPUSH_KEY=ZZZZ
+
+**Gradle wiring (app/build.gradle):**
+
+```gradle
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
+
+productFlavors {
+  dev { resValue "string", "build_config_package", "com.mybank.mobile" }
+  staging { }
+  prod { }
+}
+```
+
+**Usage in JS:**
+
+```ts
+import Config from 'react-native-config';
+fetch(`${Config.API_URL}/v1/balance`);
+```
+
+### 4) **Run commands**
+
+```bash
+# Assemble
+./gradlew assembleDevDebug
+./gradlew assembleStagingRelease
+./gradlew assembleProdRelease
+
+# Install on device
+./gradlew installDevDebug
+```
+
+***
+
+## ✅ iOS — **Schemes + Configurations + xcconfig**
+
+### 1) **Create Configurations**
+
+In Xcode:
+
+*   Duplicate **Debug** → `Dev`, `Staging`
+*   Duplicate **Release** → `Prod`
+
+You’ll have: `Dev`, `Staging`, `Prod` (and optionally keep Debug/Release for local use).
+
+### 2) **Create **Schemes** mapped to configs**
+
+Create schemes:
+
+*   **MyBank Dev** → uses **Dev** configuration
+*   **MyBank Staging** → uses **Staging**
+*   **MyBank** (Prod) → uses **Prod**
+
+### 3) **Use `xcconfig` for clean settings**
+
+Create files:
+
+    ios/Config/Dev.xcconfig
+    ios/Config/Staging.xcconfig
+    ios/Config/Prod.xcconfig
+
+**Dev.xcconfig example:**
+
+```xcconfig
+PRODUCT_BUNDLE_IDENTIFIER = com.mybank.mobile.dev
+DISPLAY_NAME = MyBank Dev
+APP_AUTH_REDIRECT_SCHEME = mybank-dev
+API_URL = https://api.dev.mybank.com
+```
+
+**Staging.xcconfig & Prod.xcconfig** similarly.
+
+Link each `xcconfig` to the corresponding **Build Configuration** in Xcode (Info tab).
+
+### 4) **Info.plist placeholders**
+
+In **Info.plist**, refer to variables:
+
+```xml
+<key>CFBundleDisplayName</key>
+<string>$(DISPLAY_NAME)</string>
+
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+    <key>CFBundleURLSchemes</key>
+    <array>
+      <string>$(APP_AUTH_REDIRECT_SCHEME)</string>
+    </array>
+  </dict>
+</array>
+```
+
+### 5) **Multiple icons per scheme**
+
+Add asset catalogs per environment or use one catalog with **AppIcon-Dev**, **AppIcon-Staging**, **AppIcon-Prod**.  
+Select the right **Asset Catalog App Icon Set** in **Build Settings** per configuration.
+
+### 6) **Firebase per scheme**
+
+Place `GoogleService-Info.plist` per config:
+
+    ios/MyBank/Resources/Dev/GoogleService-Info.plist
+    ios/MyBank/Resources/Staging/GoogleService-Info.plist
+    ios/MyBank/Resources/Prod/GoogleService-Info.plist
+
+Then, in **Build Settings → Info.plist Preprocessor Prefix File** or a **Run Script** to copy the correct plist based on `${CONFIGURATION}`:
+
+**Run Script (Build Phases):**
+
+```bash
+case "${CONFIGURATION}" in
+  Dev)     cp -r "${PROJECT_DIR}/MyBank/Resources/Dev/GoogleService-Info.plist" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist" ;;
+  Staging) cp -r "${PROJECT_DIR}/MyBank/Resources/Staging/GoogleService-Info.plist" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist" ;;
+  Prod)    cp -r "${PROJECT_DIR}/MyBank/Resources/Prod/GoogleService-Info.plist" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist" ;;
+esac
+```
+
+### 7) **CocoaPods per config (optional)**
+
+In `Podfile`, you can set per‑config flags:
+
+```ruby
+project 'MyBank', {
+  'Dev' => :debug,
+  'Staging' => :release,
+  'Prod' => :release
+}
+
+# Hermes flags or feature flags per config if needed
+```
+
+### 8) **Run**
+
+From CLI:
+
+```bash
+xcodebuild -scheme "MyBank Dev" -configuration Dev -workspace MyBank.xcworkspace -sdk iphonesimulator
+```
+
+***
+
+## 🔐 Provisioning, Signing, and Bundle IDs
+
+*   **Android**: Each flavor can use a different **signingConfig** (dev/staging debug keys; prod release key).
+*   **iOS**: Each configuration uses its own **Bundle ID**, **Provisioning Profile**, and **Signing Certificate** (often managed via **Fastlane match**).
+
+***
+
+## 🌐 Deep Links & App Links per env
+
+*   **Android**: Use flavor‑specific `manifestPlaceholders` and **assetlinks.json** per env.
+*   **iOS**: Use `CFBundleURLSchemes` and **apple-app-site-association** per bundle ID/domain.
+
+***
+
+## 🔥 CI/CD Matrix (GitHub Actions example)
+
+```yaml
+name: Build Matrix
+
+on: [push, pull_request]
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        flavor: [dev, staging, prod]
+        buildType: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 18 }
+      - run: yarn install --frozen-lockfile
+      - run: cd android && ./gradlew assemble${{ matrix.flavor }}${{ matrix.buildType }}
+
+  ios:
+    runs-on: macos-14
+    strategy:
+      matrix:
+        scheme: ["MyBank Dev", "MyBank Staging", "MyBank"]
+        configuration: [Dev, Staging, Prod]
+    steps:
+      - uses: actions/checkout@v4
+      - run: yarn install --frozen-lockfile
+      - run: cd ios && pod install
+      - run: |
+          xcodebuild -workspace MyBank.xcworkspace \
+            -scheme "${{ matrix.scheme }}" \
+            -configuration ${{ matrix.configuration }} \
+            -sdk iphonesimulator \
+            -derivedDataPath build
+```
+
+***
+
+## 🧩 CodePush/AppCenter keys per env
+
+*   **Android**: put **CodePushDeploymentKey** in each flavor’s `strings.xml` or `react-native-config`.
+*   **iOS**: inject via `xcconfig` → Info.plist and pass to CodePush on init.
+
+***
+
+## 🎯 Interview Sound‑Bite
+
+> “I configure **Android product flavors** and **iOS schemes/configurations** to support dev/staging/prod with unique bundle IDs, icons, API endpoints, deep link schemes, Firebase configs, and signing. On Android I use **flavorDimensions**, `applicationIdSuffix`, `manifestPlaceholders`, and per‑flavor resources. On iOS I use **schemes + xcconfig + Info.plist variables** and per‑configuration provisioning. CI runs a **matrix build** across envs, and we wire env vars via **react-native-config** and CodePush keys per environment. This lets us ship and test safely without cross‑contamination.”
+
+  </details>
+
+***
+
+  <details><summary>94. R8/ProGuard rules for safe obfuscation.</summary>
+
+> 🔎 Scope: Android only (R8/ProGuard). iOS doesn’t use ProGuard—use **dSYM** symbol uploads for Crashlytics instead.
+
+***
+
+## 🎯 Goals
+
+*   **Enable minification + resource shrinking** for small APK/AAB.
+*   **Keep only what reflection needs** (RN bridge, JSON mappers, DI, annotations).
+*   **Obfuscate the rest** for security.
+*   **Upload mapping.txt** to Play Console / Crashlytics.
+
+***
+
+## ✅ Gradle Setup (Release)
+
+```gradle
+// android/app/build.gradle
+android {
+  buildTypes {
+    release {
+      minifyEnabled true          // turns on R8 (ProGuard replacement)
+      shrinkResources true        // removes unused res
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+      signingConfig signingConfigs.release
+    }
+  }
+}
+```
+
+> Also enable per‑flavor if you use **dev/staging/prod**.
+
+***
+
+## ✅ Core R8/ProGuard Rules (React Native + Common Libs)
+
+Paste into `android/app/proguard-rules.pro` and keep only what you use.
+
+```pro
+#############################################
+# React Native / Hermes / SoLoader
+#############################################
+
+# Keep RN core (uses reflection)
+-keep class com.facebook.react.** { *; }
+-dontwarn com.facebook.react.**
+-keep class com.facebook.hermes.** { *; }
+-dontwarn com.facebook.hermes.**
+-keep class com.facebook.jni.** { *; }
+-dontwarn com.facebook.jni.**
+-keep class com.facebook.soloader.** { *; }
+-dontwarn com.facebook.soloader.**
+
+# RN DevSupport may be stripped in release, but silence warnings
+-dontwarn com.facebook.react.devsupport.**
+
+# Keep TurboModules/JSI bindings and annotations
+-keep class com.facebook.react.bridge.** { *; }
+-keep class com.facebook.react.turbomodule.** { *; }
+-keep class com.facebook.react.uimanager.** { *; }
+-keepattributes *Annotation*
+
+#############################################
+# Networking (OkHttp/Okio/Retrofit)
+#############################################
+
+# OkHttp/Okio are reflection-safe but keep to avoid over-shrinking
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-keep class okhttp3.** { *; }
+-keep class okio.** { *; }
+
+# Retrofit keeps interface method names for dynamic proxies
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+# Keep Retrofit method/param annotations
+-keepclassmembers interface * {
+    @retrofit2.http.* <methods>;
+}
+
+#############################################
+# JSON Mappers (Gson / Moshi / Jackson)
+#############################################
+
+# Gson: keep model fields and SerializedName annotations
+-dontwarn com.google.gson.**
+-keep class com.google.gson.** { *; }
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+-keepattributes *Annotation*, Signature
+
+# Moshi (if used): keep generated adapters & reflectively looked-up fields
+-dontwarn com.squareup.moshi.**
+-keep class com.squareup.moshi.** { *; }
+-keep @com.squareup.moshi.JsonClass class * { *; }
+-keepclasseswithmembers class * {
+    @com.squareup.moshi.Json <fields>;
+}
+-keepclassmembers class **JsonAdapter { *; }
+
+# Jackson (if used)
+-dontwarn com.fasterxml.jackson.**
+-keep class com.fasterxml.jackson.** { *; }
+-keepclassmembers class * {
+    @com.fasterxml.jackson.annotation.* <fields>;
+}
+-keepattributes *Annotation*, Signature
+
+#############################################
+# Dependency Injection (Hilt/Dagger)
+#############################################
+
+# Hilt/Dagger generated code & annotations
+-dontwarn dagger.**, dagger.hilt.**
+-keep class dagger.** { *; }
+-keep class dagger.hilt.** { *; }
+-keep class * implements dagger.android.HasAndroidInjector { *; }
+-keep class **_HiltModules { *; }
+-keepclassmembers,allowobfuscation class * {
+    @dagger.* <methods>;
+    @javax.inject.* <fields>;
+}
+-keepattributes *Annotation*
+
+#############################################
+# Kotlin / Coroutines
+#############################################
+
+-dontwarn kotlin.**, kotlinx.**
+-keep class kotlin.** { *; }
+-keep class kotlinx.coroutines.** { *; }
+-keepclassmembers class kotlinx.coroutines.internal.MainDispatcherFactory { *; }
+-keepclassmembers class kotlinx.coroutines.CoroutineExceptionHandler { *; }
+-keepattributes *Annotation*, InnerClasses, EnclosingMethod, Signature
+
+#############################################
+# AndroidX / AppCompat / WorkManager
+#############################################
+
+-dontwarn androidx.**
+-keep class androidx.** { *; }
+# WorkManager uses reflection to discover Workers
+-keep class * extends androidx.work.ListenableWorker { *; }
+-keepclassmembers class * extends androidx.work.ListenableWorker {
+    <init>(android.content.Context, androidx.work.WorkerParameters);
+}
+
+#############################################
+# Firebase / Play Services (if used)
+#############################################
+
+-dontwarn com.google.firebase.**, com.google.android.gms.**
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+-keep class com.google.crypto.tink.** { *; }   # often bundled with Firebase
+
+#############################################
+# Logging / Crashlytics
+#############################################
+
+-dontwarn com.google.firebase.crashlytics.**
+-keep class com.google.firebase.crashlytics.** { *; }
+# Keep Timber (if used) so tag names survive if you rely on them
+-dontwarn timber.log.**
+-keep class timber.log.Timber { *; }
+
+#############################################
+# RN Image / Vector / Lottie (optional)
+#############################################
+
+# react-native-vector-icons loads fonts via reflection
+-keep class com.oblador.vectoricons.** { *; }
+-dontwarn com.oblador.vectoricons.**
+
+# Lottie
+-keep class com.airbnb.lottie.** { *; }
+-dontwarn com.airbnb.lottie.**
+
+#############################################
+# Reflection-sensitive app code
+#############################################
+
+# Keep @Keep annotated elements as-is
+-keep @androidx.annotation.Keep class * { *; }
+-keepclasseswithmembers class * {
+    @androidx.annotation.Keep <methods>;
+    @androidx.annotation.Keep <fields>;
+}
+
+# Keep classes used by JNI/NDK
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+# Keep enums' values() and valueOf() when parsed by name
+-keepclassmembers enum * { 
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+# Keep your Application subclass if instantiated reflectively
+-keep class com.mybank.mobile.MainApplication { *; }
+-keep class com.mybank.mobile.MainActivity { *; }
+
+#############################################
+# Suppress common warnings (safe)
+#############################################
+
+-dontnote javax.annotation.**
+-dontwarn javax.annotation.**
+```
+
+> 🧪 **Tip:** If a specific SDK is not used, remove its block to avoid over‑keeping.
+
+***
+
+## 📦 React Native specifics (why these rules?)
+
+*   RN uses **reflection** to register modules/views, load Hermes, and hook JSI/TurboModules. Over‑aggressive obfuscation can break initialization or module lookup.
+*   Networking/JSON libraries rely on **annotations and generated adapters**—you must keep annotations and relevant class members.
+*   WorkManager/DI frameworks discover classes via reflection → keep their constructors/members.
+
+***
+
+## 🧪 Troubleshooting checklist
+
+*   **Crashes only in Release** → likely R8 removed or obfuscated something needed by reflection.
+*   Look for:
+    *   `NoSuchFieldException` / `NoSuchMethodException`
+    *   JSON fields becoming `null` after obfuscation
+    *   Workers/Services not found
+*   **Fix** by:
+    *   Adding `@Keep` to model/worker classes
+    *   Keeping annotations: `-keepattributes *Annotation*`
+    *   Targeted `-keepclassmembers` for constructors used by frameworks
+    *   Avoid blanket `-keep class ** { *; }` (kills obfuscation).
+
+***
+
+## 🔐 Security + Size best practices
+
+*   Use **R8 (default)**; it performs shrinking + obfuscation + optimization in one step.
+*   Enable `shrinkResources true` to strip unused resources.
+*   Prefer **Hermes bytecode precompilation** (smaller JS + faster startup).
+*   Avoid `-dontobfuscate` or global `-keep` unless absolutely necessary.
+*   Upload **mapping.txt** to:
+    *   **Google Play Console** (automatic deobfuscation for ANRs/crashes).
+    *   **Firebase Crashlytics** (CI step).
+
+**Example CI upload (Crashlytics Gradle task)**:
+
+```bash
+./gradlew :app:assembleProdRelease
+./gradlew :app:uploadCrashlyticsSymbolFileProdRelease
+```
+
+***
+
+## 🧪 Minimal rule set to start (safe default)
+
+If you want the fewest lines that work for most RN apps:
+
+```pro
+-keep class com.facebook.** { *; }
+-dontwarn com.facebook.**
+
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-keepattributes *Annotation*, Signature, InnerClasses, EnclosingMethod
+
+-keepclassmembers class * {
+  @com.google.gson.annotations.SerializedName <fields>;
+}
+-keep @androidx.annotation.Keep class * { *; }
+-keepclasseswithmembernames class * { native <methods>; }
+
+# WorkManager Workers
+-keep class * extends androidx.work.ListenableWorker { *; }
+-keepclassmembers class * extends androidx.work.ListenableWorker {
+  <init>(android.content.Context, androidx.work.WorkerParameters);
+}
+```
+
+Add other blocks as you integrate more libs.
+
+***
+
+## 🎯 Short interview sound‑bite
+
+> “I enable `minifyEnabled` + `shrinkResources` and keep reflection‑dependent bits only: RN core (bridge/JSI), networking/JSON annotations, DI, WorkManager constructors, JNI, and `@Keep` models. I upload `mapping.txt` to Play/Crashlytics. This preserves functionality while maximizing obfuscation and size reduction.”
+
+  </details>
+
+***
+
+  <details><summary>95. Handling iOS provisioning, certificates & entitlements.</summary>
+
+# **95. Handling iOS Provisioning, Certificates & Entitlements**
+
+*(Critical for RN release builds, CI/CD, TestFlight & App Store submissions)*
+
+This is one of the most commonly asked iOS build‑pipeline questions in mobile engineering interviews—especially in enterprise/banking environments.
+
+***
+
+# ✅ **1. Core Components You Must Manage**
+
+### **1) Certificates**
+
+These prove *who* is signing the app.
+
+Types:
+
+*   **Apple Development Certificate** → local debugging on devices
+*   **Apple Distribution Certificate** → TestFlight + App Store
+*   **(Optional) Apple Enterprise Certificate** → internal in‑org distribution
+
+Stored in macOS Keychain.
+
+***
+
+### **2) Provisioning Profiles**
+
+These bind:
+
+*   A **certificate**
+*   A **bundle identifier**
+*   A **set of devices** (for Dev/Ad‑Hoc)
+*   A **distribution method** (App Store / Ad-Hoc / Enterprise)
+
+Types:
+
+*   **Development Profile**
+*   **Ad Hoc Profile**
+*   **App Store Profile**
+*   **Enterprise Profile**
+
+***
+
+### **3) Entitlements**
+
+Capabilities your app is allowed to use. Examples:
+
+*   Keychain Access Groups
+*   Push Notifications
+*   App Groups
+*   Universal Links / Associated Domains
+*   iCloud
+*   Sign in with Apple
+*   Background Modes
+*   HealthKit
+*   Biometrics (`com.apple.developer.biometric`)
+
+Managed via:
+
+*   **Xcode Capabilities tab**
+*   `*.entitlements` file
+
+***
+
+# ✅ **2. Standard Setup for a Multi‑Environment RN App (Dev / Staging / Prod)**
+
+Usually you have:
+
+| ENV     | Bundle ID            | Provisioning | Certificate       | Purpose     |
+| ------- | -------------------- | ------------ | ----------------- | ----------- |
+| Dev     | `com.mybank.dev`     | Dev Profile  | Dev Cert          | QA, testers |
+| Staging | `com.mybank.staging` | Dev / Ad-Hoc | Dev / Dist        | UAT         |
+| Prod    | `com.mybank.app`     | App Store    | Distribution Cert | App Store   |
+
+Each scheme config maps to its own bundle ID & entitlement file.
+
+***
+
+# ✅ **3. How to Configure in Xcode (Step-by-Step)**
+
+### **1) Create Build Configurations**
+
+You create:
+
+*   Dev
+*   Staging
+*   Prod
+
+### **2) Create Schemes**
+
+*   MyBank Dev
+*   MyBank Staging
+*   MyBank
+
+Each scheme points to a unique configuration.
+
+***
+
+### **3) Setup Bundle Identifiers (with xcconfig)**
+
+**Dev.xcconfig:**
+
+```xcconfig
+PRODUCT_BUNDLE_IDENTIFIER = com.mybank.dev
+CODE_SIGN_STYLE = Manual
+DEVELOPMENT_TEAM = ABC1234567
+```
+
+**Staging.xcconfig:**
+
+```xcconfig
+PRODUCT_BUNDLE_IDENTIFIER = com.mybank.staging
+```
+
+**Prod.xcconfig:**
+
+```xcconfig
+PRODUCT_BUNDLE_IDENTIFIER = com.mybank.app
+```
+
+***
+
+### **4) Assign Entitlement Files**
+
+Create:
+
+    MyBank/MyBank.dev.entitlements
+    MyBank/MyBank.staging.entitlements
+    MyBank/MyBank.prod.entitlements
+
+Each contains environment‑specific keys, e.g.:
+
+**MyBank.dev.entitlements**
+
+```xml
+<dict>
+	<key>aps-environment</key>
+	<string>development</string>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:dev.mybank.com</string>
+	</array>
+</dict>
+```
+
+**MyBank.prod.entitlements**
+
+```xml
+<dict>
+	<key>aps-environment</key>
+	<string>production</string>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:mybank.com</string>
+	</array>
+</dict>
+```
+
+Assign them in:
+**Xcode → Target → Build Settings → Code Signing Entitlements**
+
+***
+
+# ✅ **4. Managing Certificates & Profiles the Right Way (Securely)**
+
+### ❌ BAD (manual)
+
+*   Developer machines manually manage certs/profiles
+*   People forget passwords
+*   Hard to rotate
+*   Breaks CI/CD
+
+### ✔️ BEST PRACTICE → **Use Fastlane Match**
+
+Centralizes certificates + profiles in encrypted repo.
+
+**Fastlane Match setup:**
+
+```bash
+fastlane match development
+fastlane match appstore
+fastlane match adhoc
+```
+
+Uses:
+
+*   Private Git repo
+*   Encrypted via openssl
+*   Automatically syncs to CI/CD & all developers
+
+This is industry standard in banking/fintech orgs.
+
+***
+
+# ✅ **5. iOS CI/CD Pipeline Requirements (GitHub Actions / Bitrise / Jenkins)**
+
+Your steps usually look like:
+
+### **1) Install certificates + profiles (via Match)**
+
+```bash
+bundle exec fastlane match appstore --readonly
+```
+
+### **2) Set Xcode variables**
+
+```bash
+xcodebuild \
+  -workspace MyBank.xcworkspace \
+  -scheme "MyBank" \
+  -configuration Prod \
+  -allowProvisioningUpdates \
+  -archivePath build/MyBank.xcarchive \
+  archive
+```
+
+### **3) Export with correct entitlements**
+
+```bash
+xcodebuild -exportArchive \
+  -archivePath build/MyBank.xcarchive \
+  -exportOptionsPlist ./exportOptions.plist \
+  -exportPath build
+```
+
+### **4) Upload to TestFlight**
+
+```bash
+xcrun altool --upload-app -t ios ...
+```
+
+Or with Fastlane:
+
+```bash
+fastlane upload_testflight
+```
+
+***
+
+# ✅ **6. Security Notes (important in banking interviews)**
+
+*   Never store `.p12` or provisioning files in repo
+*   Always use encrypted secrets in CI
+*   Rotate distribution certificates yearly (Apple expiry)
+*   Sync revoke events from Apple Developer Portal
+*   Ensure entitlements match exactly with App Store settings
+*   Universal Links not working? Re‑match entitlements (bundle ID mismatch).
+
+***
+
+# 🧩 **Common Entitlement Issues & Fixes**
+
+### ❌ Push notifications not working
+
+→ Wrong `aps-environment`: development vs production
+
+### ❌ Universal Links fail
+
+→ Wrong applinks domain in entitlements
+
+### ❌ Keychain items lost across reinstalls
+
+→ Keychain Access Groups mismatch
+
+### ❌ AppStore upload rejects build
+
+→ Code signing style “Manual” vs “Automatic” mismatch  
+→ Wrong provisioning profile included during export
+
+### ❌ Biometrics not available
+
+Ensure:
+
+```xml
+<key>NSFaceIDUsageDescription</key>
+<string>We use Face ID for secure login</string>
+```
+
+***
+
+# 🎯 **Short Interview Sound‑Bite**
+
+> “For iOS signing, I manage Dev/Staging/Prod using separate **bundle IDs**, **schemes**, and **entitlements**. Certificates and provisioning profiles are handled via **Fastlane Match**, which securely syncs signing assets across the team and CI/CD. Each scheme has its own entitlements (push, associated domains, app groups). CI runs archive + export steps with the correct provisioning profile. This setup ensures secure, predictable releases for TestFlight and App Store.”
+
+  </details>
+
+***
+
+  <details><summary>96. Secure handling of CI secrets.</summary>
+
+# **96. Secure Handling of CI Secrets**
+
+*(Best practices for GitHub Actions, Bitrise, Jenkins, Azure DevOps, and banking‑grade CI/CD)*
+
+Handling secrets is a critical topic—especially in **financial/banking** apps where mismanagement can lead to credential leaks, data breaches, or compromised build systems.
+
+Below is a **short, practical, developer‑friendly** explanation with **examples** you can confidently give in interviews.
+
+***
+
+# ✅ **1. Store Secrets Only in Encrypted CI Secret Managers**
+
+Never store secrets in:
+❌ Git repos  
+❌ Shell scripts  
+❌ build.gradle / xcconfig  
+❌ .env files committed to source
+
+Use CI secret managers:
+
+| CI/CD          | Secret Store                     |
+| -------------- | -------------------------------- |
+| GitHub Actions | **GitHub Encrypted Secrets**     |
+| Bitrise        | **Secret Environment Variables** |
+| GitLab         | **Masked Variables**             |
+| Jenkins        | **Credentials Binding Plugin**   |
+| Azure DevOps   | **Secure Pipeline Variables**    |
+
+Example (GitHub Actions):
+
+```yaml
+env:
+  FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+  IOS_CERT_PWD: ${{ secrets.IOS_CERT_PWD }}
+```
+
+***
+
+# ✅ **2. Never Echo Secrets in CI Logs**
+
+Example:
+
+```yaml
+run: echo "$FIREBASE_TOKEN"
+```
+
+❌ BAD — logs leak secrets.
+
+Should be masked automatically, but don't ever print it.
+
+Use secrets **only in commands**:
+
+```yaml
+run: firebase deploy --token="$FIREBASE_TOKEN"
+```
+
+***
+
+# ✅ **3. Use Least Privilege Secrets**
+
+*   Separate secrets for **Dev**, **Staging**, **Prod**
+*   Prod should have the **fewest people & pipelines** with access
+*   Rotate keys every 30–90 days
+*   Do not reuse secrets across services
+
+Example:
+
+    ANDROID_KEYSTORE_DEV
+    ANDROID_KEYSTORE_STAGING
+    ANDROID_KEYSTORE_PROD
+
+Prod keystore should *never* be accessible from dev pipelines.
+
+***
+
+# ✅ **4. Use Secret Scanning & Leak Prevention**
+
+Enable:
+
+*   GitHub Advanced Security (secret scanning)
+*   Pre‑commit hooks (`trufflehog`, `git-secrets`)
+*   CI scanners (e.g., Snyk, GitGuardian)
+
+Example dev workflow:
+
+```bash
+npx trufflehog git file:///repo
+```
+
+Prevents committing `.p12`, `.mobileprovision`, `.env`, tokens, etc.
+
+***
+
+# ✅ **5. Encrypt Sensitive Files (Keystores, Provisioning Profiles)**
+
+For iOS:
+
+*   Use **Fastlane Match** (encrypted signing repo)
+*   Uses OpenSSL AES-256 encryption
+
+Android:
+Encrypt keystore files before storing in repo or CI storage:
+
+```bash
+openssl enc -aes-256-cbc -k "$PASS" -in mybank.keystore -out mybank.keystore.enc
+```
+
+Decrypt only during build:
+
+```yaml
+run: openssl enc -aes-256-cbc -d -k "$PASS" -in mybank.keystore.enc -out mybank.keystore
+```
+
+***
+
+# ✅ **6. Use Access Control & Role-Based Permissions**
+
+For GitHub:
+
+*   Only CI runners should read Prod secrets
+*   Developers should NOT have access to Prod keys
+*   Use **Environment Protection Rules**
+
+Example:
+
+*   `prod` environment → requires approval
+*   `staging` environment → auto-run
+*   `dev` → fully open
+
+```yaml
+environment: production
+```
+
+This ensures Prod secrets are only injected into approved workflows.
+
+***
+
+# ✅ **7. Signed, Trusted CI Runners Only**
+
+Avoid public runners for sensitive jobs.
+
+Use:
+
+*   Self-hosted macOS runners for iOS builds
+*   Self-hosted Linux runners for Android builds
+*   Locked-down network/VPC
+*   Zero public IP
+
+For banking workflows, pipelines run within isolated secure build agents.
+
+***
+
+# ✅ **8. Use Secret‑Oriented Tools for Credentials (Especially iOS)**
+
+### **iOS Best Practice**
+
+Use Fastlane Match:
+
+```bash
+fastlane match appstore --readonly
+fastlane match development
+```
+
+It:
+
+*   Encrypts certs/profiles
+*   Stores in private Git repo
+*   Syncs securely with CI
+
+### **Android Best Practice**
+
+Do not include keystore in repo.  
+Inject via encrypted CI storage:
+
+```yaml
+env:
+  ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+
+run: echo "$ANDROID_KEYSTORE_B64" | base64 --decode > mybank.keystore
+```
+
+***
+
+# ✅ **9. Zero Trust Design for Secrets in Pipelines**
+
+*   Secrets should **never** be accessible to forked PRs
+*   Only internal contributors with permissions can run pipelines with secrets
+*   Use "pull\_request\_target" with caution (security risk)
+
+***
+
+# ✅ **10. Rotate Secrets Regularly + Detect Usage**
+
+Rotation interval:
+
+*   CI tokens: 30–60 days
+*   App signing: yearly (Apple cert expiry)
+*   Service credentials: quarterly
+
+Add monitoring:
+
+*   GitHub Secret Usage Insights
+*   AWS/Azure Key vault audit logs
+*   Fastlane match history
+
+***
+
+# 🎯 **Short Interview Answer**
+
+> “We store secrets only in encrypted CI secret managers, never in source control. We prevent secret printing in logs, enforce least‑privilege access, rotate secrets regularly, and isolate Dev/Staging/Prod secrets. Sensitive files like iOS certificates and Android keystores are encrypted and injected only during CI via secure runners. We use tools like Fastlane Match, git-secrets, and GitHub secret scanning to prevent leaks. In banking pipelines, we ensure Prod secrets are only exposed to protected workflows and signed/self-hosted runners.”
+
+  </details>
+
+***
+
+  <details><summary>97. Fastlane basics (build, sign, upload).</summary>
+
+# 🚀 **97. Fastlane Basics (Build, Sign, Upload)**
+
+Fastlane is a tool that automates **building**, **code signing**, and **uploading** iOS/Android apps to **TestFlight**, **App Store**, **Play Store**, or internal CI.
+
+***
+
+# ✅ **1. Install & Initialize Fastlane**
+
+Inside the `android` and `ios` folders:
+
+```bash
+cd ios
+fastlane init
+
+cd android
+fastlane init
+```
+
+Fastlane creates a `Fastfile` (+ Appfile, Matchfile).
+
+***
+
+# ✅ **2. Code Signing with Fastlane Match (iOS)**
+
+This is the most important part for iOS.
+
+### **Initialize Match**
+
+```bash
+fastlane match init
+```
+
+### **Create & Sync Certificates/Profiles**
+
+```bash
+fastlane match development
+fastlane match appstore
+```
+
+What this does:
+
+*   Creates certs & provisioning profiles
+*   Stores them **encrypted** in a private Git repo
+*   Syncs certs automatically to CI
+
+### **Use Match in your lane**
+
+```ruby
+lane :sign_ios do
+  match(type: "appstore")
+end
+```
+
+***
+
+# ✅ **3. Build iOS App (Archive)**
+
+```ruby
+lane :build_ios do
+  match(type: "appstore")   # required for signing
+  build_app(
+    scheme: "MyBank",
+    export_method: "app-store"
+  )
+end
+```
+
+Fastlane runs:
+
+*   `xcodebuild archive`
+*   Generates `.xcarchive` and `.ipa`
+
+***
+
+# ✅ **4. Upload to TestFlight / App Store**
+
+```ruby
+lane :upload_ios do
+  build_ios
+  upload_to_testflight
+end
+```
+
+Or for direct App Store upload:
+
+```ruby
+upload_to_app_store
+```
+
+***
+
+# ✅ **5. Android Signing with Fastlane**
+
+Android uses:
+
+*   `keystore.jks`
+*   `key.properties`
+
+Fastlane signs automatically during Gradle build.
+
+### **Build Android**
+
+```ruby
+lane :build_android do
+  gradle(
+    task: "assemble",
+    build_type: "Release"
+  )
+end
+```
+
+### **Upload to Play Store**
+
+Use `supply` (now part of Fastlane).
+
+```ruby
+lane :upload_android do
+  build_android
+  upload_to_play_store(
+    track: "internal"
+  )
+end
+```
+
+Supported tracks:
+
+*   `internal`
+*   `alpha`
+*   `beta`
+*   `production`
+
+***
+
+# ✅ **6. Full Example Fastfile (Production‑Ready)**
+
+```ruby
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and upload to TestFlight"
+  lane :release do
+    match(type: "appstore")
+    build_app(
+      scheme: "MyBank",
+      export_method: "app-store"
+    )
+    upload_to_testflight
+  end
+end
+
+platform :android do
+  desc "Build and upload to Play Internal"
+  lane :release do
+    gradle(
+      task: "assemble",
+      build_type: "Release"
+    )
+    upload_to_play_store(track: "internal")
+  end
+end
+```
+
+***
+
+# ⭐ **What Fastlane Automates in Practical Terms**
+
+## **iOS**
+
+✔ Certificate creation  
+✔ Provisioning profiles  
+✔ Code signing  
+✔ Xcode build steps  
+✔ TestFlight upload  
+✔ App Store metadata / screenshots (optional)
+
+## **Android**
+
+✔ Gradle builds  
+✔ Signing  
+✔ Upload to Google Play  
+✔ Store listing (optional)
+
+***
+
+# 🔐 CI/CD Integration (GitHub Actions Example)
+
+```yaml
+- name: Install Fastlane
+  run: sudo gem install fastlane
+
+- name: iOS Release
+  run: bundle exec fastlane ios release
+```
+
+Secrets like:
+
+*   `MATCH_PASSWORD`
+*   `APPLE_ID`
+*   `PLAY_STORE_JSON_KEY`
+
+are stored securely in CI secret vault.
+
+***
+
+# 🎯 **Short Interview Sound‑Bite**
+
+> “Fastlane automates the full release pipeline. For iOS, I use `match` to manage certificates and provisioning profiles, `build_app` to archive the IPA, and `upload_to_testflight` for distribution. For Android, I run Gradle via Fastlane and use `upload_to_play_store`. This setup ensures repeatable, consistent builds in CI/CD.”
+
+  </details>
+
+***
+
+  <details><summary>98. Handling store rejections (App Store & Play Store).</summary>
+
+# **98. Handling Store Rejections (App Store & Play Store)**
+
+*(practical steps + common rejection reasons + templates)*
+
+Store rejections are common in **banking/financial apps**, and knowing how to handle them professionally is a key interview skill.
+
+***
+
+# ✅ **A) Common App Store Rejection Reasons (iOS)**
+
+### **1. Metadata / Compliance Issues**
+
+*   Wrong screenshots, misleading descriptions
+*   Missing privacy details (App Privacy section)
+*   Missing permissions text (e.g., FaceID, Camera, Location)
+
+**Fix:** Update metadata in App Store Connect → resubmit.
+
+***
+
+### **2. Guideline 5.1 — Privacy / Data Collection**
+
+*   Asking for permissions before explaining reason
+*   Not disclosing all SDKs / trackers
+*   Missing consent flows
+*   Collecting data not needed for app function
+
+**Fix:**
+
+*   Add consent screen
+*   Update privacy text: “We use Face ID for secure login to your banking account.”
+*   Ensure **ATS (App Transport Security)** is enabled.
+
+***
+
+### **3. Guideline 2.1 — App Crashes or Login Issues**
+
+*   Reviewer can’t log in
+*   Backend under maintenance during review
+*   Test user account expired
+
+**Fix:**  
+Provide working test credentials, skip OTP for reviewers, or create **review-mode flag**.
+
+***
+
+### **4. Payments / Regulatory**
+
+*   Using non‑Apple payments (not allowed for digital goods)
+*   Missing EULA
+
+**Fix:** Adjust flows or clearly mark purchases as non-digital goods.
+
+***
+
+### **5. Not Following Human Interface Guidelines**
+
+*   Broken UI on iPad
+*   Landscape not supported but declared
+*   Navigation issues
+
+**Fix:** Test across all required devices, update UI.
+
+***
+
+# 🔧 **How to Respond to App Store Rejection (Template)**
+
+**Subject:** Resolution Center Reply
+
+    Hello App Review Team,
+
+    We appreciate your feedback. The issue has been addressed as follows:
+
+    - [Fix description]
+    - [Permission text updated]
+    - [Screenshots corrected]
+    - [Provided new test user credentials]
+
+    Please re-review the updated build. Let us know if any additional information is needed.
+
+    Thank you,
+    Team MyBank
+
+Be **polite, clear, and factual**. Apple responds faster.
+
+***
+
+# ✅ **B) Common Play Store Rejection Reasons (Android)**
+
+### **1. Privacy Policy Violations**
+
+*   Missing privacy policy link
+*   Not declaring sensitive permissions
+*   Misleading data-sharing statements
+
+**Fix:**  
+Update Play Console → App Content → Privacy Policy.  
+Add policy on website + inside app.
+
+***
+
+### **2. Device/App Permissions**
+
+*   Using SMS, CALL\_LOG, Accessibility, or location without clear purpose
+*   Background location without justification
+
+**Fix:**
+
+*   Remove unnecessary permissions
+*   Add in-app explanation dialog
+*   Update Play Console declarations (Data Safety form).
+
+***
+
+### **3. Crashes / ANRs during review**
+
+Happens if:
+
+*   Review device incompatible
+*   Libraries missing ABIs
+*   No internet fallback
+
+**Fix:** Add graceful error handling + universal ABIs.
+
+***
+
+### **4. Financial App Restrictions**
+
+For banking apps:
+
+*   Must declare encryption
+*   Must avoid risky permissions
+*   Must follow security guidelines
+
+***
+
+### **5. Policy Violations**
+
+*   Impersonation (wrong app name/logos)
+*   Inappropriate screenshots
+*   Missing disclaimers for beta/testing builds
+
+***
+
+# 🔧 **How to Respond to Play Store Rejection (Template)**
+
+    Hello Google Play Review Team,
+
+    We have resolved the issue mentioned in the rejection:
+
+    - [Fix summary]
+    - [Updated declarations/permissions]
+    - [Enhanced privacy policy]
+
+    Please re-review the latest build.
+
+    Regards,
+    Team MyBank
+
+Google prefers bullet‑point explanations.
+
+***
+
+# ✅ **C) Best Practices to Avoid Rejections (Both Stores)**
+
+### **1. Provide Stable Test Credentials**
+
+*   Test account with all roles
+*   No OTP required or provide bypass mechanism
+*   Working backend environment
+
+***
+
+### **2. Double‑check permissions & privacy**
+
+*   All permissions must have a clear “why” dialog
+*   Provide custom messages (Camera, Face ID, Location)
+*   Ensure Data Safety / App Privacy sections are accurate
+
+***
+
+### **3. Test on Real Devices & OS Versions**
+
+*   iOS: iPhone SE → iPad Pro
+*   Android: Low-end → high-end, Android 8–14
+
+***
+
+### **4. Check for crashes, network errors**
+
+Use:
+
+*   Crashlytics
+*   Firebase Test Lab
+*   BrowserStack App Automate
+
+***
+
+### **5. Validate Metadata**
+
+*   Screenshots
+*   App name
+*   Descriptions
+*   Category (Finance/Banking)
+*   Copyright
+*   EULA
+*   In-app permissions justification
+
+***
+
+# 🎯 **Short Interview‑Ready Answer**
+
+> “To handle store rejections, I identify which guideline was violated (Apple’s App Store Review Guidelines or Google Play Policies), reproduce the issue, apply the fix, and respond clearly through the review portal. Common causes are incorrect permissions, privacy policy gaps, test account failures, metadata problems, or crashes. For iOS, we often update entitlements, permission strings, or test account flows. For Android, we update the Play Console data privacy declarations, permissions, or fix ANRs. I always provide clear, polite responses and resubmit quickly.”
+
+  </details>
+
+***
+
+  <details><summary>99. Phased rollout strategy & kill switches.</summary>
+
+# **99. Phased Rollout Strategy & Kill Switches**
+
+*(Critical for safe releases in banking/financial apps)*
+
+***
+
+# 🎯 Why this matters
+
+In banking apps, you can NEVER ship a full release immediately.  
+Risk of:
+
+*   Crashes
+*   API incompatibility
+*   Feature flags misbehaving
+*   Performance spikes
+*   Compliance issues
+
+A failed release → blocked transactions → regulatory escalation.
+
+So we use:
+
+👉 **Phased Rollouts** → Limit release to a small % of users.  
+👉 **Kill Switches** → Remotely disable problematic features *without redeploying*.
+
+***
+
+# ✅ **1. Phased Rollout Strategy (App Store & Play Store)**
+
+## **A) Google Play (Android)**
+
+Google Play supports **staged rollouts** natively.
+
+### **Typical banking rollout steps**
+
+*   Day 1 → **1% rollout**
+*   Monitor: crashes, ANRs, login success, API errors
+*   Day 2 → **5%**
+*   Day 3–4 → **20%**
+*   Day 5 → **50%**
+*   Day 6 → **100%**
+
+### **Implemented via Google Play Console**
+
+**Production track → “Staged rollout”**  
+Select: 1%, 5%, 10%, 25%, 50%, 100%
+
+### **Automatic Safeguards**
+
+*   If crash rate > threshold → rollout automatically halts
+*   You can pause rollout anytime
+*   You can roll back to previous version instantly
+
+***
+
+## **B) App Store (iOS)**
+
+Apple supports **Phased Release** for App Store builds.
+
+Options:
+
+*   7‑day automatic ramp‑up (1%, 2%, 5%, 10%, 20%, 50%, 100%)
+*   Or manually pause the rollout
+
+iOS does not support staged percentage selection as flexibly as Android, but you can still:
+
+*   Pause
+*   Resume
+*   Halt
+*   Release fully manually
+
+> In practice, **iOS + Android** releases are coordinated to follow the same timeline.
+
+***
+
+# ✅ **2. Backend‑Driven Feature Flags**
+
+To avoid full releases for small changes → use controlled rollout via backend.
+
+Popular libraries:
+
+*   **LaunchDarkly**
+*   **Firebase Remote Config**
+*   **ConfigCat**
+*   **Unleash**
+*   **Custom backend API**
+
+### Minimal React Native pattern:
+
+```ts
+const config = await fetchRemoteConfig(); // API call
+
+if (config.newDashboardEnabled) {
+  return <NewDashboard />;
+} else {
+  return <OldDashboard />;
+}
+```
+
+### Rolls out features without app update:
+
+*   % rollout
+*   Target users by region, device model, app version
+*   Ability to instantly kill feature
+
+***
+
+# ✅ **3. Kill Switches (Critical for banking apps)**
+
+A **kill switch** remotely disables a broken feature or build **without shipping a new version**.
+
+### Use cases:
+
+*   Security vulnerability discovered
+*   Payment/UPI/transaction module down
+*   Critical API failure
+*   Analytics spike
+*   Some OS updates break core flows
+*   A/B experiment harms performance
+
+***
+
+## **A) Global Kill Switch (block entire app version)**
+
+Backend returns:
+
+```json
+{
+  "appVersion": "3.4.1",
+  "forceUpdate": true,
+  "message": "This version is no longer supported."
+}
+```
+
+Client:
+
+```ts
+if (config.forceUpdate) {
+  navigateToForceUpdateScreen();
+}
+```
+
+This allows:
+
+*   Blocking vulnerable builds
+*   Forcing users to upgrade
+*   Avoiding store review delays
+
+***
+
+## **B) Feature‑specific Kill Switch**
+
+Backend returns:
+
+```json
+{
+  "enableUPIPayments": false
+}
+```
+
+Client:
+
+```tsx
+if (!config.enableUPIPayments) return <MaintenanceMessage />;
+```
+
+Examples of kill switches:
+
+*   UPI or IMPS disabled during downtime
+*   Card activation flow off
+*   Offer banners disabled during outage
+*   New UI/feature rolled back
+
+***
+
+# ✅ **4. CI/CD Integration for Safe Rollouts**
+
+### Recommended steps:
+
+1.  **Build dev → staging → prod via Fastlane**
+2.  Upload to:
+    *   TestFlight for internal build
+    *   Play Store Internal testing
+3.  Automated smoke tests
+4.  Manual QA sign-off
+5.  Promote to:
+    *   iOS Production (phased release ON)
+    *   Android Production (staged rollout 1%)
+6.  Monitor metrics (critical!)
+
+***
+
+# ✅ **5. Monitoring During Rollout (Kill Switch triggers)**
+
+Tools:
+
+*   Firebase Crashlytics (crashes)
+*   Firebase Performance, AppD, New Relic (TTI, FPS, network failures)
+*   Sentry (JS errors)
+*   Splunk/Elastic logs (API failures)
+*   Google Play Vitals
+*   App Store Analytics
+
+### Automatic thresholds:
+
+*   Crash-Free Sessions < 99.5% → kill switch triggered
+*   API failure rate > 5% → rollback
+*   ANR > 0.47% → rollback
+*   Login failures spike → rollback
+
+***
+
+# 🧠 **6. Example Rollout Failure Handling Flow**
+
+**Day 1 — 1% rollout**  
+Crash spike → `UPIInitCrashException`
+
+**Fix:**  
+Issue remote kill switch:
+
+```json
+{
+  "enableUPI": false
+}
+```
+
+**Action:**
+
+*   UPI button disappears for all users
+*   Keep rollout paused
+*   Patch fix → release version 3.4.2
+*   New rollout begins after stability
+
+***
+
+# 🎯 **Short Interview‑Ready Answer**
+
+> “We use a phased rollout strategy: Android via staged rollouts (1%, 5%, 20%, 50%, 100%) and iOS via Phased Release. We monitor crashes, ANRs, API errors, and performance closely. We also use backend‑driven feature flags and kill switches so we can disable a broken feature or force-update a vulnerable version without shipping a new build. This protects users and ensures safe releases—critical for banking apps.”
+
+  </details>
+
+***
+
+  <details><summary>100. Automated testing + build pipelines with GitHub Actions/Bitrise.</summary>
+
+# **100. Automated Testing + Build Pipelines with GitHub Actions / Bitrise**
+
+*(Banking‑grade mobile CI/CD best practices)*
+
+This question is VERY common in senior RN interviews — they want to know if you can run automated tests, build stable binaries, and handle multi‑env release automation.
+
+Below is a concise + practical answer with examples.
+
+***
+
+# ✅ **1. What a Full Mobile CI/CD Pipeline Includes**
+
+A complete pipeline consists of:
+
+### **1) Automated checks**
+
+*   Linting (ESLint)
+*   Type checking (TypeScript)
+*   Unit tests (Jest)
+*   JS/Native formatting checks (Prettier)
+*   Security scanning (npm audit, trufflehog, GitHub Advanced Security)
+*   E2E tests (Detox / Maestro)
+
+### **2) Build steps**
+
+*   iOS: `xcodebuild`, Fastlane
+*   Android: Gradle builds
+*   Multi‑env: dev / staging / prod
+
+### **3) Deployment**
+
+*   Upload to App Center, TestFlight, Play Store
+*   OTA updates (CodePush)
+*   Tag creation, release notes
+
+***
+
+# -----------------------------------------------------------
+
+# 🚀 **2. GitHub Actions — Modern & Popular for RN**
+
+Below is a **real-world pipeline** structure:
+
+***
+
+## **A) Lint + Unit Tests Pipeline**
+
+`.github/workflows/ci.yml`:
+
+```yaml
+name: CI
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - run: yarn install --frozen-lockfile
+
+    - name: Lint
+      run: yarn lint
+
+    - name: Type Check
+      run: yarn tsc --noEmit
+
+    - name: Unit Tests
+      run: yarn test --coverage
+```
+
+Ensures all PRs follow coding standards and don’t break business logic.
+
+***
+
+## **B) E2E Testing (Detox/Maestro)**
+
+```yaml
+- uses: actions/setup-java@v3
+  with:
+    distribution: temurin
+    java-version: 17
+
+- run: yarn detox build --configuration android.emu.release
+- run: yarn detox test --configuration android.emu.release
+```
+
+OR Maestro (lighter):
+
+```yaml
+- uses: mobile-dev-inc/action-maestro-cloud@v1
+  with:
+    app-file: app-release.apk
+    test-files: .maestro
+```
+
+***
+
+## **C) Android Release Build + Play Store Upload**
+
+```yaml
+jobs:
+  android-release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-java@v3
+      with:
+        java-version: 17
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - run: yarn install
+
+    - name: Decode Keystore
+      run: echo "$KEYSTORE_BASE64" | base64 --decode > mybank.keystore
+
+    - name: Build AAB
+      run: |
+        cd android
+        ./gradlew bundleProdRelease
+
+    - name: Upload to Play
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_JSON }}
+        packageName: com.mybank.app
+        releaseFiles: android/app/build/outputs/bundle/prodRelease/app-prod-release.aab
+        track: internal
+```
+
+***
+
+## **D) iOS Archive + TestFlight Upload (Fastlane)**
+
+```yaml
+jobs:
+  ios-release:
+    runs-on: macos-14
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with: { node-version: 18 }
+
+    - name: Install Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
+
+    - run: |
+        cd ios
+        pod install
+
+    - name: Build & Upload with Fastlane
+      run: bundle exec fastlane ios release
+      env:
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_API_KEY }}
+```
+
+***
+
+# -----------------------------------------------------------
+
+# 🚀 **3. Bitrise — Specialized Mobile CI/CD**
+
+Bitrise provides **mobile-focused pipelines** and is incredibly good for RN.
+
+***
+
+## **A) Typical Bitrise Workflow**
+
+1.  **Git Clone**
+2.  **Install Node & Yarn**
+3.  **Run Lint, Type Check, Jest tests**
+4.  **Install CocoaPods**
+5.  **Android build step**
+6.  **iOS build step**
+7.  **Code signing (Bitrise Certificates tool)**
+8.  **Deploy to:**
+    *   TestFlight (Bitrise Deploy to iTunes)
+    *   Google Play (Bitrise Google Play Deploy)
+    *   App Center
+
+### Example:
+
+**Workflow: Production → Staged Release**
+
+*   build-dev → QA
+*   build-staging → internal testers
+*   build-prod → TestFlight → phased App Store rollout
+*   Android → Play Store internal → staged rollout
+
+***
+
+## **B) Bitrise + RN E2E tests**
+
+Detox is heavy; Bitrise provides device testing add‑ons:
+
+*   **Bitrise Device Testing** (Android + iOS)
+*   **Firebase Test Lab integration**
+
+Good for:
+
+*   Login tests
+*   Transactions flow
+*   Payments flow
+*   Onboarding/KYC flow
+
+***
+
+# -----------------------------------------------------------
+
+# 🔐 **4. Secure Secret Handling (Banking-grade)**
+
+*   Use **GitHub Encrypted Secrets / Bitrise Secrets**
+*   Use **Fastlane Match** for iOS signing
+*   Upload keystore as **Base64 encrypted**
+*   Never commit `.p12`, `.mobileprovision`, `keystore`, `.env*`
+*   Use separate secrets per env:
+    *   DEV\_API\_KEY
+    *   STAGING\_API\_KEY
+    *   PROD\_API\_KEY
+
+***
+
+# -----------------------------------------------------------
+
+# 🎯 **5. What Interviewers Want to Hear (Short Answer)**
+
+> “I set up automated CI pipelines using GitHub Actions or Bitrise including linting, TypeScript checks, unit tests, E2E tests, bundle size checks, and security scanning. For builds, I use Gradle for Android and Fastlane for iOS with Match for signing. Releases automatically upload to TestFlight and Google Play internal track. Secrets are securely stored in CI vaults. The entire flow supports dev/staging/prod environments and phased/staged rollouts for safe banking releases.”
+
+  </details>
 
 </details>
