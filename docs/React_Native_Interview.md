@@ -10083,29 +10083,2427 @@ This sequence ensures **safe**, **non‑breaking**, **incremental** migration.
 <details>
   <summary>API Integration &amp; Networking (12)</summary>
 
-  <details><summary>51. How to design an API layer using Axios/Fetch wrappers?</summary></details>
+  <details><summary>51. How to design an API layer using Axios/Fetch wrappers?</summary>
+Here’s a **short, interview‑friendly** answer with **production‑grade patterns** and **copy‑pasteable code** for React Native banking apps.
 
-  <details><summary>52. Explain OAuth2/OIDC PKCE flow for mobile apps.</summary></details>
+***
 
-  <details><summary>53. How to handle token refresh safely?</summary></details>
+## **51. How to design an API layer using Axios/Fetch wrappers?**
 
-  <details><summary>54. Handling retries with exponential backoff.</summary></details>
+### ✅ **Short Interview Answer**
 
-  <details><summary>55. Cursor-based vs offset-based pagination.</summary></details>
+“Create a **single HTTP client** (Axios/Fetch wrapper) with **typed methods**, **timeouts**, **retries**, **cancellation**, **auth token injection**, and **consistent error handling**. Keep endpoints in **service modules**, isolate **network concerns** (logging, backoff, headers) in the client, and expose **domain-friendly functions** to the app. Optionally integrate with **React Query** for caching.”
 
-  <details><summary>56. GraphQL basics: caching, persisted queries.</summary></details>
+***
 
-  <details><summary>57. How do you validate API response schemas (zod/yup)?</summary></details>
+## **Goals of a good API layer**
 
-  <details><summary>58. Normalizing API errors for consistent UX.</summary></details>
+*   **Single source** of HTTP truth (baseURL, timeouts, headers)
+*   **Security**: auth token injection, idempotency keys, PII scrubbing
+*   **Reliability**: retries with backoff, network timeouts, cancellation
+*   **Observability**: structured logging, request IDs, error normalization
+*   **DX**: TypeScript types, narrow return shapes, simple function signatures
+*   **Extensibility**: middleware/interceptors, plugins (e.g., Sentry)
 
-  <details><summary>59. Secure network logging without exposing PII.</summary></details>
+***
 
-  <details><summary>60. Rate limiting & retry policies.</summary></details>
+## **Recommended Structure**
 
-  <details><summary>61. WebSockets vs polling vs SSE in RN.</summary></details>
+    src/
+      services/
+        http/
+          httpClient.ts         // Axios/Fetch wrapper
+          interceptors.ts       // req/resp interceptors
+          errors.ts             // error normalization
+          backoff.ts            // retry strategy
+        api/
+          auth.api.ts           // feature service (clean functions)
+          accounts.api.ts
+          transactions.api.ts
 
-  <details><summary>62. Time sync issues when signing financial transactions.</summary></details>
+***
+
+## **1) Core Axios Client (Typed, Secure, Robust)**
+
+```ts
+// services/http/httpClient.ts
+import axios, { AxiosError, AxiosInstance } from "axios";
+import { getAccessToken } from "../secureTokens";
+import { normalizeError, ApiError } from "./errors";
+import { withExponentialBackoff } from "./backoff";
+
+export type HttpClient = {
+  get<T>(url: string, config?: object): Promise<T>;
+  post<T, B = unknown>(url: string, body?: B, config?: object): Promise<T>;
+  put<T, B = unknown>(url: string, body?: B, config?: object): Promise<T>;
+  patch<T, B = unknown>(url: string, body?: B, config?: object): Promise<T>;
+  delete<T>(url: string, config?: object): Promise<T>;
+  raw: AxiosInstance;
+};
+
+const DEFAULT_TIMEOUT_MS = 15_000;
+
+export function createHttpClient(baseURL: string): HttpClient {
+  const instance = axios.create({
+    baseURL,
+    timeout: DEFAULT_TIMEOUT_MS,
+  });
+
+  // Request interceptor: auth, headers, request-id, idempotency key (for POST/transfer)
+  instance.interceptors.request.use(async (config) => {
+    const token = await getAccessToken(); // secure MMKV + Keychain/Keystore
+    if (token) config.headers = { ...config.headers, Authorization: `Bearer ${token}` };
+
+    // Correlation ID
+    config.headers = { "x-request-id": makeRequestId(), ...config.headers };
+
+    // Example: idempotency for sensitive POSTs (payments, transfers)
+    if (config.method === "post" && isIdempotentEndpoint(config.url)) {
+      config.headers["Idempotency-Key"] = config.headers["Idempotency-Key"] ?? makeIdempotencyKey();
+    }
+
+    // Prevent caching for GET in some flows
+    if (config.method === "get") {
+      config.headers["Cache-Control"] = "no-cache";
+    }
+    return config;
+  });
+
+  // Response interceptor: normalize errors, retry on transient failures
+  instance.interceptors.response.use(
+    (resp) => resp,
+    async (error: AxiosError) => {
+      const normalized = normalizeError(error);
+
+      // Retry policy: only for safe/retriable conditions
+      const retriable = normalized.isNetworkError || [502, 503, 504].includes(normalized.status ?? 0);
+      const method = error.config?.method?.toLowerCase();
+
+      if (retriable && (method === "get" || method === "head")) {
+        return withExponentialBackoff(() => instance.request(error.config!));
+      }
+
+      // Token handling example (optional): if 401, signal auth refresh flow elsewhere
+      // if (normalized.status === 401) { emitAuthExpiredEvent(); }
+
+      return Promise.reject(normalized);
+    }
+  );
+
+  // Narrow typed helpers
+  async function wrap<T>(promise: Promise<any>): Promise<T> {
+    try {
+      const res = await promise;
+      return res.data as T;
+    } catch (e) {
+      throw e as ApiError;
+    }
+  }
+
+  return {
+    get: <T>(url: string, config?: object) => wrap<T>(instance.get(url, config)),
+    post: <T, B = unknown>(url: string, body?: B, config?: object) => wrap<T>(instance.post(url, body, config)),
+    put:  <T, B = unknown>(url: string, body?: B, config?: object) => wrap<T>(instance.put(url, body, config)),
+    patch:<T, B = unknown>(url: string, body?: B, config?: object) => wrap<T>(instance.patch(url, body, config)),
+    delete:<T>(url: string, config?: object) => wrap<T>(instance.delete(url, config)),
+    raw: instance,
+  };
+}
+
+// utils
+function makeRequestId() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+function makeIdempotencyKey() {
+  return `idem_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+function isIdempotentEndpoint(url?: string) {
+  return url?.includes("/payments") || url?.includes("/transfers");
+}
+```
+
+***
+
+## **2) Error Normalization**
+
+```ts
+// services/http/errors.ts
+import { AxiosError } from "axios";
+
+export type ApiError = Error & {
+  status?: number;
+  code?: string; // backend/business code
+  isNetworkError?: boolean;
+  details?: unknown;
+  requestId?: string;
+};
+
+export function normalizeError(err: unknown): ApiError {
+  if ((err as AxiosError).isAxiosError) {
+    const e = err as AxiosError<any>;
+    const apiErr: ApiError = new Error(extractMessage(e));
+    apiErr.status = e.response?.status;
+    apiErr.code = e.response?.data?.code ?? e.code;
+    apiErr.isNetworkError = !e.response;
+    apiErr.details = scrubPII(e.response?.data);
+    apiErr.requestId = e.response?.headers?.["x-request-id"];
+    return apiErr;
+  }
+  const apiErr: ApiError = new Error("Unexpected error");
+  return apiErr;
+}
+
+function extractMessage(e: AxiosError<any>) {
+  return e.response?.data?.message || e.message || "Network error";
+}
+
+// Ensure logs don’t keep raw PII
+function scrubPII(payload: any) {
+  if (!payload) return undefined;
+  const clone = { ...payload };
+  if (clone.pan) clone.pan = mask(clone.pan);
+  if (clone.aadhaar) clone.aadhaar = "***masked***";
+  return clone;
+}
+function mask(v: string) {
+  return v.replace(/\d(?=\d{4})/g, "*");
+}
+```
+
+***
+
+## **3) Retry / Backoff Utility**
+
+```ts
+// services/http/backoff.ts
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+export async function withExponentialBackoff<T>(
+  fn: () => Promise<T>,
+  { tries = 3, base = 300, factor = 2, jitter = true } = {}
+): Promise<T> {
+  let attempt = 0;
+  let lastError: any;
+  while (attempt < tries) {
+    try { return await fn(); } catch (e) {
+      lastError = e;
+      attempt++;
+      if (attempt >= tries) break;
+      let wait = base * Math.pow(factor, attempt - 1);
+      if (jitter) wait = wait * (0.5 + Math.random());
+      await sleep(wait);
+    }
+  }
+  throw lastError;
+}
+```
+
+***
+
+## **4) Feature Service Modules (Domain‑friendly APIs)**
+
+```ts
+// services/api/transactions.api.ts
+import { createHttpClient } from "../http/httpClient";
+
+const http = createHttpClient(process.env.API_BASE_URL!);
+
+export type Transaction = {
+  id: string;
+  accountId: string;
+  amount: number;
+  currency: "INR" | "USD";
+  timestamp: string;
+  status: "PENDING" | "POSTED" | "FAILED";
+};
+
+// Narrow, typed functions – don’t leak Axios outside
+export const TransactionsApi = {
+  list: (accountId: string, cursor?: string) =>
+    http.get<{ items: Transaction[]; nextCursor?: string }>(
+      `/accounts/${accountId}/transactions`,
+      { params: { cursor, limit: 50 } }
+    ),
+  detail: (id: string) => http.get<Transaction>(`/transactions/${id}`),
+  // Sensitive: add idempotency automatically via interceptor
+  createPayment: (payload: { fromId: string; toId: string; amount: number }) =>
+    http.post<{ paymentId: string; status: string }>(`/payments`, payload),
+};
+```
+
+***
+
+## **5) Cancellation (important for fast navigation / list searches)**
+
+```ts
+// Usage example with AbortController
+const controller = new AbortController();
+http.raw.get("/search", { signal: controller.signal, params: { q } });
+// later on unmount or input change:
+controller.abort();
+```
+
+> With Axios v1+, `signal` supports AbortController natively.
+
+***
+
+## **6) Using with React Query (recommended for server cache)**
+
+```ts
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { TransactionsApi } from "../services/api/transactions.api";
+
+export function useTransactions(accountId: string) {
+  return useQuery({
+    queryKey: ["transactions", accountId],
+    queryFn: () => TransactionsApi.list(accountId),
+    staleTime: 30_000,
+  });
+}
+
+export function useCreatePayment() {
+  return useMutation({
+    mutationFn: TransactionsApi.createPayment,
+  });
+}
+```
+
+*   Let **React Query** handle caching, dedupe, background refresh.
+*   Keep the **HTTP client** responsible for security/retries/errors.
+
+***
+
+## **7) Production Security Checklist (Banking)**
+
+*   **Auth tokens** from **secure storage** (Keychain/Keystore via MMKV), not Redux.
+*   **Idempotency keys** for POST transfers/payments (prevent double-charging).
+*   **Request/Correlation IDs** for tracing (backend logs).
+*   **PII scrubbing** in logs/analytics.
+*   **TLS pinning** if policy requires (e.g., `react-native-ssl-pinning` via a custom fetch; or use a native networking module).
+*   **Timeouts & backoff** on all requests.
+*   **Least privilege headers**; no secrets in query params.
+*   **Environment isolation**: dev/qa/uat/prod base URLs via schemes/flavors.
+*   **Input validation** at domain layer before calling API.
+
+***
+
+## **8) Nice-to-haves**
+
+*   **Auto-refresh token** queue (serialize requests while refreshing).
+*   **Global offline awareness** (NetInfo) to soft-fail quickly.
+*   **Pagination helpers** (cursor-based).
+*   **Upload/download helpers** with progress callbacks.
+*   **Metrics hooks** (duration, retries, status distribution).
+
+***
+
+## **Interview One‑liner**
+
+> “I wrap Axios in a typed client with interceptors for auth, request IDs, idempotency keys, timeouts and backoff. Errors are normalized centrally. Feature modules expose small typed functions. React Query handles caching, while the client enforces security, reliability, and observability.”
+
+  </details>
+
+  <details><summary>52. Explain OAuth2/OIDC PKCE flow for mobile apps.</summary>
+
+Below is a **short, interview‑friendly**, super clear explanation of the **OAuth2 / OIDC PKCE flow for mobile apps**, specifically tailored for **React Native + Banking** use cases.
+
+***
+
+# **52. Explain OAuth2/OIDC PKCE flow for mobile apps.**
+
+## ✅ **Short Interview Answer**
+
+“PKCE is an extension to OAuth2/OIDC that makes the Authorization Code flow secure for mobile apps. The mobile app generates a random `code_verifier` and a hashed `code_challenge`. It sends the challenge during login. After the user authenticates in the browser, the authorization server returns an authorization code. The app exchanges that code along with the original `code_verifier`. If the two match, it gets tokens (ID token, access token, refresh token). This prevents attackers from stealing the authorization code and using it.”
+
+***
+
+# 🌟 **Why PKCE? (Simple Explanation)**
+
+Mobile apps **cannot store client secrets safely** (APK/IPA can be reverse engineered).
+
+PKCE makes OAuth secure **without a client secret** by adding:
+
+*   **Code Verifier** (random string kept *only* on device)
+*   **Code Challenge** (hash of verifier sent to auth server)
+
+So even if someone steals the authorization code, they **cannot** exchange it without the verifier.
+
+***
+
+# 🔐 **OAuth2 + OIDC PKCE Flow (Step-by-Step)**
+
+## **1️⃣ App creates:**
+
+*   `code_verifier` → long random string
+*   `code_challenge = SHA256(code_verifier)` (Base64URL-encoded)
+
+```ts
+const codeVerifier = generateRandomString();
+const codeChallenge = base64UrlEncode(sha256(codeVerifier));
+```
+
+***
+
+## **2️⃣ App opens system browser (AppAuth Chrome Custom Tab / SafariViewController)**
+
+Redirect user to:
+
+    https://auth-server.com/authorize?
+      response_type=code&
+      client_id=mobile-app&
+      code_challenge=XYZ123&
+      code_challenge_method=S256&
+      redirect_uri=myapp://callback
+
+### Why system browser?
+
+*   More secure (cookies isolated, anti‑phishing)
+*   Supports SSO
+
+***
+
+## **3️⃣ User logs in on the Authorization Server**
+
+May involve:
+
+*   Username+Password
+*   MFA/OTP
+*   Aadhaar/PAN verification
+*   Biometrics
+
+OIDC adds **ID Token** (JWT with user identity).
+
+***
+
+## **4️⃣ Authorization Server redirects back to the app**
+
+Example:
+
+    myapp://callback?code=AUTH_CODE_ABC
+
+Your deep-link / AppAuth callback receives this.
+
+***
+
+## **5️⃣ App exchanges code + verifier for tokens**
+
+POST:
+
+    grant_type=authorization_code
+    code=AUTH_CODE_ABC
+    code_verifier=ORIGINAL_VERIFIER
+    redirect_uri=myapp://callback
+
+### Server verifies:
+
+`SHA256(code_verifier)` must equal `code_challenge`.
+
+If valid → returns:
+
+```json
+{
+  "access_token": "...",
+  "refresh_token": "...",
+  "id_token": "...",
+  "expires_in": 3600
+}
+```
+
+***
+
+## **6️⃣ App stores tokens securely**
+
+❌ Not Redux  
+❌ Not AsyncStorage  
+✔ **MMKV + device Keychain/Keystore**
+
+***
+
+## **7️⃣ App uses access token in API calls**
+
+```ts
+Authorization: Bearer ACCESS_TOKEN
+```
+
+***
+
+## **8️⃣ Refresh token flow**
+
+The app silently refreshes tokens:
+
+    grant_type=refresh_token
+    refresh_token=....
+
+New tokens → old ones overwritten.
+
+***
+
+# 🔍 **OIDC (OpenID Connect) Extras**
+
+OIDC adds **Identity Layer** on top of OAuth2.
+
+You get:
+
+*   **ID Token** → user identity in JWT
+*   **UserInfo endpoint**
+*   **Standard claims** (email, name, sub ID, phone)
+
+Very common in banking because identity is critical.
+
+***
+
+# 🏦 **Why PKCE is essential in mobile banking?**
+
+### ✔ Prevents authorization code interception
+
+(e.g., malicious app capturing the redirect code)
+
+### ✔ No need to ship client secret in app
+
+(attackers can reverse engineer the binary)
+
+### ✔ Mandatory for high‑security & regulatory flows
+
+(eKYC, payments, UPI)
+
+### ✔ Works with device SSO
+
+(Okta, Auth0, Azure AD, Keycloak)
+
+***
+
+# 🎯 **Simple Diagram (Interview Friendly)**
+
+    App -----------------> Auth Server
+        (code_challenge)
+
+    Browser Login -----> Auth Server
+                         |
+                         v
+    Callback <--------- Auth Server
+         (auth_code)
+
+    App -----------------> Auth Server
+      (auth_code + code_verifier)
+
+    Tokens <------------- Auth Server
+
+***
+
+# 🧪 Common React Native Libraries
+
+*   **react-native-app-auth** → Best & most secure
+*   **@azure/msal-react-native** → Azure AD / B2C
+*   **OIDC custom WebView redirect** → ❌ Avoid for banking
+*   **OAuth via browser deep-link** → Recommended
+
+***
+
+# 🎤 **Interview One‑liner**
+
+> “PKCE secures the OAuth2 Authorization Code flow for mobile apps by using a code\_verifier + code\_challenge pair. Even if the authorization code is intercepted, attackers cannot exchange it without the verifier. The PKCE flow uses a system browser, returns an auth code, then exchanges it securely for tokens stored in Keychain/Keystore.”
+
+  </details>
+
+  <details><summary>53. How to handle token refresh safely?</summary>
+
+Here’s a **short, interview-ready**, *production-grade* explanation for:
+
+# **53. How to handle token refresh safely? (Mobile + Banking Apps)**
+
+This is one of the most important topics for *secure mobile apps*.  
+Your answer must show **security**, **race‑condition safety**, and **correct architecture**.
+
+***
+
+# ✅ **Short Interview Answer**
+
+“I use a secure refresh token flow with an isolated token service. I queue API requests during a refresh, refresh the token only once, retry the original request after success, and log the user out on repeated failures. Tokens are stored in secure storage (Keychain/Keystore via MMKV encrypted). The API client handles refresh internally through Axios interceptors.”
+
+***
+
+# 🔐 **Core Principles for Safe Token Refresh (Banking Grade)**
+
+### ✔ 1. **Never refresh tokens in Redux / UI hooks**
+
+Always refresh in the **API layer**, not in UI code.
+
+### ✔ 2. **Only one refresh at a time**
+
+Prevent multiple refresh calls → avoid token overwrite.
+
+### ✔ 3. **Queue pending requests**
+
+Requests that fail with 401 are queued until refresh completes.
+
+### ✔ 4. **Store tokens securely**
+
+Store using:
+
+*   iOS Keychain
+*   Android Keystore
+*   Backed by **MMKV encrypted** instance
+
+### ✔ 5. **Detect refresh-token theft / expiry → force logout**
+
+If refresh fails → clear storage and logout safely.
+
+### ✔ 6. **Use an idempotent refresh mechanism**
+
+Refresh request must NOT duplicate user actions.
+
+***
+
+# 🧩 **Standard Architecture**
+
+    httpClient (Axios)
+       ├─ Auth Interceptor (attach access token)
+       ├─ Response Interceptor (detect 401)
+       │       ├─ queue requests
+       │       ├─ refresh token (once)
+       │       ├─ retry queued requests
+       │       └─ logout if refresh fails
+    secureTokens.ts (Keychain/MMKV)
+    redux authSlice (only stores user profile; not tokens)
+
+***
+
+# 🛠️ **Code: Safe Token Refresh Queue (Axios)**
+
+### **1) Secure Token Storage**
+
+```ts
+// secureTokens.ts
+import { MMKV } from "react-native-mmkv";
+
+const storage = new MMKV({ id: "secure", encryptionKey: "keyFromKeychain" });
+
+export function getAccessToken() {
+  return storage.getString("accessToken") ?? null;
+}
+
+export function getRefreshToken() {
+  return storage.getString("refreshToken") ?? null;
+}
+
+export function saveTokens({ accessToken, refreshToken }) {
+  if (accessToken) storage.set("accessToken", accessToken);
+  if (refreshToken) storage.set("refreshToken", refreshToken);
+}
+
+export function clearTokens() {
+  storage.delete("accessToken");
+  storage.delete("refreshToken");
+}
+```
+
+***
+
+### **2) Axios Refresh Logic (One Refresh at a Time)**
+
+```ts
+// httpClient.ts
+import axios from "axios";
+import { getAccessToken, getRefreshToken, saveTokens, clearTokens } from "./secureTokens";
+
+let isRefreshing = false;
+let requestQueue: { resolve: Function; reject: Function }[] = [];
+
+async function refreshToken() {
+  const refresh = getRefreshToken();
+  if (!refresh) throw new Error("No refresh token");
+
+  const resp = await axios.post("/auth/refresh", { refreshToken: refresh });
+  saveTokens(resp.data);
+  return resp.data.accessToken;
+}
+
+const api = axios.create({ baseURL: process.env.API_URL });
+
+api.interceptors.request.use((config) => {
+  const token = getAccessToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+api.interceptors.response.use(
+  (res) => res,
+  async (err) => {
+    const originalRequest = err.config;
+
+    // If unauthorized
+    if (err.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      // If refresh already happening → enqueue
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          requestQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch(Promise.reject);
+      }
+
+      // Begin refresh
+      isRefreshing = true;
+
+      try {
+        const newToken = await refreshToken();
+
+        // Retry queued requests
+        requestQueue.forEach((p) => p.resolve(newToken));
+        requestQueue = [];
+        isRefreshing = false;
+
+        // Set new token and retry failed request
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return api(originalRequest);
+      } catch (refreshErr) {
+        requestQueue.forEach((p) => p.reject(refreshErr));
+        requestQueue = [];
+        isRefreshing = false;
+
+        // Logout strategy
+        clearTokens();
+        // Optionally: dispatch(logout()) or navigate("Login")
+        return Promise.reject(refreshErr);
+      }
+    }
+
+    return Promise.reject(err);
+  }
+);
+
+export default api;
+```
+
+***
+
+# 🔥 **Why This is Safe for Banking Apps**
+
+### **1. Prevents token races**
+
+Multiple failed requests → only **one** refresh is executed.
+
+### **2. Protects against token overwrite**
+
+Queue ensures old refresh responses cannot overwrite new tokens.
+
+### **3. Supports deep background refresh**
+
+Safe for:
+
+*   Auto-refresh before expiry
+*   App resume
+*   Silent SSO
+
+### **4. Not vulnerable to refresh attacks**
+
+Refresh tokens remain in:
+
+*   Keystore
+*   Keychain
+
+Not in memory or Redux.
+
+### **5. No accidental token leaks**
+
+Tokens are never logged.  
+No URL query params.  
+Headers only.
+
+***
+
+# ⚠️ **Edge Cases to Handle (Mention in Interview)**
+
+### ✔ Refresh token expired → logout
+
+### ✔ Auth server unreachable → show offline UI
+
+### ✔ App opened with expired tokens → bootstrap refresh
+
+### ✔ Request while refreshing → must be queued
+
+### ✔ Force logout on refresh token reuse (stolen token)
+
+***
+
+# 🏦 Banking-Specific Enhancements
+
+### 🔸 **Add device binding keys**
+
+Refresh requests must include device ID / public key.
+
+### 🔸 **Use OAuth2/OIDC refresh rules**
+
+Never refresh more than allowed (rotate refresh tokens).
+
+### 🔸 **Refresh in background tasks**
+
+Before expiry (e.g., using `react-native-background-timer` or AppState listeners).
+
+***
+
+# 🎤 **Interview One‑Liner**
+
+> “I use a secure refresh-token flow in the Axios layer with a single refresh in flight, a request queue, retry-once logic, and secure storage via Keychain/Keystore. If refresh fails, I clear tokens and log out. UI never handles refresh; it’s fully encapsulated in the API client.”
+
+  </details>
+
+  <details><summary>54. Handling retries with exponential backoff.</summary>
+
+Here’s a **short, interview‑friendly** explanation with **production‑grade patterns** for:
+
+# **54. Handling retries with exponential backoff**
+
+***
+
+# ✅ **Short Interview Answer**
+
+“I implement retries using **exponential backoff with jitter** to avoid server overload and retry storms. Only safe/retriable errors (network errors, 5xx, timeouts) are retried, and only for **idempotent** operations like GET. I cap max retries, add randomness, and integrate it in Axios/Fetch wrappers.”
+
+***
+
+# 🔥 Why Exponential Backoff?
+
+*   Prevents hammering the server
+*   Reduces load during outages
+*   Smooths client retry spikes
+*   Recommended by AWS, Google, Stripe, PayPal for reliability
+
+Formula:
+
+    delay = base * (2 ** attempt)
+    with jitter = delay * (0.5 + random())
+
+***
+
+# 🛠 Minimal Production‑Ready Utility (Used in Interviews)
+
+```ts
+// backoff.ts
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+export async function withExponentialBackoff<T>(
+  fn: () => Promise<T>,
+  {
+    retries = 3,
+    base = 300,
+    factor = 2,
+    jitter = true
+  } = {}
+): Promise<T> {
+  let attempt = 0;
+  let lastError;
+
+  while (attempt < retries) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err;
+      attempt++;
+
+      if (attempt >= retries) break;
+
+      let delay = base * Math.pow(factor, attempt);
+      if (jitter) {
+        delay = delay * (0.5 + Math.random());
+      }
+
+      await sleep(delay);
+    }
+  }
+  throw lastError;
+}
+```
+
+***
+
+# 🔗 Integrating Backoff into Axios Interceptor
+
+```ts
+import axios from "axios";
+import { withExponentialBackoff } from "./backoff";
+
+const api = axios.create({
+  baseURL: process.env.API_BASE_URL,
+  timeout: 15000,
+});
+
+api.interceptors.response.use(
+  r => r,
+  async (error) => {
+    const status = error.response?.status;
+
+    const retriable =
+      !error.response ||            // network error
+      status === 502 || status === 503 || status === 504;
+
+    const method = error.config?.method?.toLowerCase();
+
+    // Retry only idempotent requests
+    if (retriable && (method === "get" || method === "head")) {
+      return withExponentialBackoff(
+        () => api.request(error.config)
+      );
+    }
+
+    return Promise.reject(error);
+  }
+);
+```
+
+***
+
+# 🧠 When to Retry (Good for Interview)
+
+### **Safe to retry**
+
+✔ Network failures  
+✔ DNS errors  
+✔ Timeouts  
+✔ 502 / 503 / 504  
+✔ Idempotent GET/HEAD  
+✔ Payment/KYC status polling
+
+### **Not safe to retry**
+
+❌ POST transfers/payments *(unless using idempotency keys)*  
+❌ Form submissions  
+❌ Anything non-idempotent  
+❌ Business errors (400, 401, 409)
+
+***
+
+# 🏦 Banking‑Specific Best Practices
+
+### ✔ Use **idempotency keys** for sensitive POSTs
+
+Prevents duplicate charges.
+
+### ✔ Cap retries (max 3–5)
+
+Avoid DoS‑like behavior.
+
+### ✔ Add **full jitter**
+
+Prevents retry storms after backend outage.
+
+### ✔ Emit telemetry
+
+Useful for reliability metrics & debugging issues.
+
+### ✔ Never retry on:
+
+*   Auth errors
+*   Validation errors
+*   Fraud/AML errors
+*   OTP errors
+
+***
+
+# 🎯 Interview One‑Liner
+
+> “I implement exponential backoff with jitter, retry only safe errors (network, 5xx), only retry idempotent requests, and integrate it inside the Axios layer. For banking POSTs, I rely on idempotency keys, not retries. This prevents retry storms and ensures safe, resilient networking.”
+
+  </details>
+
+  <details><summary>55. Cursor-based vs offset-based pagination.</summary>
+
+Here’s a **short, crisp, interview‑ready** explanation of:
+
+# **55. Cursor-based vs Offset-based pagination**
+
+This is a classic API + mobile performance question—your answer should highlight **performance**, **consistency**, and **banking relevance**.
+
+***
+
+# ✅ **Short Interview Answer**
+
+“Offset pagination uses `?offset=100&limit=20` and is simple but breaks when data changes—items can shift, causing duplicates or missing rows. Cursor pagination uses a stable `cursor` (like timestamp or ID) and is more reliable for real-time data. Banking apps use cursor-based pagination for transactions because it’s consistent, efficient, and safer for large datasets.”
+
+***
+
+# 📌 **Offset-based Pagination**
+
+**Example:**
+
+    GET /transactions?offset=40&limit=20
+
+### ✔ Pros
+
+*   Easy to implement
+*   Works with SQL `LIMIT/OFFSET`
+*   Good for small static data
+
+### ❌ Cons
+
+*   **Slow for large datasets** (offset scans)
+*   **Data inconsistencies** — items shift if new transactions arrive
+*   **Duplicates / missing items**
+*   Bad for real-time lists (`transactions`, `feeds`)
+
+> Banking systems rarely use offset because **transaction rows change constantly**.
+
+***
+
+# 📌 **Cursor-based Pagination**
+
+**Example:**
+
+    GET /transactions?cursor=txn_24488&limit=20
+
+Response:
+
+```json
+{
+  "items": [...],
+  "nextCursor": "txn_24468"
+}
+```
+
+### ✔ Pros
+
+*   **Consistent** even if new data arrives
+*   **Fast** (queries use indexed `id`, `timestamp`)
+*   **Works in real-time**
+*   Perfect for infinite scrolling
+
+### ❌ Cons
+
+*   Slightly more complex
+*   Cannot jump to arbitrary pages (“go to page 7”)
+
+> In mobile banking, cursor pagination is the **default** because you want stable, correct data.
+
+***
+
+# 🏦 **Why Banks Prefer Cursor-based Pagination**
+
+*   Transaction data changes every second
+*   Prevents showing **duplicate transactions**
+*   Prevents missing **new credits or debits**
+*   Supports **infinite scroll** with high reliability
+*   Avoids expensive `OFFSET` scans on huge tables (millions of rows)
+
+***
+
+# 🧠 Example (Client-side React Query usage)
+
+```ts
+const fetchTxns = ({ cursor }) =>
+  api.get("/transactions", { params: { cursor, limit: 20 } });
+
+const {
+  data,
+  fetchNextPage,
+  hasNextPage
+} = useInfiniteQuery(["transactions"], fetchTxns, {
+  getNextPageParam: (lastPage) => lastPage.nextCursor
+});
+```
+
+Super smooth infinite scrolling.
+
+***
+
+# ⚖️ Quick Comparison Table
+
+| Feature                    | Offset Pagination | Cursor Pagination |
+| -------------------------- | ----------------- | ----------------- |
+| Performance on large data  | ❌ Slow            | ✅ Fast            |
+| Real-time consistency      | ❌ Poor            | ✅ Great           |
+| Risk of duplicates/missing | High              | None              |
+| Jump to page N             | Yes               | No                |
+| Implementation complexity  | Easy              | Medium            |
+| Banking suitability        | ❌ Not recommended | ✅ Best choice     |
+
+***
+
+# 🎤 Interview One‑liner
+
+> “Offset pagination is simple but unreliable for dynamic data. Cursor-based pagination is stable, faster, and avoids duplicates—so it’s the recommended approach for banking transaction lists and any real-time feed.”
+
+  </details>
+
+  <details><summary>56. GraphQL basics: caching, persisted queries.</summary>
+
+Here’s a **short, crisp, interview‑friendly** explanation of:
+
+# **56. GraphQL basics: caching, persisted queries**
+
+This answer is tailored for **React Native + mobile banking** style interviews.
+
+***
+
+# ✅ **Short Interview Answer**
+
+“GraphQL uses a strongly typed schema and returns exactly the data the client needs. For caching, libraries like Apollo and URQL normalize data using entity IDs, enabling automatic updates. Persisted queries push predefined queries to the server, reducing bandwidth, improving security, and preventing malicious queries.”
+
+***
+
+# 🧩 **Basics of GraphQL**
+
+*   One endpoint → `/graphql`
+*   Client sends a **query** describing exactly what fields it needs
+*   Server resolves via typed schema (`Query`, `Mutation`, `Subscription`)
+*   No overfetching / underfetching
+
+Example:
+
+```graphql
+query GetAccount($id: ID!) {
+  account(id: $id) {
+    id
+    balance
+    currency
+  }
+}
+```
+
+***
+
+# 🎛 **1. GraphQL Caching (Client‑Side)**
+
+### **Apollo Client Caching**
+
+Apollo handles caching via its **normalized store**.
+
+Example cache config:
+
+```ts
+const client = new ApolloClient({
+  uri: "https://api.bank.com/graphql",
+  cache: new InMemoryCache({
+    typePolicies: {
+      Account: {
+        keyFields: ["id"],
+      },
+    },
+  }),
+});
+```
+
+### How caching works:
+
+*   Each object with an `id` becomes a cache entry
+*   Queries are merged into the cache
+*   When the same entity appears elsewhere, Apollo reads from cache
+*   Updates propagate automatically to all screens
+
+This is great for:
+
+*   Account details
+*   Transaction updates
+*   User profile
+
+### Cache advantages:
+
+✔ No repeated network calls  
+✔ Instant UI updates  
+✔ Efficient merges  
+✔ Works offline (if using cache-first strategies)
+
+***
+
+# 📦 **Cache Policies You Should Mention**
+
+Common read policies:
+
+*   **cache-first** → fastest
+*   **network-only** → always fresh
+*   **cache-and-network** → returns cached data, then refreshes
+
+Example:
+
+```ts
+useQuery(GET_ACCOUNTS, { fetchPolicy: "cache-and-network" });
+```
+
+***
+
+# 🔐 **2. Persisted Queries (Very Important for Mobile)**
+
+### What are persisted queries?
+
+Instead of sending full GraphQL query strings every time, the client sends a **hash** (SHA‑256) of the query.
+
+The server stores the actual query ahead of time.
+
+### Example:
+
+Client sends:
+
+```json
+{
+  "id": "a8d1c9f123",
+  "variables": { "accountId": "123" }
+}
+```
+
+Server looks up the query by ID → executes → returns data.
+
+***
+
+# 👍 **Why Persisted Queries? (Interview‑safe points)**
+
+### ✔ **Bandwidth savings**
+
+GraphQL query strings are verbose. Hash is very small.
+
+### ✔ **Performance boost**
+
+Great for slow networks (common in mobile).
+
+### ✔ **Security hardening**
+
+Prevents:
+
+*   Arbitrary queries
+*   Introspection
+*   Malicious nested queries
+*   Heavy deep queries
+
+Great for banking and regulated apps.
+
+### ✔ **DoS protection**
+
+Server only allows **known, whitelisted** queries.
+
+***
+
+# 🔧 How to implement persisted queries
+
+### Option 1: Apollo Automatic Persisted Queries (APQ)
+
+Apollo can hash queries automatically and retry if server doesn’t have them.
+
+```ts
+import { createPersistedQueryLink } from "@apollo/client/link/persisted-queries";
+import { sha256 } from "crypto-hash";
+
+const link = createPersistedQueryLink({ sha256 }).concat(
+  new HttpLink({ uri: "/graphql" })
+);
+```
+
+### Option 2: Hand‑rolled server-side registry
+
+e.g., `query-id → query string` mapping.
+
+***
+
+# 🧠 How caching + persisted queries work together
+
+*   Persisted queries reduce **query size**
+*   Apollo cache reduces **query frequency**
+
+Together → extremely fast and low‑latency mobile API performance.
+
+***
+
+# 🎤 **Interview One‑liner**
+
+> “GraphQL caching works through entity normalization and cache policies like cache-first or cache-and-network. Persisted queries store queries server-side and let the client send only a hash, improving performance, reducing bandwidth, and preventing unknown queries—essential in mobile banking apps.”
+
+  </details>
+
+  <details><summary>57. How do you validate API response schemas (zod/yup)?</summary>
+
+Here’s a **short, crisp, interview‑ready** answer on:
+
+# **57. How do you validate API response schemas (zod / yup)?**
+
+This question checks if you understand **runtime validation**, **type safety**, and **defensive programming** — critical in **banking apps** where backend responses must be trusted **only after validation**.
+
+***
+
+# ✅ **Short Interview Answer**
+
+“I use Zod to validate API responses at runtime. I define schemas that match the expected server response, parse them in my API layer, and fail fast if the backend sends unexpected fields. This protects the app from malformed responses, backend bugs, and MITM attacks. Zod gives me TypeScript types automatically, making API usage type‑safe.”
+
+***
+
+# 🚀 Why Validate API Responses?
+
+**Mobile apps are exposed to:**
+
+*   Backend bugs / unexpected nulls
+*   Contract mismatches between frontend & backend
+*   Malicious/invalid payloads (especially in fintech/banking)
+
+Validation ensures:
+
+*   Defensive handling
+*   Predictable UI rendering
+*   Crash prevention
+*   Security hardening
+
+***
+
+# 🧩 **Using Zod (Recommended)**
+
+## **1. Define a schema**
+
+```ts
+import { z } from "zod";
+
+export const TransactionSchema = z.object({
+  id: z.string(),
+  accountId: z.string(),
+  amount: z.number(),
+  currency: z.enum(["INR", "USD"]),
+  timestamp: z.string(),
+  status: z.enum(["PENDING", "POSTED", "FAILED"]),
+});
+```
+
+***
+
+## **2. Validate API response**
+
+```ts
+const res = await api.get("/transactions/123");
+
+const txn = TransactionSchema.parse(res); 
+// Throws if schema mismatch
+```
+
+Use `.safeParse()` if you prefer non‑throwing behavior:
+
+```ts
+const result = TransactionSchema.safeParse(res);
+if (!result.success) {
+  // handle gracefully, log, fallback UI
+}
+```
+
+***
+
+## **3. Infer TS types automatically**
+
+```ts
+export type Transaction = z.infer<typeof TransactionSchema>;
+```
+
+This eliminates duplicated types.
+
+***
+
+# 🧱 Validating **list responses**
+
+```ts
+const TransactionListSchema = z.object({
+  items: z.array(TransactionSchema),
+  nextCursor: z.string().nullable(),
+});
+```
+
+***
+
+# 🔒 Banking-Safe Patterns
+
+### ✔ Validate ALL external inputs
+
+Response validation is a **security layer**.
+
+### ✔ Normalize data (convert strings → numbers/dates)
+
+Zod supports transforms:
+
+```ts
+const BalanceSchema = z.string().transform(Number);
+```
+
+### ✔ Fail fast in API layer, not UI
+
+UI should receive **clean, guaranteed-correct data**.
+
+### ✔ Log validation errors (with PII scrubbing)
+
+Avoid logging sensitive data.
+
+### ✔ Graceful fallback
+
+If schema fails → show offline UI or generic error.
+
+***
+
+# 🆚 Yup vs Zod
+
+| Feature               | Yup      | Zod       |
+| --------------------- | -------- | --------- |
+| Runtime validation    | ✅        | ✅         |
+| TypeScript inference  | ❌ weak   | ✅ strong  |
+| Transform support     | Limited  | Excellent |
+| API shape validation  | Moderate | Excellent |
+| Banking-grade schemas | Good     | Best      |
+
+**Verdict:**  
+👉 **Zod** is preferred for **API response validation**.
+
+***
+
+# 🧪 Example: Full API Layer with Validation
+
+```ts
+import { z } from "zod";
+import http from "../httpClient";
+
+const AccountSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  balance: z.number(),
+  currency: z.string(),
+});
+
+export type Account = z.infer<typeof AccountSchema>;
+
+export async function getAccount(id: string): Promise<Account> {
+  const res = await http.get(`/accounts/${id}`);
+  return AccountSchema.parse(res);
+}
+```
+
+Your screens now receive **strict, typed, sanitized** data.
+
+***
+
+# 🎯 Interview One‑liner
+
+> “I validate API responses using Zod schemas in the API layer. I parse backend data, reject malformed responses, and generate TypeScript types automatically. This ensures reliability, safety, and type‑safe data flow—critical for banking-grade mobile apps.”
+
+  </details>
+
+  <details><summary>58. Normalizing API errors for consistent UX.</summary>
+
+Here’s a **short, crisp, interview‑ready** explanation for:
+
+# **58. Normalizing API errors for consistent UX**
+
+This is a very common **senior‑level** question — interviewers want to see if you understand **error normalization**, **error mapping**, and **consistent UI/UX for failures**.
+
+***
+
+# ✅ **Short Interview Answer**
+
+“I never show raw backend errors directly to the UI. I normalize all errors in a central API layer into a consistent structure with fields like `code`, `message`, `status`, and `isNetworkError`. This gives the UI predictable behavior and lets us map errors into user-friendly messages, regardless of which backend or endpoint they come from.”
+
+***
+
+# 🎯 Why Normalize API Errors?
+
+Backend errors are often inconsistent:
+
+*   Different microservices return different shapes
+*   Some return `message`, others return `error`
+*   Network errors look different from business errors
+*   Validation errors differ per endpoint
+
+**Without normalization → UI logic becomes messy**.  
+With normalization → **one error shape for the whole app**.
+
+***
+
+# 🧱 #1: Define a Global Normalized Error Shape
+
+```ts
+export type NormalizedError = {
+  status: number | null;       // HTTP status
+  code: string | null;         // backend business code
+  message: string;             // user-friendly error
+  details?: unknown;           // optional debugging info
+  isNetworkError: boolean;     // no response? timeout? offline?
+  requestId?: string;          // correlation ID
+};
+```
+
+***
+
+# 🔧 #2: Central Error Normalizer (Axios Example)
+
+```ts
+// errors.ts
+import { AxiosError } from "axios";
+
+export function normalizeError(error: AxiosError): NormalizedError {
+  const isNetwork = !error.response;
+
+  const status = error.response?.status ?? null;
+  const data = error.response?.data ?? {};
+
+  return {
+    status,
+    code: data.code ?? error.code ?? null,
+    message: extractMessage(error),
+    details: sanitize(data),
+    isNetworkError: isNetwork,
+    requestId: error.response?.headers?.["x-request-id"],
+  };
+}
+
+function extractMessage(err: AxiosError) {
+  return (
+    err.response?.data?.message ||
+    err.response?.data?.error ||
+    err.message ||
+    "Something went wrong"
+  );
+}
+
+// scrub PII before logging
+function sanitize(payload: any) {
+  if (!payload) return undefined;
+  const clone = { ...payload };
+  if (clone.pan) clone.pan = "***masked***";
+  if (clone.aadhaar) clone.aadhaar = "***masked***";
+  return clone;
+}
+```
+
+This ensures every failure has the same structure.
+
+***
+
+# 🧩 #3: API Layer Returns Only Normalized Errors
+
+```ts
+try {
+  const response = await http.get("/account");
+  return response.data;
+} catch (err) {
+  throw normalizeError(err);
+}
+```
+
+Now the **UI never sees raw backend errors**.
+
+***
+
+# 🎨 #4: UI Uses a Consistent Error Model
+
+```tsx
+const onError = (error: NormalizedError) => {
+  if (error.isNetworkError) {
+    showToast("No internet. Please try again later.");
+  } else if (error.status === 401) {
+    logoutUser();
+  } else if (error.code === "LIMIT_EXCEEDED") {
+    showModal("Your daily limit has been exceeded.");
+  } else {
+    showToast(error.message);
+  }
+};
+```
+
+**One error model → predictable UI behavior**.
+
+***
+
+# 🏦 Banking-Grade Error Types (Most Important)
+
+### **1. Network errors**
+
+*   No internet
+*   Backend unreachable
+*   Timeout
+
+→ Use retry/backoff, offline UI.
+
+### **2. Technical backend errors**
+
+*   500, 502, 503, 504  
+    → Show generic failure.
+
+### **3. Authentication errors**
+
+*   401 → token expired → refresh
+*   403 → unauthorized → show forbidden screen
+
+### **4. Business rule errors**
+
+e.g.,
+
+*   `"INSUFFICIENT_FUNDS"`
+*   `"DAILY_LIMIT_REACHED"`
+*   `"ACCOUNT_BLOCKED"`
+
+→ Show specific UX.
+
+### **5. Validation errors**
+
+Field-level errors:  
+`amount: "must be greater than 0"`
+
+→ Map into form UI.
+
+***
+
+# 🧠 #5: Error Mapping Table (Optional But Interview Friendly)
+
+    code: "INSUFFICIENT_FUNDS" → "Your balance is too low."
+    code: "LIMIT_EXCEEDED" → "Transaction limit crossed."
+    status: 401 → "Session expired."
+    isNetworkError → "Check your internet connection."
+
+Central mapping avoids repeating logic in screens.
+
+***
+
+# 🧾 #6: React Query Integration
+
+```ts
+useQuery({
+  queryKey: ["txn"],
+  queryFn,
+  onError: (err: NormalizedError) => {
+    handleAppError(err); // centralized handler
+  },
+});
+```
+
+Again — **UI only deals with normalized errors**.
+
+***
+
+# 🎤 **Interview One‑liner**
+
+> “I normalize all API errors in a central Axios layer into a single consistent shape. UI components never handle raw backend errors—they rely on a clean `status`, `code`, `message`, and `isNetworkError` model. This ensures predictable UX and easy mapping of business errors like insufficient funds or daily limit exceeded.”
+
+  </details>
+
+  <details><summary>59. Secure network logging without exposing PII.</summary>
+
+Here’s a **short, crisp, interview‑ready** explanation for:
+
+# **59. Secure network logging without exposing PII**
+
+This is a very common question in **banking/fintech** interviews.  
+They want to see that you understand **security, masking, redaction, transport protection, and compliance**.
+
+***
+
+# ✅ **Short Interview Answer**
+
+“I log only non‑sensitive metadata from network requests (method, URL, status, duration), and I redact or mask all PII before logging. I never log request/response bodies for sensitive endpoints. I centralize logging in the API layer, scrub sensitive fields, and use secure channels (HTTPS & encrypted logs) so no PAN/Aadhaar/phone/email accidentally leaks.”
+
+***
+
+# 🧩 **Why PII-safe Logging Matters**
+
+*   Backend often returns sensitive info (PAN, Aadhaar, KYCs)
+*   Device logs can be accessed by tools or root users
+*   Logs sometimes get shipped to monitoring platforms
+*   Compliance requirements (PCI‑DSS, GDPR, RBI)
+
+**So you must never log raw payloads.**
+
+***
+
+# 🔒 **What NOT to Log**
+
+❌ Full names  
+❌ Aadhaar / PAN / SSN  
+❌ Card numbers  
+❌ OTP / PIN  
+❌ Access tokens / refresh tokens  
+❌ Full addresses  
+❌ Bank account numbers  
+❌ Raw API responses
+
+***
+
+# ✔️ What You CAN Log Safely
+
+*   URL path (without query params)
+*   Method (GET, POST)
+*   Status Code
+*   Duration / latency
+*   Error code (business code)
+*   request-id / correlation-id
+*   Flags like `isNetworkError`, `retryCount`
+
+***
+
+# 🛠 **Centralized Safe Logger (Axios Example)**
+
+```ts
+// safeLogger.ts
+const SENSITIVE_KEYS = [
+  "pan",
+  "aadhaar",
+  "cardNumber",
+  "accountNumber",
+  "email",
+  "phone",
+  "otp",
+  "pin",
+  "token",
+];
+
+export function scrub(value: any) {
+  if (!value || typeof value !== "object") return value;
+
+  const clone: any = Array.isArray(value) ? [] : {};
+
+  for (const key in value) {
+    if (SENSITIVE_KEYS.includes(key.toLowerCase())) {
+      clone[key] = "***masked***";  
+    } else if (typeof value[key] === "object") {
+      clone[key] = scrub(value[key]);
+    } else {
+      clone[key] = value[key];
+    }
+  }
+
+  return clone;
+}
+
+export function logRequest(config: any) {
+  console.log("[HTTP REQUEST]", {
+    method: config.method,
+    url: config.url,
+    headers: scrub(config.headers),
+  });
+}
+
+export function logResponse(response: any) {
+  console.log("[HTTP RESPONSE]", {
+    url: response.config.url,
+    status: response.status,
+  });
+}
+
+export function logError(error: any) {
+  console.log("[HTTP ERROR]", {
+    url: error?.config?.url,
+    status: error?.response?.status,
+    code: error?.response?.data?.code,
+    message: error?.message,
+  });
+}
+```
+
+***
+
+# 🔗 **Integrating with Axios**
+
+```ts
+api.interceptors.request.use((config) => {
+  logRequest(config); // SAFE (masked)
+  return config;
+});
+
+api.interceptors.response.use(
+  (res) => {
+    logResponse(res); // SAFE
+    return res;
+  },
+  (err) => {
+    logError(err); // SAFE
+    return Promise.reject(err);
+  }
+);
+```
+
+👉 **Never** log `res.data`.
+
+***
+
+# 🏦 Banking-Safe Practices (Very Good to Mention)
+
+### ✔ **1. Never log request/response bodies**
+
+Only log metadata.
+
+### ✔ **2. Mask sensitive fields**
+
+PAN → `*******1234`  
+Aadhaar → `******1234`  
+Phone → `******7890`
+
+### ✔ **3. Log only URL path**
+
+No query params (they can contain PII).
+
+### ✔ **4. Use correlation IDs**
+
+Helps debug without exposing data.
+
+### ✔ **5. Store logs securely**
+
+Encrypted log storage (e.g., SumoLogic, Splunk, Datadog with encryption).
+
+### ✔ **6. Separate dev vs prod logging**
+
+*   Dev → allow full payload logging (with caution)
+*   Prod → strict PII redaction
+
+### ✔ **7. Turn off verbose logs in production**
+
+Use feature flags or env flags.
+
+***
+
+# 🧠 Extra Tip (Interview Gold)
+
+Mention **PII Redaction Middleware** + **Zero Trust Logging**.
+
+> “Even our internal logs treat PII as untrusted data. Everything is masked before leaving the device. No raw data ever leaves the mobile app."
+
+***
+
+# 🎤 **Interview One-liner**
+
+> “I centralize network logging, scrub all PII fields, never log payloads, and only log safe metadata like method, URL, status, and duration. This ensures compliant, secure logging without leaking sensitive data in a banking environment.”
+
+  </details>
+
+  <details><summary>60. Rate limiting & retry policies.</summary>
+
+Here’s a **short, crisp, interview‑ready** answer for:
+
+# **60. Rate limiting & retry policies (API best practices for mobile apps)**
+
+This is a classic networking + reliability question.  
+Banks *love* this topic because it shows you understand **safety**, **stability**, and **traffic control**.
+
+***
+
+# ✅ **Short Interview Answer**
+
+“I implement client‑side rate limiting to prevent excessive calls and server throttling. When the server returns 429 or 503, I respect the `Retry‑After` header and retry using **exponential backoff with jitter**, but only for idempotent operations. For sensitive POSTs (payments, transfers), I use idempotency keys instead of retries.”
+
+***
+
+# 🧩 **1. What is Rate Limiting?**
+
+Rate limiting prevents clients from calling an endpoint **too frequently**.
+
+Types:
+
+*   **Client‑side rate limiting** → throttle/debounce UI triggers
+*   **Server‑side rate limiting** → backend returns `429 Too Many Requests`
+
+Common causes:
+
+*   Rapid search queries
+*   User double‑taps
+*   Infinite loops
+*   Polling
+
+***
+
+# 🔧 Client-side Rate Limiting Patterns
+
+### **1) Debounce (search box / typeahead)**
+
+Only fire API after user stops typing.
+
+```ts
+const search = debounce((q) => api.search(q), 400);
+```
+
+### **2) Throttle (scroll, frequent taps)**
+
+Send request at most once every X ms.
+
+```ts
+const send = throttle(() => api.refresh(), 1000);
+```
+
+### **3) Queueing**
+
+Limit concurrency to 1–2 calls at a time.
+
+***
+
+# 🧩 **2. Retry Policies**
+
+Retry only **safe** operations:
+
+*   GET
+*   HEAD
+*   Status polling
+*   Fetching metadata
+
+⚠️ **Never retry payment/transfer POST unless idempotency key used**
+
+Common retry triggers:
+
+*   Network failure
+*   Timeout
+*   502 / 503 / 504
+*   429 (too many requests)
+
+***
+
+# 🔄 **3. Exponential Backoff with Jitter (Safe & Standard)**
+
+Backoff formula:
+
+    delay = base * (2 ^ attempt) * random(jitter)
+
+With jitter = random 50–100%.
+
+Advantages:
+
+*   Prevents retry storms
+*   Smooths out server pressure
+*   Aligns with AWS, Google, Stripe recommendations
+
+Already implemented in:
+
+```ts
+withExponentialBackoff(() => api.request(config));
+```
+
+***
+
+# 🧠 **4. Retry-after Header (Respect Server Signals)**
+
+If server returns:
+
+    HTTP 429 Too Many Requests
+    Retry-After: 5
+
+The client MUST wait 5 seconds before retry.
+
+Example:
+
+```ts
+if (err.response?.status === 429) {
+  const retryAfter = Number(err.response.headers["retry-after"]);
+  await sleep(retryAfter * 1000);
+  return api.request(err.config);
+}
+```
+
+***
+
+# 🛡 **5. Banking-Specific Safe Practices**
+
+### ✔ **Use Idempotency Keys for POSTs**
+
+Prevents double-charging during retries:
+
+    Idempotency-Key: <UUID>
+
+### ✔ **Avoid retrying high-risk operations**
+
+*   Payments
+*   UPI transactions
+*   Fund transfers
+*   OTP verification
+
+### ✔ **Cap retries**
+
+Max 3–5 retry attempts → prevent infinite loops.
+
+### ✔ **Telemetry**
+
+Log:
+
+*   retry count
+*   time taken
+*   correlation ID
+
+### ✔ **Prefer cursor-based pagination**
+
+So retries don’t duplicate items.
+
+***
+
+# 🏦 **6. Where Rate Limiting Happens in Mobile Banking Apps**
+
+### **UI layer**
+
+*   Typeahead searches
+*   Prevent double-taps on Pay button
+*   Prevent multi-submit on login/KYC forms
+
+### **API layer**
+
+*   Deduplicate identical API calls
+*   Queue & cancel stale requests
+*   Retry GETs with exponential backoff
+
+### **Backend**
+
+*   Returns 429 when overloaded
+*   Requires clients to respect retry-after
+
+***
+
+# 🧱 **7. Combined Flow (Interview Gold)**
+
+**User spams Refresh button → throttled (client)**  
+⬇  
+**API call fails with 503 → automatic retry with backoff**  
+⬇  
+**After 3 attempts → show fallback UI**  
+⬇  
+**If backend returns 429 → honor Retry-After header**  
+⬇  
+**POST operations use idempotency keys**
+
+***
+
+# 🎤 Interview One-liner
+
+> “I limit API calls using client-side throttling/debouncing, handle server 429/503 with exponential backoff + jitter, and only retry idempotent requests. For sensitive POSTs like payments, I use idempotency keys, not retries. This prevents retry storms and ensures safe, compliant behavior in mobile banking apps.”
+
+  </details>
+
+  <details><summary>61. WebSockets vs polling vs SSE in RN.</summary>
+
+Here’s a **short, interview‑friendly**, practical comparison tailored for **React Native** (banking/fintech apps):
+
+***
+
+## **61. WebSockets vs Polling vs SSE (Server‑Sent Events) in React Native**
+
+### ✅ **Quick TL;DR**
+
+*   **WebSockets** → **Full‑duplex, low‑latency** bi‑directional channel. Best for **real‑time** two‑way features (trading ticks, chat, live dashboards).
+*   **SSE (EventSource)** → **One‑way, server→client** stream over HTTP. Lightweight for **push updates** (status updates, long‑running job progress).
+*   **Polling** → Client pulls at intervals. **Simplest**, most compatible, but **least efficient**; okay for **low‑frequency** updates or when infra is limited.
+
+***
+
+## **When to use what (banking examples)**
+
+| Use case                                                                | Best choice                     | Why                                                  |
+| ----------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------- |
+| Live market/FX ticks, order book, trader chat                           | **WebSockets**                  | Ultra‑low latency, bi‑directional, continuous stream |
+| Payment/transfer status, KYC job progress, notification badges          | **SSE** (or push notifications) | Server‑push, simpler than WS, efficient over HTTP    |
+| Balance refresh every few mins, infrequent updates, constrained backend | **Polling**                     | Easiest to implement, acceptable for low frequency   |
+| Background/device‑suspended notifications                               | **Push (FCM/APNs)**             | Streams pause in background; use push to wake app    |
+
+> For **regulated actions** (payments/UPI), prefer server webhooks → **push notifications** → client **fetch** to avoid keeping long‑lived sockets unnecessarily.
+
+***
+
+## **React Native support & libraries**
+
+*   **WebSockets**: Built‑in (`new WebSocket(url)`), widely used; GraphQL subscriptions use WS via `subscriptions-transport-ws` or `graphql-ws`.
+*   **SSE**: No native `EventSource` in RN—use **polyfills** like `react-native-event-source` or implement **Fetch‑based SSE** reader.
+*   **Polling**: Just `setInterval` + `fetch` (cancel with `AbortController`).
+*   **NetInfo**: Use `@react-native-community/netinfo` to auto‑pause/retry on connectivity changes.
+*   **Background limits**: iOS/Android may suspend sockets when app is backgrounded—don’t rely on WS/SSE for alerts; use FCM/APNs.
+
+***
+
+## **Pros & cons (what to mention in interviews)**
+
+### **WebSockets**
+
+**Pros**
+
+*   True **bi‑directional**, low latency, multiplexing via one connection
+*   Efficient for **high‑frequency** updates  
+    **Cons**
+*   More moving parts: heartbeats, **reconnect with backoff**, auth renewal
+*   Backend infra must support WS, load balancing sticky sessions or token‑based routing
+*   Battery impact if always on
+
+**Use for:** trading, chat, real‑time dashboards, collaborative edits.
+
+***
+
+### **SSE (Server‑Sent Events)**
+
+**Pros**
+
+*   Simple **one‑way** server→client, HTTP/2 friendly
+*   Auto‑reconnect semantics, smaller protocol overhead than WS
+*   Great for **event streams** and **status updates**
+    **Cons**
+*   Not built‑in in RN → requires polyfill
+*   **Downlink only**; if client needs to send commands, pair with normal POSTs
+
+**Use for:** transaction status, job progress, notifications badges, audit logs stream.
+
+***
+
+### **Polling**
+
+**Pros**
+
+*   Works everywhere, easy to cache, simple to secure
+*   No special infra required
+    **Cons**
+*   **Inefficient** (wasted calls), staleness between polls
+*   Can hammer backend without careful throttling/jitter
+
+**Use for:** low‑frequency refresh (e.g., every 30–60s), fallback when WS/SSE blocked.
+
+***
+
+## **Security & reliability checklist (banking-grade)**
+
+*   **TLS**: Always `wss://` for WebSockets; HTTPS for SSE/polling.
+*   **Auth**: Short‑lived access token; refresh safely. For WS, send token in query/header and **re‑authenticate on reconnect**.
+*   **Reconnects**: Exponential backoff + **jitter**; cap attempts; pause when offline (NetInfo).
+*   **Heartbeats**: WS ping/pong or app‑level heartbeat to detect half‑open connections.
+*   **Backpressure**: Drop or coalesce stale messages (e.g., keep only latest price).
+*   **PII**: Never stream sensitive PII; encrypt on transport; **mask in logs**.
+*   **Background behavior**: Expect streams to pause; use **push notifications** for critical alerts.
+
+***
+
+## **Code snippets (RN)**
+
+### 1) **WebSocket with reconnect + heartbeat**
+
+```tsx
+import { useEffect, useRef } from "react";
+import NetInfo from "@react-native-community/netinfo";
+
+export function usePriceSocket(url: string, token: string, onTick: (t: any) => void) {
+  const wsRef = useRef<WebSocket | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const hbRef = useRef<NodeJS.Timeout | null>(null);
+  let attempts = 0;
+
+  const connect = () => {
+    const ws = new WebSocket(`${url}?token=${encodeURIComponent(token)}`);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      attempts = 0;
+      // heartbeat every 30s
+      hbRef.current && clearInterval(hbRef.current);
+      hbRef.current = setInterval(() => ws.send(JSON.stringify({ type: "ping" })), 30000);
+    };
+
+    ws.onmessage = (evt) => {
+      try {
+        const msg = JSON.parse(evt.data);
+        if (msg.type === "pong") return;
+        onTick(msg);
+      } catch {}
+    };
+
+    ws.onerror = () => {/* avoid noisy logs in prod */};
+
+    ws.onclose = () => {
+      hbRef.current && clearInterval(hbRef.current);
+      const backoff = Math.min(1000 * 2 ** attempts, 15000) * (0.5 + Math.random());
+      attempts += 1;
+      timerRef.current && clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => connect(), backoff);
+    };
+  };
+
+  useEffect(() => {
+    const unsub = NetInfo.addEventListener(state => {
+      if (!state.isConnected) {
+        wsRef.current?.close();
+      } else if (!wsRef.current || wsRef.current.readyState === WebSocket.CLOSED) {
+        connect();
+      }
+    });
+    connect();
+    return () => {
+      unsub();
+      timerRef.current && clearTimeout(timerRef.current);
+      hbRef.current && clearInterval(hbRef.current);
+      wsRef.current?.close();
+    };
+  }, [url, token]);
+}
+```
+
+***
+
+### 2) **SSE (EventSource polyfill)**
+
+```tsx
+// npm: react-native-event-source (or implement fetch-based reader)
+import EventSource from "react-native-event-source";
+import NetInfo from "@react-native-community/netinfo";
+
+export function useSSE(url: string, token: string, onEvent: (e: any) => void) {
+  useEffect(() => {
+    let es: EventSource | null = new EventSource(url, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const sub = NetInfo.addEventListener(state => {
+      if (!state.isConnected) {
+        es?.close();
+      } else if (!es) {
+        es = new EventSource(url, { headers: { Authorization: `Bearer ${token}` } });
+      }
+    });
+
+    es.addEventListener("message", (evt: any) => {
+      try { onEvent(JSON.parse(evt.data)); } catch {}
+    });
+    es.addEventListener("error", () => { /* auto-reconnect handled by lib, optionally custom retry */ });
+
+    return () => { sub(); es?.close(); };
+  }, [url, token]);
+}
+```
+
+***
+
+### 3) **Polling with cancellation + jitter**
+
+```tsx
+import { useEffect, useRef } from "react";
+
+export function usePolling(fetchFn: (signal: AbortSignal) => Promise<void>, baseMs = 10000) {
+  const timer = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    let aborted = false;
+
+    const tick = async () => {
+      const ctrl = new AbortController();
+      try {
+        await fetchFn(ctrl.signal);
+      } catch {}
+      if (!aborted) {
+        const jitter = baseMs * (0.5 + Math.random());
+        timer.current = setTimeout(tick, jitter);
+      }
+    };
+
+    tick();
+
+    return () => {
+      aborted = true;
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, [baseMs, fetchFn]);
+}
+```
+
+***
+
+## **Practical selection guide**
+
+*   **Need two‑way, sub‑second updates?** → **WebSockets**
+*   **Need server‑only push (lightweight) & HTTP infra reuse?** → **SSE**
+*   **Backend doesn’t support streams or updates are rare?** → **Polling**
+*   **App often in background and only needs alerts?** → **Push notifications**, then fetch on tap
+
+***
+
+## **Banking‑specific tips**
+
+*   Coalesce frequent updates (e.g., emit only the **latest** price to UI)
+*   Use **topic/room** subscriptions (symbol, accountId) to limit data volume
+*   Always **authenticate** the stream and **authorize** per resource (no broad topics)
+*   Implement **server‑side rate limits** + **client‑side throttling** to prevent overload
+*   Add **observability**: connection uptime, reconnect count, message lag
+
+  </details>
+
+  <details><summary>62. Time sync issues when signing financial transactions.</summary>
+
+Here’s a **short, crisp, interview‑ready**, banking‑grade answer for:
+
+# **62. Time sync issues when signing financial transactions**
+
+This is a *critical* topic in regulated/financial systems because **cryptographic signatures, JWTs, OAuth tokens, nonce/expiry windows, and HMAC signing** all depend on **accurate device time**.
+
+***
+
+# ✅ **Short Interview Answer**
+
+“Financial transactions often require timestamped signatures (HMAC, JWT, OAuth, UPI‑style nonces). If the device clock is skewed, signatures become invalid. I fix this by never trusting device time—always use server time via `/time` sync endpoint or NTP drift calculation. I maintain a delta offset and apply it whenever generating signatures or timestamps.”
+
+***
+
+# 🔐 **Why Time Sync Matters in Financial Apps**
+
+Financial APIs commonly require:
+
+*   **Timestamped request headers**  
+    (`X-Timestamp`, `X-Date`, `ts`, etc.)
+*   **JWT `iat` and `exp` checks**
+*   **HMAC signatures using timestamp**
+*   **Replay‑attack protection** (valid for 30–120 seconds)
+*   **Nonce/one‑time tokens with expiry**
+
+If device is ahead/behind by even **±30 seconds**, API may reject the request with:
+
+*   `INVALID_SIGNATURE`
+*   `TIMESTAMP_OUT_OF_RANGE`
+*   `REQUEST_EXPIRED`
+*   `REPLAY_DETECTED`
+
+This breaks payments, UPI mandates, investments, trading, etc.
+
+***
+
+# 🧠 **The Core Idea: Don’t Trust Device Time**
+
+### ✔ Always derive a **server–client time delta**
+
+    serverTime - deviceLocalTime = timeOffset
+
+### ✔ Use the **server‑corrected time** for all:
+
+*   Signing
+*   Nonces
+*   JWT creation
+*   Timestamps
+*   Request headers
+*   Auditing
+
+***
+
+# 🛠 **Recommended Strategy (Banking Standard)**
+
+## **1) Fetch server time at app startup**
+
+API:
+
+    GET /time
+    → { serverTime: 1738823100000 } // UNIX ms
+
+## **2) Compute offset**
+
+```ts
+const deviceTime = Date.now();
+const delta = serverTime - deviceTime; // can be + or -
+```
+
+## **3) Store delta in memory (NOT persistent)**
+
+```ts
+let TIME_OFFSET = delta;
+export const getServerCorrectedTime = () => Date.now() + TIME_OFFSET;
+```
+
+**Do NOT store delta permanently** — drift changes over time.
+
+***
+
+# 🔁 **4) Re-sync periodically**
+
+*   On app launch
+*   When app comes foreground
+*   Before signing sensitive transactions
+*   On every 401/invalid-signature error
+
+Typically every **10–15 minutes**.
+
+***
+
+# 🔐 **5) Use corrected time in signatures**
+
+Example for HMAC signing:
+
+```ts
+const ts = getServerCorrectedTime();
+
+const payload = `${method}\n${path}\n${ts}`;
+const signature = hmacSHA256(payload, secretKey);
+```
+
+Header:
+
+    X-Timestamp: <corrected_ts>
+    X-Signature: <signature>
+
+Never use `new Date()` directly.
+
+***
+
+# 🔥 **6) Server tolerance window**
+
+Most banking systems allow:
+
+*   **±30 sec** drift → strict systems
+*   **±2–5 min** drift → typical OAuth/JWT
+*   **±1–2 sec** tolerance for trading
+
+If out-of-range → customer gets failure.
+
+Your app must anticipate this.
+
+***
+
+# 🧪 **7) Detect and handle time drift**
+
+If error response contains:
+
+*   `"TIMESTAMP_SKEW"`
+*   `"INVALID_IAT"`
+*   `"REQUEST_EXPIRED"`
+
+Then **trigger automatic re-sync** with server time and retry the request.
+
+***
+
+# 📱 Why device time cannot be trusted
+
+*   User changes system clock manually
+*   OS auto‑sync disabled
+*   Device clock drift (common in cheap Androids)
+*   Timezone misconfigurations
+*   Emulator/Debug devices
+*   Time updated from carrier with delay
+
+***
+
+# 🏦 Banking/UPI/Trading Real Use Cases
+
+### **UPI / Payment Gateways**
+
+HMAC signatures contain timestamp → time drift breaks payments.
+
+### **OAuth2 / OIDC**
+
+JWT `iat`/`exp` → validates only if clock is accurate.
+
+### **Mutual Funds / Investments**
+
+NFO closing windows → exact timestamp needed.
+
+### **Trading**
+
+Order book timestamps must match server precision.
+
+***
+
+# ⚠️ Security Pitfalls (Mention in Interview)
+
+### ✔ Never rely on device’s `Date.now()` for:
+
+*   Nonces
+*   Signing
+*   JWT issuing
+*   Payment initiation
+
+### ✔ Never sync time using a random NTP server
+
+Use:
+
+*   Your bank’s `/time` API
+*   Pre-configured official NTP pool
+*   Signed time endpoints
+
+### ✔ Never log raw timestamps for sensitive flows
+
+Mask or sanitize logs.
+
+***
+
+# 🎤 **Interview One‑liner**
+
+> “I never trust the device clock. I sync time with the server, compute a delta, and always use server‑corrected time for signing financial transactions, JWTs, nonces, and replay protection. If the server reports timestamp skew, I auto‑resync and retry.”
+
+  </details>
 
 </details>
 
