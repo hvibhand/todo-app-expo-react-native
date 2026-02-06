@@ -2681,29 +2681,2939 @@ const emi = principal.times(rate).times((1 + rate) ** n)
 <details>
   <summary>React Native Core Concepts (12)</summary>
 
-  <details><summary>13. Explain RN Architecture (Bridge, JSI, TurboModules, Fabric).</summary></details>
+  <details><summary>13. Explain RN Architecture (Bridge, JSI, TurboModules, Fabric).</summary>
 
-  <details><summary>14. How does Hermes improve startup performance?</summary></details>
+Absolutely—here’s a crisp, developer‑friendly overview of **React Native architecture** and how it evolved: **Bridge → JSI → TurboModules → Fabric**. I’ll explain what each is, why it matters for performance, and what you should do in real apps.
 
-  <details><summary>15. JS thread vs UI thread — what runs where?</summary></details>
+***
 
-  <details><summary>16. How to optimize re-renders using memo, useMemo, useCallback?</summary></details>
+## 🧱 The Big Picture
 
-  <details><summary>17. Best practices for FlatList performance (windowing, keys, memoization).</summary></details>
+React Native historically had **three realms**:
 
-  <details><summary>18. How to handle responsive UI across multiple screen sizes?</summary></details>
+*   **JS runtime** (Hermes or JavaScriptCore) — runs your React app logic.
+*   **Native/UI realm** (Android/iOS) — renders views and accesses device APIs.
+*   **A communication layer** that connects them.
 
-  <details><summary>19. Explain RN navigation stacks & how you prevent memory leaks.</summary></details>
+Over time, RN moved from the **legacy Bridge** to **JSI**, enabling **TurboModules** (faster native modules) and **Fabric** (new renderer).
 
-  <details><summary>20. What are Error Boundaries and how to implement one?</summary></details>
+    JS (Hermes/JSC)
+       │
+       │  (old) Batched, JSON-serialized calls
+       ▼
+    Legacy Bridge  ❌ (slow, asynchronous, JSON, copy overhead)
+       │
+       └──────────────► Native/UI
 
-  <details><summary>21. Explain deep linking & universal links.</summary></details>
+    JS (Hermes/JSC)
+       │
+       │  (new) Direct C++ interface
+       ▼
+    JSI  ✅ (zero-copy, sync/async, function pointers)
+       │
+       ├─► TurboModules (fast native modules)
+       └─► Fabric (new UI renderer)
 
-  <details><summary>22. How do push notifications work (APNs, FCM)?</summary></details>
+***
 
-  <details><summary>23. RN accessibility best practices (TalkBack/VoiceOver).</summary></details>
+## 1) Legacy **Bridge** (old architecture)
 
-  <details><summary>24. When to use CodePush, and why banking apps may restrict it?</summary></details>
+*   **How it works:** JS and Native talk via an **asynchronous, batched bridge** using **JSON serialization**. Messages queue up and are processed in order.
+*   **Limitations:**
+    *   Serialization & copies → **overhead**
+    *   Always async → **no synchronous calls** (some APIs need sync)
+    *   Backpressure/jank under heavy traffic (animations, large lists)
+*   **Where you still see it:** In older RN apps and libraries not yet migrated.
+
+> TL;DR: The Bridge made RN possible, but it became a bottleneck for **perf‑sensitive** features (animations/gestures/crypto).
+
+***
+
+## 2) **JSI** (JavaScript Interface) — the modern foundation
+
+*   **What it is:** A **C++ API** that embeds the JS engine (Hermes/JSC) and lets native code **expose functions/objects directly** to JS **without the Bridge**.
+*   **Why it matters:**
+    *   **Zero/low‑copy** data access
+    *   **Synchronous** calls where needed
+    *   Unlocks **high‑perf** libraries (e.g., crypto, image processing, ML) directly from JS
+*   **Practical impact:**
+    *   Libraries can implement **JSI bindings** for near-native performance.
+    *   Enables the new systems: **TurboModules** and **Fabric**.
+
+> Think of JSI as “C++ hooks” into the JS VM—no JSON, no message queue required.
+
+***
+
+## 3) **TurboModules** — next‑gen Native Modules
+
+*   **What they are:** Native modules rewritten to use the **JSI** pipeline rather than the Bridge.
+*   **Benefits:**
+    *   **Lazy loading** (modules are loaded on first use → smaller startup cost)
+    *   **Direct calls via JSI** (fewer copies, optional sync)
+    *   Stronger **type safety** when paired with codegen (RN’s codegen can auto-generate stubs)
+*   **When to use:** For any custom native module you write today—**prefer TurboModules**.
+*   **Migration tip:** If you depend on heavy Bridge‑based modules, look for Turbo/JSI versions or alternatives.
+
+***
+
+## 4) **Fabric** — the new concurrent UI renderer
+
+*   **What it is:** The next‑gen renderer for React Native views (replacing the old UI manager).
+*   **Key improvements:**
+    *   **Concurrent React** compatible (interruptible rendering → smoother UX)
+    *   **Synchronous layout** when needed (better coordination with native)
+    *   **View flattening & better memory** handling
+    *   Uses **Yoga** (layout) + **C++ core** for consistency across platforms
+*   **Why you care:**
+    *   Lower TTI, smoother gestures/animations, more deterministic layout
+    *   It’s the future—new UI kits target Fabric compatibility.
+
+***
+
+## How they fit together in modern RN
+
+*   **JSI** is the base layer.
+*   **TurboModules** use JSI for fast native module calls.
+*   **Fabric** uses JSI for the renderer, enabling concurrent rendering and better perf.
+*   **Hermes** JS engine is optimized for RN (fast startup, smaller memory), and works hand‑in‑hand with JSI.
+
+***
+
+## RN Version & Enablement (practical notes)
+
+*   Recent RN versions (0.70+) have **Hermes on by default** and ship the **New Architecture** tooling (Fabric + TurboModules).
+*   In a new app, you typically **opt into the New Architecture** with config flags; many popular libraries are already compatible.
+*   For brownfield/legacy apps, you can **migrate incrementally**:
+    1.  Turn on **Hermes**.
+    2.  Migrate critical libraries to **JSI/Turbo** alternatives.
+    3.  Enable **Fabric** and fix any view manager incompatibilities.
+
+*(Exact flags and steps vary by RN version; the recommended approach is to start with Hermes and adopt Turbo/Fabric per library/feature.)*
+
+***
+
+## Real‑world impact (what interviewers expect)
+
+*   **Performance:** Less overhead between JS and native; better **startup**, **memory**, and **animation smoothness**.
+*   **Reliability:** Fewer flaky async hops; sync APIs possible when appropriate.
+*   **Scalability:** **Lazy module init** and **codegen** improve large app maintainability.
+*   **Future‑proof:** Fabric aligns RN with **React Concurrent** features.
+
+***
+
+## Example: Why Reanimated 2/3 feels smooth
+
+Reanimated uses **worklets** and **JSI** to run animations on the UI thread, avoiding the Bridge—so gestures and animations don’t lag even if the JS thread is busy. This is exactly the kind of win JSI enables.
+
+***
+
+## What to say in the interview (short version)
+
+> The **legacy Bridge** batched JSON messages between JS and native, which added latency and copies.  
+> The **JSI** replaces this with a direct C++ interface to the JS engine, allowing **synchronous** and **zero‑copy** calls.  
+> On top of JSI, **TurboModules** provide faster, lazy‑loaded native modules, and **Fabric** is the new UI renderer supporting **Concurrent React**, with more deterministic layout and better performance.  
+> Modern RN apps should enable **Hermes**, adopt **TurboModules** for native integrations, and migrate UI to **Fabric** for the best performance.
+
+  </details>
+
+  <details><summary>14. How does Hermes improve startup performance?</summary>
+
+Great one—Hermes is a big lever for **cold start** and **memory** in React Native apps. Here’s an interview‑ready, RN‑practical answer.
+
+***
+
+## ✅ How Hermes Improves Startup Performance
+
+Hermes is a JS engine optimized for React Native. It reduces startup time by:
+
+1.  **Precompiled Bytecode (ahead of time)**
+
+*   Instead of shipping raw JS that must be parsed & compiled at app launch, Hermes can **precompile your bundle into bytecode** during build.
+*   On startup, Hermes **loads bytecode directly** → **skips parse + JIT compilation** → faster **TTI (Time To Interactive)** and lower CPU spikes on cold start.
+
+2.  **Smaller Runtime & Memory Footprint**
+
+*   Hermes has a **compact GC** and a small baseline, so it **allocates less memory** on startup.
+*   Lower heap usage means **fewer GC pauses** and faster object allocation early in app life.
+
+3.  **Deterministic, JIT‑less Execution**
+
+*   Hermes favors **ahead-of-time compilation** over heavy JIT warmup.
+*   This avoids the “warmup lag” and *unstable perf* you sometimes see with JIT engines, improving **consistent** startup behavior—especially on low‑end Android devices.
+
+4.  **Faster Source Map & Debuggable Bytecode**
+
+*   Optimized integration with Metro improves bundle & source map handling, aiding **symbolication** and **error reporting** without a big cost at startup.
+
+5.  **Better Integration with RN New Architecture**
+
+*   The **JSI-based** pipeline (TurboModules/Fabric) benefits from Hermes’s close integration, lowering **bridge overhead** and enabling faster **module loading** during app launch.
+
+***
+
+## 🔬 What “startup” improvements typically look like
+
+(Varies by app & device; these are common patterns teams observe)
+
+*   **Cold start TTI**: improved by **100–500ms** on mid/low-end devices (sometimes more if your old engine had heavy parse/compile).
+*   **App size tradeoff**: APK/IPA may grow slightly (engine + bytecode), but **JS bundle bytes shrink** and execution is faster.
+*   **Memory**: lower peak memory during startup; fewer GC interruptions early.
+
+> Tip: Always **measure on your real target devices** (especially low‑RAM Androids). Enable Hermes on **one platform at a time** and compare A/B.
+
+***
+
+## 🛠 How to Enable Hermes (React Native ≥ 0.70 is Hermes‑first)
+
+**Android — `android/gradle.properties`**
+
+```properties
+# Usually already true in modern RN templates
+hermesEnabled=true
+```
+
+**iOS — `ios/Podfile`**
+
+```ruby
+use_react_native!(
+  :hermes_enabled => true,    # Enable Hermes
+  :fabric_enabled => true     # (Optional) if you’re on Fabric
+)
+```
+
+Reinstall pods and rebuild:
+
+```bash
+cd ios && pod install && cd ..
+npx react-native run-android
+npx react-native run-ios
+```
+
+**Optional: Precompile to Hermes bytecode**
+
+*   RN’s modern build typically handles Hermes bytecode by default in release builds.
+*   To confirm, inspect your **release artifacts** and monitor **startup logs** (Hermes prints a banner; you can also check `global.HermesInternal` in JS).
+
+***
+
+## 📏 How to Measure the Impact
+
+**JS Metrics**
+
+```ts
+const start = Date.now();
+// After your app is “ready to interact” (e.g., first screen mounted)
+console.log('TTI(ms)=', Date.now() - start);
+```
+
+**Android**
+
+*   Add **`Systrace`**/`Android Profiler` for CPU & memory.
+*   Compare **release** builds with/without Hermes.
+*   Check **Flipper** Hermes plugin for profiling.
+
+**iOS**
+
+*   Use **Instruments → Time Profiler** for cold start.
+*   Compare app memory footprint and first render time.
+
+**In‑app**
+
+*   Emit **performance marks** (e.g., from splash start → first screen displayed), send to analytics for real‑world telemetry.
+
+***
+
+## ⚠️ Common Gotchas (and fixes)
+
+*   **App size**: Engine adds footprint; but overall performance improves. Use **ABI splits** (Android App Bundles) to keep download size in check.
+*   **Non‑Hermes‑friendly libs**: Rare now, but ensure native/JSI libs support Hermes; update to latest versions.
+*   **Debug vs Release**: Only trust **release** metrics for startup comparisons—debug builds are much slower and not comparable.
+
+***
+
+## 🎤 Short Interview Answer
+
+> Hermes speeds up React Native startup by **precompiling JS to bytecode**, so the app **skips parsing/JIT at launch**. It also has a **smaller, mobile‑optimized GC and runtime**, which reduces memory and CPU spikes during cold start. With **JSI**, Hermes integrates tightly with **TurboModules/Fabric**, improving module load and early render phases. In practice, you’ll often see **hundreds of ms** improvement in cold start TTI, especially on lower‑end Android devices.
+
+  </details>
+
+  <details><summary>15. JS thread vs UI thread — what runs where?</summary>
+
+Great question—this is foundational for diagnosing performance in React Native.
+
+## 15) JS thread vs UI thread — what runs where?
+
+### Threads at a glance (modern RN with Hermes, JSI, Fabric)
+
+*   **JS thread**: Runs your **JavaScript/TypeScript** (React app logic, setState, effects, business code). Also runs most **timers**, **promises**, and typical **gesture handlers** (unless offloaded).
+*   **UI thread (Main thread)**: Handles **touch input**, **view updates**, **layout & drawing**, and **native animations**. It must stay **butter-smooth** (60/120 FPS).
+*   **Shadow/Layout thread** (legacy): Yoga layout calculations often happened off the main thread. With **Fabric**, layout is more tightly integrated and synchronized, but still designed to keep rendering responsive.
+
+> In the **old architecture**, JS ↔ Native communication went over the **Bridge** (batched, async). In the **new architecture**, **JSI** enables **TurboModules** (fast native calls) and **Fabric** (new renderer), reducing overhead and enabling sync/zero‑copy patterns.
+
+***
+
+## What runs on the **JS thread?**
+
+*   React rendering & reconciliation (diffing virtual tree, scheduling updates).
+*   Your **component code**, **hooks/effects**, business logic.
+*   **Timers** (`setTimeout`, `setInterval`), **Promises/microtasks**.
+*   **Networking callbacks** (the event/callback side).
+*   Many **gesture/animation drivers**—unless using libraries that offload to UI thread (see below).
+
+**If you block the JS thread**, symptoms:
+
+*   Taps/scrolls stop responding.
+*   Press handlers fire late.
+*   Frames drop during heavy loops / JSON processing / crypto in JS.
+
+**Avoid:** Long, synchronous JS work on the JS thread.
+
+***
+
+## What runs on the **UI thread?**
+
+*   Touch input dispatch, hit testing.
+*   View hierarchy updates, layout resolve, drawing.
+*   Native animations (Core Animation on iOS; UI/Render thread paths on Android).
+*   Fabric’s rendering pipeline & commit to native views.
+
+**If you block the UI thread**, symptoms:
+
+*   Visual jank despite JS thread being free.
+*   Navigation transitions stutter.
+*   Animations drop frames.
+
+**Avoid:** Long synchronous work or heavy main-thread I/O in native code.
+
+***
+
+## Modern optimizations you can use
+
+### 1) **Reanimated 2/3 worklets (run on UI thread)**
+
+Animations and some gesture calculations can run on the **UI thread**, independent of JS thread.
+
+```ts
+// Example (conceptual)
+const animated = useSharedValue(0);
+
+const pan = useAnimatedGestureHandler({
+  onActive: (e) => {
+    animated.value = e.translationX; // runs on UI thread
+  },
+});
+
+const style = useAnimatedStyle(() => ({
+  transform: [{ translateX: animated.value }],
+}));
+```
+
+**Benefit:** Smooth gestures/animations even if JS thread is busy.
+
+### 2) **TurboModules / JSI for heavy compute**
+
+Move CPU-heavy or crypto/image ops to a native module exposed via **JSI** (sync or async) to avoid blocking JS.
+
+```ts
+// pseudo-typing
+import { hashSync } from 'react-native-jsi-crypto'; 
+const digest = hashSync(largeBuffer); // native speed, non-Bridge
+```
+
+### 3) **InteractionManager** (defer non-critical JS work)
+
+Schedule JS work **after** animations/interactions finish.
+
+```ts
+import { InteractionManager } from 'react-native';
+
+InteractionManager.runAfterInteractions(() => {
+  // Heavy non-urgent JS (parsing, precomputation)
+});
+```
+
+### 4) **Background/Headless tasks**
+
+For periodic background work (sync, notifications), use **Headless JS** / background fetch so heavy work isn’t done during critical UI time.
+
+***
+
+## Typical pitfalls & fixes
+
+### Pitfall A: Heavy loops on JS thread
+
+```ts
+// ❌ Will freeze taps/scroll for hundreds of ms
+const sum = bigArray.reduce((a, b) => a + b, 0);
+```
+
+**Fixes:**
+
+*   Chunk work with timers/microtasks (cooperative scheduling).
+*   Move to native/JSI or a web worker–like approach (community libs), or let the backend do it.
+
+### Pitfall B: Doing layout/measure in a tight render loop
+
+*   Measuring in **every** render/frame causes layout thrash.
+*   Prefer **onLayout**, memoized layout, or **Fabric** measurement APIs; batch changes.
+
+### Pitfall C: JS-driven animations
+
+*   `Animated` (old, JS-driven) stutters if JS is busy.
+*   **Use Reanimated** (UI-thread worklets) or **native driver** where applicable.
+
+***
+
+## What updates the screen?
+
+1.  **JS thread** computes new React tree (setState/useState → reconciliation).
+2.  The framework **commits updates** to native (via Fabric).
+3.  **UI thread** applies layout/draws frames.
+
+If step 1 is slow → **UI can’t get updates** → apparent lag.
+If step 3 is slow → **frames drop** even if JS is fast.
+
+***
+
+## How to keep both threads healthy
+
+*   **JS thread**
+    *   Minimize sync CPU work (JSON, transforms, crypto → native/JSI).
+    *   Use **React.memo**, **useMemo**, **useCallback** to prevent useless renders.
+    *   Virtualize long lists (FlatList/FlashList), keyExtractor, `getItemLayout`.
+    *   Debounce/throttle high-frequency events.
+
+*   **UI thread**
+    *   Prefer **Reanimated** for animations/gestures.
+    *   Avoid expensive view trees; flatten where possible.
+    *   Optimize images (size, caching), avoid layouts that relayout everything.
+    *   Keep native main-thread work minimal.
+
+***
+
+## Quick RN examples
+
+**Avoid blocking JS on navigation**
+
+```ts
+// ❌ Heavy sync work during screen mount
+useEffect(() => {
+  const data = parseLargeJsonSync(raw); // freezes UI interactions
+}, []);
+```
+
+**Better**
+
+```ts
+useEffect(() => {
+  InteractionManager.runAfterInteractions(() => {
+    parseLargeJsonInChunks(raw); // or move to native/JSI
+  });
+}, []);
+```
+
+**JS timers vs UI-thread animations**
+
+```ts
+// ❌ JS setInterval to drive animation → stutter under load
+setInterval(() => setX(x => x + 1), 16);
+
+// ✅ Reanimated drives on UI thread (smooth)
+```
+
+***
+
+## Short interview soundbite
+
+> The **JS thread** runs your React app logic—state updates, effects, timers, and most business code.  
+> The **UI (main) thread** handles input, layout, and drawing.  
+> If you block the JS thread, the app stops responding to taps; if you block the UI thread, animations and scrolling stutter.  
+> Use **Reanimated** to run animations on the UI thread, **JSI/TurboModules** for heavy compute, **InteractionManager** to defer non‑critical JS, and keep both threads light for 60/120 FPS.
+
+  </details>
+
+  <details><summary>16. How to optimize re-renders using memo, useMemo, useCallback?</summary>
+
+Absolutely—let’s keep this practical and RN‑focused with clear rules, examples, and pitfalls.
+
+***
+
+## 16) How to optimize re‑renders using `React.memo`, `useMemo`, `useCallback`
+
+### 🔑 Core idea
+
+React re-renders a component when its **parent re-renders** and **any of its props** have a **new reference** or **new primitive value**.  
+We optimize by:
+
+*   **Keeping props stable** (same references when value didn’t change),
+*   **Splitting components** so only affected subtrees update,
+*   **Memoizing** values/functions to avoid new identities, and
+*   **Avoiding unnecessary state/prop changes**.
+
+***
+
+## 1) `React.memo` — prevent child re-render when props are “equal”
+
+```tsx
+import React from 'react';
+
+type RowProps = { id: string; title: string; onPress: (id: string) => void };
+
+const Row = React.memo(function Row({ id, title, onPress }: RowProps) {
+  return <Item title={title} onPress={() => onPress(id)} />;
+});
+// Optional custom comparator: React.memo(Component, areEqual)
+```
+
+**When to use**
+
+*   Pure visual components that receive **stable props**.
+*   List items (e.g., FlatList `renderItem`) that only change when item data changes.
+
+**Custom comparator** (for expensive prop objects):
+
+```tsx
+const Row = React.memo(RowImpl, (prev, next) =>
+  prev.id === next.id && prev.title === next.title && prev.onPress === next.onPress
+);
+```
+
+> ⚠️ `React.memo` is only effective if **props don’t change identity** every render.
+
+***
+
+## 2) `useCallback` — keep function props stable
+
+Parents often pass handlers like `onPress={() => doSomething(item)}`—this creates **new functions** each render → child re-renders.
+
+```tsx
+// ❌ New function each render → child re-renders
+<Item onPress={() => onPress(id)} />
+
+// ✅ useCallback keeps same reference if deps unchanged
+const handlePress = useCallback(() => onPress(id), [onPress, id]);
+<Item onPress={handlePress} />
+```
+
+**Common RN patterns**
+
+*   `renderItem` for lists:
+
+```tsx
+const renderItem = useCallback(({ item }) => (
+  <Row id={item.id} title={item.title} onPress={onPressRow} />
+), [onPressRow]);
+
+<FlatList renderItem={renderItem} /* ... */ />
+```
+
+*   Stable `keyExtractor`:
+
+```tsx
+const keyExtractor = useCallback((item) => item.id, []);
+```
+
+> ⚠️ Don’t overuse `useCallback`. Only add it where a stable function **prevents a real re-render** (e.g., memoized children or list renderers).
+
+***
+
+## 3) `useMemo` — keep object/array props stable + cache expensive computations
+
+*   **For referential stability** of props:
+
+```tsx
+// ❌ New array each render (breaks memo equality)
+<Item tags={[...tags]} />
+
+// ✅ Stable reference if tags unchanged
+const stableTags = useMemo(() => tags, [tags]); // (if tags comes from state/props already stable, this isn’t needed)
+<Item tags={stableTags} />
+```
+
+*   **For expensive calculations**:
+
+```tsx
+const sorted = useMemo(() => heavySort(transactions), [transactions]);
+```
+
+> Use `useMemo` for **expensive** work or when you must pass **stable object/array** props into `React.memo` children.
+
+***
+
+## 4) Split components to reduce blast radius
+
+```tsx
+// Parent re-renders often due to unrelated state
+function AccountScreen() {
+  const [filter, setFilter] = useState('');
+  // … other states triggering rerenders
+
+  return (
+    <>
+      <FilterBar value={filter} onChange={setFilter} />
+      <AccountList filter={filter} />   {/* isolate list */}
+    </>
+  );
+}
+
+// Memo child that only depends on `filter`
+const AccountList = React.memo(({ filter }: { filter: string }) => {
+  // expensive list
+});
+```
+
+**Result:** Only `AccountList` re-renders when `filter` changes, not when other parent states change.
+
+***
+
+## 5) RN list essentials (big wins)
+
+*   **Use `React.memo` for row items**.
+*   **Pass stable `renderItem`, `keyExtractor`, and handlers** (useCallback).
+*   Provide `getItemLayout`, `initialNumToRender`, and proper `key` to reduce work.
+*   Consider **FlashList** for better defaults with large datasets.
+
+```tsx
+const Row = React.memo(/* ... */);
+
+const renderItem = useCallback(({ item }) => (
+  <Row id={item.id} title={item.title} onPress={onPressRow} />
+), [onPressRow]);
+
+<FlatList
+  data={items}
+  keyExtractor={useCallback((i) => i.id, [])}
+  renderItem={renderItem}
+  getItemLayout={getItemLayout}
+/>
+```
+
+***
+
+## 6) Avoid creating new references in JSX
+
+**Bad:**
+
+```tsx
+<Item style={{ padding: 12 }} />          // new object each render
+<Item tags={['new', 'hot']} />            // new array each render
+<Item onPress={() => doSomething(id)} />  // new function each render
+```
+
+**Good:**
+
+```tsx
+const style = useMemo(() => ({ padding: 12 }), []);
+const tags = useMemo(() => ['new', 'hot'], []);
+const handle = useCallback(() => doSomething(id), [doSomething, id]);
+
+<Item style={style} tags={tags} onPress={handle} />
+```
+
+> Memoizing trivial constants is optional; do it when passed to memoized children or frequently re-rendered lists.
+
+***
+
+## 7) Common pitfalls (and fixes)
+
+*   **Stale closure** in callbacks:
+    *   Use functional updates or include dependencies correctly.
+    *   For long-lived handlers, use a **ref** to always read latest values.
+
+```tsx
+const latest = useRef(value);
+useEffect(() => { latest.current = value; }, [value]);
+
+const handler = useCallback(() => {
+  doSomething(latest.current);
+}, []);
+```
+
+*   **Over-memoization**:
+    *   `useMemo`/`useCallback` have overhead; avoid blanketing everything.
+    *   Focus on components within **hot paths** (lists, grids, frequently updating screens).
+
+*   **Context causing re-renders**:
+    *   Avoid putting fast‑changing values in a global context.
+    *   Use **context selectors** (libraries) or **split contexts** by concern.
+
+*   **Object equality in `React.memo`**:
+    *   If you pass nested objects that change identity, add a **custom comparator** or return **stable references** via `useMemo`.
+
+***
+
+## 8) Practical checklist (copy for code reviews)
+
+*   [ ] Split large components—only the subtree that changes should re-render.
+*   [ ] Wrap heavy/leaf components with `React.memo`.
+*   [ ] Ensure props to memoized children are **referentially stable** (useMemo/useCallback).
+*   [ ] In lists: memoize `renderItem`, `keyExtractor`, item rows.
+*   [ ] Avoid inline object/array/function props in hot paths.
+*   [ ] Use functional `setState` to avoid stale closures.
+*   [ ] Measure before/after with **Flipper Perf Monitor**, React DevTools Profiler.
+
+***
+
+## 9) Micro examples
+
+**A) Prevent child re-render when parent state changes unrelatedly**
+
+```tsx
+function Parent() {
+  const [count, setCount] = useState(0);
+  const user = { id: 'u1', name: 'Harshal' }; // ❌ new each render
+
+  return (
+    <>
+      <Button title="Increment" onPress={() => setCount(c => c + 1)} />
+      <UserCard user={user} />
+    </>
+  );
+}
+
+const UserCard = React.memo(({ user }: { user: { id: string; name: string } }) => {
+  return <Text>{user.name}</Text>;
+});
+```
+
+**Fix:** stabilize `user`
+
+```tsx
+const user = useMemo(() => ({ id: 'u1', name: 'Harshal' }), []);
+```
+
+**B) Stable handler to memo child**
+
+```tsx
+const onPressUser = useCallback((id: string) => {
+  // navigation, analytics, etc.
+}, []);
+
+<UserRow id={id} onPress={onPressUser} />
+```
+
+***
+
+## 10) When NOT to optimize
+
+*   Small screens/forms where re-renders are cheap.
+*   If child already re-renders due to state changes inside itself.
+*   When memoization complexity + deps management outweighs benefit.
+
+Start with a clear **perf issue** (e.g., list stutter) → profile → apply targeted memoization.
+
+***
+
+## TL;DR (Interview answer)
+
+*   Use **`React.memo`** to skip re-renders when props don’t change.
+*   Use **`useCallback`** to keep **function props stable**.
+*   Use **`useMemo`** to cache **expensive computations** and keep **object/array props stable**.
+*   Split components and optimize **lists** (memoized rows + stable renderers).
+*   Avoid creating **new references in JSX** for hot paths. Measure with DevTools/Flipper.
+
+  </details>
+
+  <details><summary>17. Best practices for FlatList performance (windowing, keys, memoization).</summary>
+
+Absolutely—here’s a **practical, interview‑ready** checklist to get buttery‑smooth **FlatList** performance in React Native, with copy‑paste snippets and explanations.
+
+***
+
+## 17) Best practices for **FlatList** performance (windowing, keys, memoization)
+
+### 1) Use **stable keys** (never array index)
+
+*   Stable keys let RN recycle cells correctly and avoid re‑mounts.
+
+```tsx
+const keyExtractor = React.useCallback((item: Item) => item.id, []);
+<FlatList keyExtractor={keyExtractor} /* ... */ />
+```
+
+> **Avoid:** `keyExtractor={(item, index) => String(index)}` — causes extra renders on inserts/deletes/reorders.
+
+***
+
+### 2) Memoize **renderItem** and the **row component**
+
+*   Prevents row re-renders unless **relevant props** actually change.
+
+```tsx
+type RowProps = { item: Item; onPress: (id: string) => void };
+
+const Row = React.memo(({ item, onPress }: RowProps) => {
+  return <ItemCard title={item.title} onPress={() => onPress(item.id)} />;
+});
+
+const renderItem = React.useCallback(
+  ({ item }: { item: Item }) => <Row item={item} onPress={onPressRow} />,
+  [onPressRow]
+);
+
+<FlatList renderItem={renderItem} /* ... */ />
+```
+
+> Tip: If rows still re-render, check you’re not passing **new object/array/function props** each time (memoize them too).
+
+***
+
+### 3) Windowing & batch render settings (tune per screen)
+
+These control how many items mount initially and per batch—avoid rendering “the whole world”.
+
+```tsx
+<FlatList
+  data={data}
+  renderItem={renderItem}
+  keyExtractor={keyExtractor}
+  initialNumToRender={10}            // fast first paint
+  maxToRenderPerBatch={10}           // how many per batch
+  updateCellsBatchingPeriod={50}     // ms between batches
+  windowSize={5}                     // # of screens to render (2 before, 2 after + current)
+  removeClippedSubviews              // unmount offscreen (Android big win)
+/>
+```
+
+*   **`initialNumToRender`**: small but enough to avoid blank on first scroll.
+*   **`windowSize`**: 5 is a good start for feeds; reduce for simpler lists, increase for big screens.
+
+***
+
+### 4) Provide **`getItemLayout`** (when item height is known or computable)
+
+Prevents measurement passes and allows **constant-time** scroll jumps → big perf win.
+
+```tsx
+// Fixed height rows
+const ITEM_HEIGHT = 72;
+
+const getItemLayout = React.useCallback(
+  (_: Item[] | null | undefined, index: number) => ({
+    length: ITEM_HEIGHT,
+    offset: ITEM_HEIGHT * index,
+    index,
+  }),
+  []
+);
+
+<FlatList getItemLayout={getItemLayout} /* ... */ />
+```
+
+*   For variable heights within a few patterns, consider caching heights or grouping by size.
+
+***
+
+### 5) Avoid creating new references in JSX (hot path)
+
+```tsx
+// ❌ causes unnecessary re-renders
+<ItemCard style={{ padding: 12 }} tags={['new']} onPress={() => onPress(id)} />
+
+// ✅ stabilize
+const style = React.useMemo(() => ({ padding: 12 }), []);
+const tags = React.useMemo(() => ['new'], []);
+const handlePress = React.useCallback(() => onPress(id), [onPress, id]);
+
+<ItemCard style={style} tags={tags} onPress={handlePress} />
+```
+
+***
+
+### 6) Use **`extraData`** carefully
+
+Only pass `extraData` when necessary. It forces FlatList to re-check rows when the value changes.
+
+```tsx
+<FlatList data={items} extraData={selectedId} /* ... */ />
+```
+
+> If too many unrelated values are in `extraData`, you’ll trigger avoidable row updates.
+
+***
+
+### 7) Split UI to reduce re-render blast radius
+
+Keep parent lightweight; memoize heavy children (filters, headers, footers).
+
+```tsx
+const ListHeader = React.memo(() => <Filters />);
+
+<FlatList ListHeaderComponent={ListHeader} /* ... */ />
+```
+
+Also memoize `ItemSeparatorComponent`, `ListEmptyComponent` if they are not trivial.
+
+***
+
+### 8) Control infinite scroll (end reached noise)
+
+Tune `onEndReachedThreshold` and debounce `onEndReached` to avoid duplicate loads.
+
+```tsx
+const onEndReached = React.useCallback(() => {
+  if (!hasMore || loading) return;
+  loadMore();
+}, [hasMore, loading, loadMore]);
+
+<FlatList onEndReached={onEndReached} onEndReachedThreshold={0.5} />
+```
+
+***
+
+### 9) Images: pre-size & cache
+
+*   Provide **width/height** to avoid layout thrash.
+*   Use `react-native-fast-image` (or modern caching) for heavy feeds.
+*   Prefetch thumbnails; lazy-load larger assets after idle.
+
+```tsx
+<FastImage
+  source={{ uri, priority: FastImage.priority.normal }}
+  style={{ width: 72, height: 72 }}
+  resizeMode={FastImage.resizeMode.cover}
+/>
+```
+
+***
+
+### 10) Avoid expensive inline conditions in rows
+
+Compute heavy values outside render or **useMemo** inside row:
+
+```tsx
+const computed = React.useMemo(() => heavyCompute(item), [item.id]);
+```
+
+***
+
+### 11) Use **FlashList** for very large lists (drop-in, better defaults)
+
+If your list is huge or stutters, **FlashList** (Shopify) often performs better with minimal changes:
+
+```tsx
+import { FlashList } from '@shopify/flash-list';
+
+<FlashList
+  data={data}
+  renderItem={renderItem}
+  keyExtractor={keyExtractor}
+  estimatedItemSize={72}
+/>
+```
+
+*   `estimatedItemSize` lets it compute layout efficiently.
+*   Still apply memoization best practices.
+
+***
+
+### 12) Don’t do heavy JS work during scroll
+
+Network parsing, JSON transforms, crypto, etc. will block the JS thread → scroll jank.
+
+*   Move to **JSI/native** or defer via **`InteractionManager.runAfterInteractions`**.
+
+```tsx
+import { InteractionManager } from 'react-native';
+InteractionManager.runAfterInteractions(() => parseLargeJSON());
+```
+
+***
+
+### 13) Advanced: `CellRendererComponent` / `shouldRasterizeIOS`
+
+*   **`CellRendererComponent`** can help batch row wrappers (rarely needed).
+*   On iOS, for complex static cells, `style={{ transform: [], backfaceVisibility: 'hidden' }}` or layer‑backing can help, but use sparingly. Measure first.
+
+***
+
+### 14) Avoid nested scrollable lists when possible
+
+Nested `FlatList`/`ScrollView` can fight for gestures and memory. Prefer a single list with **section headers** (`SectionList`) or render expanded content inline.
+
+***
+
+### 15) Measure & verify (don’t guess)
+
+*   **React DevTools Profiler**: which components re-render and why.
+*   **Flipper Perf Monitor**: FPS and JS frame drops.
+*   **Systrace/Android Profiler** / **Xcode Instruments** for native jank.
+
+***
+
+## Example: Putting it together
+
+```tsx
+type Item = { id: string; title: string };
+
+const Row = React.memo(({ item, onPress }: { item: Item; onPress: (id: string) => void }) => {
+  const handlePress = React.useCallback(() => onPress(item.id), [onPress, item.id]);
+  return <ItemCard title={item.title} onPress={handlePress} />;
+});
+
+const keyExtractor = React.useCallback((it: Item) => it.id, []);
+const getItemLayout = React.useCallback(
+  (_: Item[] | null | undefined, index: number) => ({
+    length: 72,
+    offset: 72 * index,
+    index,
+  }),
+  []
+);
+
+export function ItemsList({ data, onPressRow }: { data: Item[]; onPressRow: (id: string) => void }) {
+  const renderItem = React.useCallback(
+    ({ item }: { item: Item }) => <Row item={item} onPress={onPressRow} />,
+    [onPressRow]
+  );
+
+  return (
+    <FlatList
+      data={data}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      initialNumToRender={10}
+      maxToRenderPerBatch={10}
+      updateCellsBatchingPeriod={50}
+      windowSize={5}
+      removeClippedSubviews
+      getItemLayout={getItemLayout}
+      onEndReachedThreshold={0.5}
+    />
+  );
+}
+```
+
+***
+
+## Quick checklist (for code reviews)
+
+*   [ ] Stable `keyExtractor` (no index).
+*   [ ] `Row` uses `React.memo`.
+*   [ ] `renderItem`, `keyExtractor`, handlers are `useCallback`.
+*   [ ] No inline objects/arrays/functions in hot paths.
+*   [ ] Reasonable `initialNumToRender`, `windowSize`, batching.
+*   [ ] `getItemLayout` provided (if item height known).
+*   [ ] Image sizes fixed + caching in place.
+*   [ ] Infinite scroll tuned; no duplicate loads.
+*   [ ] Measured with Profiler/Flipper.
+
+  </details>
+
+  <details><summary>18. How to handle responsive UI across multiple screen sizes?</summary>
+
+Here’s a clean, **interview‑ready**, RN‑focused guide on building **responsive UI across multiple screen sizes**—Android & iOS, small to large devices, tablets, notch devices, dynamic type, etc.
+
+***
+
+# ✅ **18. How to handle responsive UI across multiple screen sizes?**
+
+React Native does **not** scale layouts automatically—you must design components that adapt to:
+
+*   Varying screen widths/heights
+*   Pixel density (DPI)
+*   Safe areas (notches, home indicators)
+*   Dynamic text scaling (accessibility)
+*   Orientation changes
+*   Tablets vs phones
+
+Below are the **best practices** with code snippets.
+
+***
+
+# 1) **Use Flexbox layout (primary tool)**
+
+Flexbox handles most responsiveness with **no pixel math**.
+
+### Example
+
+```tsx
+<View style={{ flexDirection: 'row', flex: 1 }}>
+  <View style={{ flex: 1, backgroundColor: 'red' }} />
+  <View style={{ flex: 2, backgroundColor: 'blue' }} />
+</View>
+```
+
+*   Avoid fixed widths/heights unless necessary.
+*   Prefer `flex`, `justifyContent`, `alignItems`, `gap`, `padding`, `margin`.
+
+***
+
+# 2) **Use % widths instead of absolute pixels**
+
+```tsx
+<View style={{ width: '90%', alignSelf: 'center' }}>
+  <Text>Responsive Box</Text>
+</View>
+```
+
+Useful for cards, containers, images, grids, modals.
+
+***
+
+# 3) **Use `Dimensions` or `useWindowDimensions()`**
+
+Automatically adapt on screen rotation or resizing.
+
+```tsx
+import { useWindowDimensions } from 'react-native';
+
+const { width, height } = useWindowDimensions();
+```
+
+### Example: Responsive columns
+
+```tsx
+const numColumns = width > 600 ? 3 : 2;  // tablet vs phone
+```
+
+***
+
+# 4) **Use breakpoints (like web responsive design)**
+
+Define breakpoints once:
+
+```tsx
+export const BREAKPOINTS = {
+  phone: 0,
+  tablet: 600,
+  largeTablet: 900,
+};
+```
+
+Usage:
+
+```tsx
+const layout = width > BREAKPOINTS.tablet ? 'tablet' : 'phone';
+```
+
+***
+
+# 5) **Safe Area for notches, status bar, home bar**
+
+Use `react-native-safe-area-context`
+
+```tsx
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+<SafeAreaView style={{ flex: 1 }}>
+  <AppContent />
+</SafeAreaView>
+```
+
+Ensures UI does not overlap:
+
+*   iPhone notch
+*   Android cutouts
+*   Home indicator
+*   Status bars
+
+***
+
+# 6) **Use scalable units (moderate scale)**
+
+Pixel-perfect UI breaks on different DPIs.  
+Use libraries for consistent scaling:
+
+### Option A: `react-native-size-matters`
+
+```tsx
+import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+
+const styles = StyleSheet.create({
+  title: { fontSize: scale(18) },
+  card: { padding: moderateScale(12) },
+});
+```
+
+### Option B: `react-native-responsive-screen`
+
+```tsx
+import { widthPercentageToDP, heightPercentageToDP } from 'react-native-responsive-screen';
+
+const styles = {
+  container: {
+    width: widthPercentageToDP('90%'),
+    height: heightPercentageToDP('20%'),
+  },
+};
+```
+
+> These help maintain **consistent UI across small/large Android devices**.
+
+***
+
+# 7) **Support Dynamic Type / Font scaling**
+
+Text needs to respond to Accessibility font size settings.
+
+```tsx
+<Text
+  allowFontScaling
+  numberOfLines={2}
+  adjustsFontSizeToFit
+>
+  Hello World
+</Text>
+```
+
+To **prevent breaking layouts**:
+
+```tsx
+<Text style={{ flexShrink: 1 }}>Scalable Text</Text>
+```
+
+***
+
+# 8) **Use platform-specific styles when needed**
+
+```tsx
+import { Platform } from 'react-native';
+
+const styles = {
+  card: {
+    padding: Platform.OS === 'ios' ? 16 : 12,
+  }
+};
+```
+
+Styling differences help on:
+
+*   Android tablets
+*   iPads
+*   iOS default padding
+
+***
+
+# 9) **Use responsive images**
+
+Always specify image **width/height**, even when responsive.
+
+```tsx
+<Image
+  resizeMode="contain"
+  style={{ width: '100%', height: 200 }}
+  source={{ uri }}
+/>
+```
+
+For device‑scale bitmap variants:
+
+*   Deliver multiple density images (`@1x`, `@2x`, `@3x`).
+
+***
+
+# 10) **Grids & Lists — responsive columns**
+
+```tsx
+const numColumns = width > 600 ? 3 : 2;
+
+<FlatList
+  numColumns={numColumns}
+  columnWrapperStyle={{ gap: 10 }}
+  contentContainerStyle={{ padding: 10 }}
+  data={data}
+  renderItem={renderItem}
+/>
+```
+
+Good for:
+
+*   Product grids
+*   Dashboards
+*   Photo galleries
+
+***
+
+# 11) **Use `react-native-responsive-fontsize` (optional)**
+
+```tsx
+import { RFValue } from 'react-native-responsive-fontsize';
+<Text style={{ fontSize: RFValue(14) }}>Text</Text>
+```
+
+***
+
+# 12) **Tablet‑specific UI patterns**
+
+For tablets, use **side-by-side layouts**:
+
+```tsx
+const isTablet = width > 600;
+
+return isTablet ? (
+  <View style={{ flexDirection: 'row' }}>
+    <Sidebar />
+    <Content />
+  </View>
+) : (
+  <Content />
+);
+```
+
+Makes banking apps look professional:
+
+*   Dashboard + Sidebar
+*   Split transactions & detail view
+
+***
+
+# Real-world RN examples (banking apps)
+
+### **A) Transaction list spacing**
+
+```tsx
+const isLargeScreen = width > 420;
+
+<TransactionRow style={{ padding: isLargeScreen ? 20 : 12 }} />
+```
+
+### **B) Responsive card grid**
+
+```tsx
+const cardWidth = width > 450 ? width / 3 : width / 2;
+```
+
+### **C) Bottom sheet heights**
+
+```tsx
+const SHEET_HEIGHT = height * 0.5;   // half screen
+```
+
+***
+
+# Pitfalls (what interviewers want to hear)
+
+*   ❌ Hardcoded widths/heights break on tablets
+*   ❌ Absolute positioning everywhere
+*   ❌ Ignoring dynamic text sizes → clipped UI
+*   ❌ Using ScrollView inside ScrollView
+*   ❌ Huge, non-flexbox layouts that don't wrap
+
+***
+
+# Best Practices Summary (Interview answer)
+
+> Use **Flexbox** as the foundation, responsive **percent widths**, breakpoints, `useWindowDimensions()`, and safe area views.  
+> For scaling, use tools like `size-matters` or `responsive-screen`.  
+> Always adapt **font scaling**, **image sizing**, and **tablet layouts**.  
+> Avoid fixed pixel values unless required, and measure UI with Preview on different screen sizes.
+
+  </details>
+
+  <details><summary>19. Explain RN navigation stacks & how you prevent memory leaks.</summary>
+
+Great topic—navigation architecture and leak‑proofing go hand in hand in React Native apps.
+
+Below is a concise, **interview‑ready** guide covering **navigation stacks** (how they work, how to structure them) and **practical patterns to prevent memory leaks** (timers, subscriptions, async work, and navigator listeners).
+
+***
+
+## ✅ 19) React Native navigation stacks & preventing memory leaks
+
+### 1) What is a **navigation stack**?
+
+*   A **stack** is a **LIFO** history of screens. Each `navigate()`/`push()` **adds** a screen; `goBack()` **pops** the top.
+*   Typical stacks:
+    *   **Auth stack** (Login → OTP → Reset)
+    *   **App stack** (Tabs or Drawer nested with feature stacks)
+    *   **Modal stack** (overlays, sheets)
+*   With **React Navigation**, stacks nest:
+    *   **Root**: `Stack`
+    *   **Tab**: `BottomTab`
+    *   **Feature**: nested `Stack` inside each tab
+*   Navigation state lives in JS; transitions/gestures are native.
+
+> Key APIs: `navigate`, `push`, `replace`, `reset`, `goBack`, `setParams`.  
+> Use **`replace`** for auth handoff (prevents back to login); use **`reset`** after onboarding.
+
+***
+
+### 2) Example: Common architecture (root → tabs → feature stacks)
+
+```tsx
+// Root navigator
+const RootStack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+const TransferStack = createNativeStackNavigator();
+
+function TransferNavigator() {
+  return (
+    <TransferStack.Navigator>
+      <TransferStack.Screen name="TransferHome" component={TransferHome} />
+      <TransferStack.Screen name="Recipient" component={Recipient} />
+      <TransferStack.Screen name="Review" component={Review} />
+      <TransferStack.Screen name="Success" component={Success} />
+    </TransferStack.Navigator>
+  );
+}
+
+function Tabs() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Transfer" component={TransferNavigator} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+    </Tab.Navigator>
+  );
+}
+
+export function AppNavigator() {
+  return (
+    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+      <RootStack.Screen name="Auth" component={AuthStack} />
+      <RootStack.Screen name="Main" component={Tabs} />
+      <RootStack.Screen name="Modal" component={SomeModal} options={{ presentation: 'modal' }} />
+    </RootStack.Navigator>
+  );
+}
+```
+
+**Patterns**
+
+*   **Auth → Main**: use `replace('Main')` so back doesn’t return to login.
+*   **Deep link** to a nested screen by **name** and **params**; export route types for TS safety.
+
+***
+
+## Preventing Memory Leaks
+
+Leaks in RN typically come from **un‑cleared references** (timers, subscriptions, listeners, inflight async), **overgrown stacks**, or **long‑lived closures** capturing old state. Use the patterns below.
+
+### 3) Clean up **timers, intervals, animations**
+
+```tsx
+useEffect(() => {
+  const id = setInterval(poll, 5000);
+  return () => clearInterval(id); // ✅ cleanup
+}, []);
+```
+
+For animations (old `Animated`):
+
+```tsx
+useEffect(() => {
+  const anim = Animated.timing(value, { toValue: 1, duration: 300, useNativeDriver: true });
+  anim.start();
+  return () => anim.stop(); // ✅
+}, []);
+```
+
+### 4) Cancel **network requests / async work** on unmount
+
+```tsx
+useEffect(() => {
+  const ac = new AbortController();
+  (async () => {
+    try {
+      const res = await fetch(url, { signal: ac.signal });
+      const json = await res.json();
+      if (!ac.signal.aborted) setData(json);
+    } catch (e) { /* handle */ }
+  })();
+  return () => ac.abort(); // ✅ cancel in-flight
+}, [url]);
+```
+
+If using **React Query**, it automatically cancels queries on unmount/focus change; prefer it for server state.
+
+### 5) Unsubscribe **event listeners**
+
+Common culprits: `AppState`, `BackHandler`, `Dimensions`, `NetInfo`, `Keyboard`, `Linking`, `Appearance`, `DeviceEventEmitter`.
+
+```tsx
+useEffect(() => {
+  const sub = AppState.addEventListener('change', onChange);
+  return () => sub.remove(); // ✅
+}, []);
+```
+
+Back handler:
+
+```tsx
+useEffect(() => {
+  const sub = BackHandler.addEventListener('hardwareBackPress', onBack);
+  return () => sub.remove(); // ✅
+}, [onBack]);
+```
+
+### 6) Use **navigation lifecycle** correctly (`useFocusEffect`)
+
+Run screen‑specific logic only while focused; cleanup when blurred to avoid dangling work.
+
+```tsx
+import { useFocusEffect } from '@react-navigation/native';
+
+useFocusEffect(
+  React.useCallback(() => {
+    const id = setInterval(refresh, 3000);
+    return () => clearInterval(id); // cleanup on blur
+  }, [refresh])
+);
+```
+
+### 7) Avoid **state updates after unmount** (stale closures)
+
+Guard with a ref or cancellation:
+
+```tsx
+function useMountedRef() {
+  const ref = useRef(true);
+  useEffect(() => () => { ref.current = false; }, []);
+  return ref;
+}
+
+const mounted = useMountedRef();
+useEffect(() => {
+  let done = false;
+  (async () => {
+    const data = await load();
+    if (!done && mounted.current) setData(data);
+  })();
+  return () => { done = true; };
+}, []);
+```
+
+### 8) Prevent **stack bloat** (navigation leaks)
+
+*   Prefer `replace()` for flows (auth, wizard step transitions) when going forward should **remove** previous screens:
+    ```ts
+    navigation.replace('Dashboard');
+    ```
+*   After onboarding/login, **reset** to a clean state:
+    ```ts
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Main' }],
+    });
+    ```
+*   Avoid `push()` loops on the same route for idempotent actions (e.g., detail → detail). Use `navigate()` (which reuses) or a **route key** if unique is needed.
+*   For modals, ensure you **dismiss** (`goBack`) rather than stacking new ones repeatedly.
+
+### 9) Keep **params lightweight** (no large objects/functions)
+
+*   Don’t pass huge objects or functions in route params—they keep references alive.
+*   Pass **IDs** and fetch on the screen.
+*   If you must pass data, use **normalized cache** (React Query / Redux store) and reference by key.
+
+### 10) Guard **listeners created in effects** with correct deps
+
+Avoid re‑adding listeners on every render:
+
+```tsx
+const onChange = useCallback(() => { /* ... */ }, []); // stable
+useEffect(() => {
+  const sub = NetInfo.addEventListener(onChange);
+  return () => sub(); // ✅ unsubscribe
+}, [onChange]);
+```
+
+### 11) Reanimated / Gesture Handler
+
+*   Prefer **Reanimated** worklets (UI thread) to avoid JS timers.
+*   Clean up gesture handlers or subscriptions when screen blurs/unmounts.
+*   Avoid keeping big JS objects in shared values.
+
+### 12) Large lists in stacks (FlatList)
+
+*   Use `removeClippedSubviews`, windowing, and **unmount heavy children** when leaving screen (move polling to `useFocusEffect`).
+*   If stacks keep many screens mounted (e.g., `detachInactiveScreens={false}`), consider enabling **`detachInactiveScreens`** on navigators to free memory.
+
+```tsx
+<Stack.Navigator screenOptions={{ detachInactiveScreens: true }}>
+  {/* ... */}
+</Stack.Navigator>
+```
+
+### 13) Avoid global singletons retaining screen refs
+
+*   Do not store `navigation` or component instances in singletons. If a singleton needs to trigger navigation, use an **event bus** pattern and have a **top‑level** listener (in the app shell) perform navigation.
+
+***
+
+## Mini checklists
+
+**When adding a new screen**
+
+*   [ ] All timers/intervals clear in cleanup.
+*   [ ] All subscriptions remove in cleanup.
+*   [ ] All fetches cancellable or handled by React Query.
+*   [ ] Heavy work moved to `useFocusEffect` (start on focus, stop on blur).
+*   [ ] Route params are small (IDs, not big objects).
+
+**When wiring navigation**
+
+*   [ ] Use `replace/reset` to prevent stack growth when appropriate.
+*   [ ] Don’t `push` the same screen repeatedly (use `navigate` unless truly needed).
+*   [ ] Enable `detachInactiveScreens` if memory pressure is observed.
+
+***
+
+## Code snippets you can copy
+
+**Auth handoff without back to login**
+
+```ts
+// After success login
+navigation.reset({
+  index: 0,
+  routes: [{ name: 'Main' }],
+});
+```
+
+**Wizard step (replace keeps stack shallow)**
+
+```ts
+navigation.replace('Review', { id });
+```
+
+**Focus-bounded polling**
+
+```tsx
+useFocusEffect(
+  useCallback(() => {
+    const id = setInterval(fetchLatest, 5000);
+    return () => clearInterval(id);
+  }, [fetchLatest])
+);
+```
+
+**Back handler that unsubscribes**
+
+```tsx
+useFocusEffect(
+  useCallback(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      navigation.goBack();
+      return true;
+    });
+    return () => sub.remove();
+  }, [navigation])
+);
+```
+
+**Cancelable fetch with AbortController**
+
+```tsx
+useEffect(() => {
+  const ac = new AbortController();
+  (async () => {
+    try {
+      const res = await fetch(url, { signal: ac.signal });
+      setData(await res.json());
+    } catch {}
+  })();
+  return () => ac.abort();
+}, [url]);
+```
+
+***
+
+## Short interview answer (soundbite)
+
+> A **navigation stack** is a LIFO history of screens. In React Navigation, you compose stacks with tabs/drawers and use `navigate`, `push`, `replace`, and `reset` to control history.  
+> To **prevent memory leaks**, always **clean up timers, listeners, and async work** (use `AbortController` or React Query), use **`useFocusEffect`** to start/stop work on focus/blur, prefer **`replace/reset`** to avoid overgrowing stacks, keep **route params small**, and enable **`detachInactiveScreens`** when needed. This keeps both memory and responsiveness healthy.
+
+  </details>
+
+  <details><summary>20. What are Error Boundaries and how to implement one?</summary>
+
+Great question—this is a must‑know for shipping resilient RN apps.
+
+## 20) What are Error Boundaries and how to implement one?
+
+### What is an Error Boundary?
+
+An **Error Boundary** is a React component that **catches JavaScript errors** in its **child component tree** during **rendering**, in **lifecycle methods**, and in **constructors** of child components. It lets you:
+
+*   Show a **fallback UI** instead of a broken screen,
+*   **Log** the error (Sentry/Crashlytics),
+*   Optionally give users a **“Try again”** flow.
+
+> ⚠️ **They do *not*** catch errors in:
+>
+> *   **Event handlers** (wrap with `try/catch`),
+> *   **Asynchronous code** (e.g., `setTimeout`, Promises),
+> *   **Server-side rendering**,
+> *   **Errors thrown in the error boundary itself**.
+
+***
+
+## Minimal Error Boundary (class component)
+
+```tsx
+import React from 'react';
+import { View, Text, Button } from 'react-native';
+
+type Props = {
+  fallback?: React.ReactNode;
+  onReset?: () => void;
+  children: React.ReactNode;
+};
+
+type State = { hasError: boolean; error?: Error };
+
+export class ErrorBoundary extends React.Component<Props, State> {
+  state: State = { hasError: false };
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    // Log to your service (Sentry/Crashlytics/etc.)
+    // Sentry.captureException(error, { extra: info });
+    console.error('ErrorBoundary caught:', error, info);
+  }
+
+  reset = () => {
+    this.setState({ hasError: false, error: undefined });
+    this.props.onReset?.();
+  };
+
+  render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) return <>{this.props.fallback}</>;
+      return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <Text style={{ fontSize: 16, marginBottom: 8 }}>Something went wrong.</Text>
+          <Button title="Try again" onPress={this.reset} />
+        </View>
+      );
+    }
+    return this.props.children;
+  }
+}
+```
+
+**Usage (wrap a screen or a subtree):**
+
+```tsx
+export function TransferScreenWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <TransferScreen />
+    </ErrorBoundary>
+  );
+}
+```
+
+***
+
+## Resetting the boundary when navigating
+
+When you navigate, you often want a **fresh** boundary so previous errors don’t persist. Key the boundary by the **route key**:
+
+```tsx
+import { useRoute } from '@react-navigation/native';
+
+export function ScreenWrapper({ children }: { children: React.ReactNode }) {
+  const route = useRoute(); // unique per screen instance
+  return (
+    <ErrorBoundary key={route.key}>
+      {children}
+    </ErrorBoundary>
+  );
+}
+```
+
+Wrap each screen’s content with `ScreenWrapper` to ensure it **resets on navigation**.
+
+***
+
+## Functional alternative with `react-error-boundary`
+
+If you prefer hooks/functional style, use the community package:
+
+```tsx
+import { ErrorBoundary } from 'react-error-boundary';
+import { View, Text, Button } from 'react-native';
+
+function Fallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Oops: {error.message}</Text>
+      <Button title="Try again" onPress={resetErrorBoundary} />
+    </View>
+  );
+}
+
+export function WrappedScreen() {
+  return (
+    <ErrorBoundary
+      FallbackComponent={Fallback}
+      onError={(error, info) => {
+        // Sentry.captureException(error, { extra: info });
+        console.error(error, info);
+      }}
+      onReset={() => {
+        // optional: reset local state, refetch, etc.
+      }}
+    >
+      <ActualScreen />
+    </ErrorBoundary>
+  );
+}
+```
+
+> With React Navigation, combine with `key={route.key}` the same way to reset on route changes.
+
+***
+
+## What Error Boundaries **don’t** catch (and what to do)
+
+### 1) Event handlers (use `try/catch`)
+
+```tsx
+const onPress = () => {
+  try {
+    riskyAction();
+  } catch (e) {
+    // show toast/dialog, log error
+  }
+};
+```
+
+### 2) Async/Promise / timers (handle in the async chain)
+
+```tsx
+useEffect(() => {
+  let cancelled = false;
+  (async () => {
+    try {
+      await riskyAsync();
+    } catch (e) {
+      if (!cancelled) {
+        // set local error state → renders fallback area you control
+      }
+    }
+  })();
+  return () => { cancelled = true; };
+}, []);
+```
+
+### 3) Global “last resort” handler (crash surface)
+
+For unexpected unhandled errors in production, you can set a global JS handler (and native handlers) via libraries like `react-native-exception-handler` or directly:
+
+```tsx
+const defaultHandler = (ErrorUtils as any).getGlobalHandler?.();
+(ErrorUtils as any).setGlobalHandler?.((e: any, isFatal?: boolean) => {
+  // Log to Crashlytics/Sentry
+  // Show a fatal error screen if needed
+  defaultHandler?.(e, isFatal);
+});
+```
+
+*(Use judiciously; prefer scoped boundaries where possible.)*
+
+***
+
+## Where to place Error Boundaries (practical guidance)
+
+*   **Root boundary**: Around your entire app to avoid full white screens.
+*   **Feature boundaries**: Around risky areas (heavy lists, webviews, complex forms, experimental modules).
+*   **Route boundaries**: Around individual screens so one broken screen doesn’t take down others.
+*   **Async UI**: For network-heavy screens, show controlled error UIs (not necessarily a global boundary).
+
+***
+
+## UX & Observability best practices
+
+*   Show a **friendly message** with a **Retry** and “Report issue” (optional).
+*   **Log** with user/session context and breadcrumbs (Sentry/Crashlytics).
+*   Include a **unique error ID** to correlate user reports with logs.
+*   Avoid infinite loops (don’t keep throwing from the fallback).
+*   Test by throwing deliberately:
+    ```tsx
+    if (__DEV__ && forceError) { throw new Error('Test error'); }
+    ```
+
+***
+
+## Interview soundbite
+
+> Error Boundaries are **class (or library) components** that catch errors during **rendering and lifecycle** of their children and display a **fallback UI** instead of crashing the app. They don’t catch **event handler** or **async** errors, so those need **try/catch** (or request‑level error handling). In RN, place boundaries at the **root** and around **screens/features**, **log** with Sentry/Crashlytics, and **reset** the boundary on navigation by keying it to the **route key**.
+
+  </details>
+
+  <details><summary>21. Explain deep linking & universal links.</summary>
+
+Absolutely—here’s a clear, interview‑ready guide to **Deep Linking** and **Universal/App Links** in React Native, with copy‑paste configs and practical testing tips.
+
+***
+
+## ✅ What are Deep Links, Universal Links, and App Links?
+
+*   **Deep Link (generic)**: A link (e.g., `mybank://transfer/123`) that **opens your app** and navigates to a specific screen/route. Uses a **custom URL scheme**.
+    *   Pros: Easy to set up.
+    *   Cons: Not verified; the OS can show a chooser; doesn’t work from web by default.
+
+*   **iOS Universal Links**: **HTTP/HTTPS links** (e.g., `https://app.mybank.com/transfer/123`) that, when tapped, **open your app directly** (no browser) if installed; otherwise they **fall back to the website**. Mapping is verified via an **`apple-app-site-association`** (AASA) file hosted on your domain.
+
+*   **Android App Links**: Android’s equivalent to Universal Links. **HTTPS links** verified via **`assetlinks.json`** so Android can **directly open** your app without a chooser if installed; otherwise goes to the web page.
+
+> **Rule of thumb**: Use **Universal Links (iOS)** and **App Links (Android)** for production banking apps; keep a **custom scheme** as a fallback (for internal automation, QR codes, manual testing).
+
+***
+
+## 🧭 RN App-Level Linking: Single source of truth
+
+With **React Navigation**, define a **linking configuration** to map URLs → screens.
+
+```ts
+// app/navigation/linking.ts
+import { LinkingOptions } from '@react-navigation/native';
+
+const linking: LinkingOptions<RootStackParamList> = {
+  prefixes: ['mybank://', 'https://app.mybank.com'], // scheme + universal/app links
+  config: {
+    screens: {
+      Main: {
+        screens: {
+          Home: 'home',
+          Transfer: {
+            screens: {
+              TransferHome: 'transfer',
+              Recipient: 'transfer/recipient',
+              Review: 'transfer/review/:id',
+              Success: 'transfer/success/:id',
+            },
+          },
+          Profile: 'profile',
+        },
+      },
+      Auth: {
+        screens: {
+          Login: 'login',
+          Otp: 'otp',
+        },
+      },
+    },
+  },
+};
+
+export default linking;
+```
+
+Then pass it to the NavigationContainer:
+
+```tsx
+<NavigationContainer linking={linking} fallback={<Splash />}>
+  {/* navigators */}
+</NavigationContainer>
+```
+
+***
+
+## 📱 iOS — Universal Links
+
+### 1) Enable Associated Domains
+
+In Xcode → Target → **Signing & Capabilities** → **+ Capability** → **Associated Domains**:
+
+    applinks:app.mybank.com
+    applinks:my.mybank.com    // if you have multiple domains
+
+### 2) Host `apple-app-site-association` (AASA)
+
+*   Serve at: `https://app.mybank.com/apple-app-site-association` (no `.json` extension)
+*   Content-Type: `application/json`
+*   **No redirects**; must be HTTPS.
+
+**Minimal AASA example:**
+
+```json
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["ABCDE12345.com.mybank.mobile"],
+        "paths": [
+          "/transfer/*",
+          "/login",
+          "/otp",
+          "/profile/*",
+          "/home",
+          "NOT /admin/*"
+        ]
+      }
+    ]
+  }
+}
+```
+
+*   `appIDs`: `<TeamID>.<BundleID>`
+*   `paths`: Which paths should open the app. `"*"` for everything, `"NOT /path"` to exclude.
+
+### 3) Handle incoming links in RN
+
+React Navigation handles routing if `linking` is configured. If you need lower‑level access:
+
+```ts
+import { Linking } from 'react-native';
+useEffect(() => {
+  const sub = Linking.addEventListener('url', ({ url }) => {
+    // optional custom handling
+  });
+  return () => sub.remove();
+}, []);
+```
+
+### Testing (iOS)
+
+*   Install app (release is more representative).
+*   On device: tap `https://app.mybank.com/transfer/123`.
+*   If it opens Safari instead: verify **AASA** (no redirects, correct `appIDs`, correct bundle ID/team ID), Associated Domains entitlement, and path matches.
+
+***
+
+## 🤖 Android — App Links
+
+### 1) Intent filter for HTTPS routes (AndroidManifest.xml)
+
+```xml
+<activity
+  android:name=".MainActivity"
+  android:autoVerify="true"
+  android:exported="true">
+  <intent-filter android:autoVerify="true">
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data android:scheme="https"
+          android:host="app.mybank.com" />
+  </intent-filter>
+
+  <!-- Optional: custom scheme fallback -->
+  <intent-filter>
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data android:scheme="mybank" />
+  </intent-filter>
+</activity>
+```
+
+### 2) Host `assetlinks.json`
+
+Serve at `https://app.mybank.com/.well-known/assetlinks.json`:
+
+```json
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.mybank.mobile",
+      "sha256_cert_fingerprints": [
+        "11:22:33:AA:BB:...:FF"  // release certificate fingerprint
+      ]
+    }
+  }
+]
+```
+
+**Important**:
+
+*   Use the **release** signing cert fingerprint (use `keytool -list -v -keystore ...` or from Play Console).
+*   Domain must serve valid **HTTPS**; no redirects.
+
+### 3) Verify on device
+
+```bash
+adb shell am start -a android.intent.action.VIEW \
+  -d "https://app.mybank.com/transfer/123"
+```
+
+If it shows a chooser or opens the browser:
+
+*   Check `assetlinks.json` path, content, and fingerprint.
+*   Ensure `android:autoVerify="true"` and device has network to verify.
+*   Some OEMs require manual default selection once.
+
+***
+
+## 🧰 Custom URL Scheme (fallback / internal)
+
+**iOS (Info.plist):**
+
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+    <key>CFBundleURLSchemes</key>
+    <array>
+      <string>mybank</string>
+    </array>
+  </dict>
+</array>
+```
+
+**Android (AndroidManifest.xml):**
+
+```xml
+<intent-filter>
+  <action android:name="android.intent.action.VIEW" />
+  <category android:name="android.intent.category.DEFAULT" />
+  <category android:name="android.intent.category.BROWSABLE" />
+  <data android:scheme="mybank" />
+</intent-filter>
+```
+
+**Usage:** `mybank://transfer/123`
+
+***
+
+## 🔐 Security & Compliance (Banking)
+
+*   **Do not** encode sensitive data (tokens, PAN, PII) directly in URLs—they can appear in logs, notifications, referrers.
+*   For **login/OTP** deep links, use **short‑lived codes**; exchange server‑side for tokens.
+*   Validate **signature**/HMAC in deferred deep links if distributing via marketing.
+*   Use **universal/app links** so OS verifies ownership—prevents phishing via custom schemes.
+*   Implement **allow‑list** of domains and routes, reject anything else.
+
+***
+
+## 🧭 Handling “open app if installed, else go to store/web”
+
+*   **Universal/App Links** already do app‑if‑installed, else web fallback.
+*   If you need **App Store / Play Store fallback**, use a **redirector** service or JS on the fallback page to detect app presence and route accordingly.
+
+***
+
+## 🔄 Deferred Deep Links (after install)
+
+If a user taps a link without the app installed, you may want to open the **intended screen after install**. This typically uses a provider (e.g., **Firebase Dynamic Links**, **Branch.io**, **AppsFlyer**):
+
+*   Create a smart link that opens web → store → app,
+*   SDK reads the params on first open and navigates accordingly.
+
+> For interviews, mention “**Firebase Dynamic Links** or **Branch** for deferred deep linking and attribution.”
+
+***
+
+## 🧪 Testing matrix (copy for your QA plan)
+
+*   iOS: iPhone with app installed vs not installed; iOS 14–17; tap from **Notes**, **Mail**, **Safari**.
+*   Android: Multiple OEMs; Chrome vs in‑app browsers; installed vs not installed; first open behavior.
+*   Confirm **path routing** (`/transfer/:id`, `/otp`, `/profile/:id`) for both platforms.
+*   Verify **AASA** and **assetlinks.json** with curl / Chrome “Digital Asset Links” tool.
+*   Ensure **fallback** behavior (web/app store) is correct.
+
+***
+
+## Common Pitfalls (and fixes)
+
+*   **AASA/assetlinks served with wrong content‑type** or behind **redirects** → OS cannot verify.
+*   **Wrong TeamID/BundleID** in AASA or **wrong certificate fingerprint** in assetlinks → verification fails.
+*   Using only **custom schemes** → security risk & poor UX (chooser dialogs).
+*   Missing **prefixes** or route **config** in React Navigation linking → link opens app but doesn’t navigate to correct screen.
+*   Passing **huge data** in URLs → leaks, crashes; pass IDs and fetch in app.
+
+***
+
+## Short interview soundbite
+
+> Deep links open a specific route in your app. For production, we use **iOS Universal Links** and **Android App Links**, which are verified HTTPS links that open the app directly if installed, falling back to the website otherwise. They’re enabled by entitlements/intent filters and verified via **AASA** (iOS) and **assetlinks.json** (Android). In React Navigation, we define a **linking config** mapping paths to screens. We avoid putting sensitive data in URLs, validate inputs, and use a provider like **Dynamic Links/Branch** for **deferred deep linking**.
+
+  </details>
+
+  <details><summary>22. How do push notifications work (APNs, FCM)?</summary>
+
+Absolutely—let’s keep this **interview‑ready** and **practical** for React Native, with clear flows, payload examples, and gotchas for **APNs (iOS)** and **FCM (Android/iOS)**.
+
+***
+
+## ✅ What are Push Notifications—High Level
+
+A push notification involves four parties:
+
+1.  **Your app on the device** → requests **permission** and obtains a **device token**.
+2.  **Platform push service** → **APNs** (Apple) or **FCM** (Google) routes the notification to devices.
+3.  **Your app server** (or provider like Firebase/OneSignal/Braze) → sends payloads to APNs/FCM.
+4.  **The OS** → displays the notification or wakes the app (limited) to process it.
+
+In **React Native**, most teams use **Firebase Cloud Messaging (FCM)** to unify Android + iOS, but you can also send directly to **APNs** on iOS.
+
+***
+
+## 🛠️ Basic Flows
+
+### iOS (APNs)
+
+1.  App asks for **user permission** (`alert`, `sound`, `badge`).
+2.  App registers with **APNs** and receives a **device token** (per app/device/build).
+3.  Your server uses **APNs HTTP/2** with your **Auth Key (.p8)** or legacy certificate to send a payload to that token.
+4.  APNs delivers to the device; iOS displays or hands to your app depending on state and payload flags.
+
+### Android (FCM)
+
+1.  App gets a **registration token** from **FCM** (no explicit user permission required before Android 13; now Android 13+ requires runtime notification permission).
+2.  Your server calls **FCM HTTP v1** API with the token (or a **topic**).
+3.  FCM routes and delivers; Android posts the notification or passes data to your app.
+
+### Using FCM on both platforms
+
+*   **iOS**: Your app still registers with APNs, but **Firebase iOS SDK** exchanges the APNs token for an **FCM token**; you send via **FCM** and Google handles the APNs handshake under the hood.
+*   **Android**: Native.
+
+> **Why teams like FCM**: one API (HTTP v1) for both platforms, topics, conditions, analytics, and device group messaging.
+
+***
+
+## 🔐 Permissions & Tokens
+
+*   **iOS**: Must request **UNUserNotificationCenter** permissions; user can deny, limit alerts, or allow provisional (quiet) notifications. Token can change—**refresh and update your backend** on every app start.
+*   **Android**: Android 13+ requires **`POST_NOTIFICATIONS`** runtime permission. Tokens also rotate—update backend appropriately.
+
+***
+
+## 🔔 Message Types (Important for behavior)
+
+*   **Notification message**: OS displays it automatically; app callback may not run if the app is killed (varies).
+*   **Data message**: Delivered to the app’s handler; you’re responsible for showing a local notification if needed.
+*   **Silent / Background**:
+    *   **iOS**: `content-available: 1` (background refresh). Requires background mode and is throttled; no UI.
+    *   **Android**: pure data message handled in the background service.
+
+> Banking apps often use **data messages** + **local notifications** for precise control and to **avoid PII** in the cloud‑visible notification.
+
+***
+
+## 📦 Payload Examples
+
+### APNs (HTTP/2 over TLS, direct to Apple)
+
+**Header:**
+
+*   `apns-topic: <bundle-id>` (or `<bundle-id>.voip` for VoIP)
+*   Optional: `apns-push-type: alert|background|voip`
+*   `apns-priority: 10` (alert) or `5` (background)
+
+**Body (alert):**
+
+```json
+{
+  "aps": {
+    "alert": { "title": "Payment Received", "body": "₹1,250 from Rohan" },
+    "badge": 3,
+    "sound": "default"
+  },
+  "txnId": "abc123",            // custom data (avoid PII)
+  "deeplink": "mybank://txn/abc123"
+}
+```
+
+**Background (silent) push:**
+
+```json
+{
+  "aps": { "content-available": 1 },
+  "refresh": true
+}
+```
+
+**Curl (example using token auth)**
+
+```bash
+curl -v \
+  --header "apns-topic: com.mybank.mobile" \
+  --header "apns-push-type: alert" \
+  --header "authorization: bearer <jwt-from-your-p8-key>" \
+  --data '{"aps":{"alert":{"title":"Hello","body":"World"},"sound":"default"}}' \
+  https://api.push.apple.com/3/device/<apns-device-token>
+```
+
+### FCM (HTTP v1, both Android+iOS)
+
+**Notification message:**
+
+```json
+{
+  "message": {
+    "token": "<fcm-token>",
+    "notification": {
+      "title": "Payment Received",
+      "body": "₹1,250 from Rohan"
+    },
+    "data": {
+      "deeplink": "mybank://txn/abc123",
+      "txnId": "abc123"
+    },
+    "android": {
+      "priority": "HIGH",
+      "notification": { "channel_id": "payments", "sound": "default" }
+    },
+    "apns": {
+      "headers": { "apns-push-type": "alert", "apns-priority": "10" },
+      "payload": { "aps": { "sound": "default", "badge": 3 } }
+    }
+  }
+}
+```
+
+**Data-only message (you show local notification)**
+
+```json
+{
+  "message": {
+    "token": "<fcm-token>",
+    "data": {
+      "type": "PAYMENT",
+      "amountMinor": "125000",
+      "currency": "INR",
+      "deeplink": "mybank://txn/abc123"
+    },
+    "android": { "priority": "HIGH" },
+    "apns": { "headers": { "apns-push-type": "background" }, "payload": { "aps": { "content-available": 1 } } }
+  }
+}
+```
+
+***
+
+## 🧩 React Native Handling (using `@react-native-firebase/messaging`)
+
+**Request permissions (iOS & Android 13+):**
+
+```ts
+import messaging from '@react-native-firebase/messaging';
+import { PermissionsAndroid, Platform } from 'react-native';
+
+export async function requestPushPermission() {
+  if (Platform.OS === 'ios') {
+    await messaging().requestPermission(); // alerts/sounds/badges (configurable)
+  } else if (Platform.OS === 'android' && Platform.Version >= 33) {
+    await PermissionsAndroid.request('android.permission.POST_NOTIFICATIONS');
+  }
+}
+```
+
+**Get / refresh FCM token:**
+
+```ts
+const fcmToken = await messaging().getToken();
+// Send to backend, associate with user/session/device
+messaging().onTokenRefresh(token => updateBackend(token));
+```
+
+**Foreground message listener:**
+
+```ts
+const unsubscribe = messaging().onMessage(async remoteMessage => {
+  // Show in-app banner or build a local notification
+});
+```
+
+**Background/quit state handler (Headless):**
+
+```ts
+// index.js (must be top-level)
+messaging().setBackgroundMessageHandler(async remoteMessage => {
+  // Process data, schedule local notification if needed
+});
+```
+
+**Navigating from a notification tap:**
+
+*   Use `getInitialNotification()` for cold start.
+*   Use `onNotificationOpenedApp` for background → foreground transitions.
+*   Map `deeplink` or params to your navigation.
+
+> Always **debounce navigation** to avoid double navigation if both handlers fire.
+
+***
+
+## 📣 iOS Extensions & Rich Notifications
+
+*   **Notification Service Extension (NSE)**: Download media, decrypt payloads, or modify content **before display** (e.g., mask account digits).
+*   **Mutable content**: Set `mutable-content: 1` (APNs) to trigger NSE.
+*   **Categories & actions**: Define interactive buttons and handle actions in app.
+
+***
+
+## 📊 Delivery, Priority & Throttling
+
+*   **APNs**: `apns-priority: 10` for alert, `5` for background. `content-available` pushes are throttled and not guaranteed if the app is force-quit.
+*   **FCM**: `priority: HIGH` for time-sensitive messages. Use **collapse keys** / **notification keys** to avoid spam and save battery.
+*   **No delivery guarantees** for background data on iOS; design idempotent sync on app open.
+
+***
+
+## 🔐 Security & Privacy (Banking-grade)
+
+*   **Never put PII or secrets in notification payloads**—they can appear on lock screens and logs. Prefer IDs/tokens and fetch details in-app.
+*   **Use short-lived IDs** and server fetch on open.
+*   **Encrypt sensitive parts** (if business allows) and decrypt in **Notification Service Extension** (iOS).
+*   **Rotate tokens** on logout; **unsubscribe from topics** on logout.
+*   **App Attest (iOS)** / **Play Integrity (Android)** for device trust; don’t deliver high-risk content to untrusted devices.
+*   Respect **user consent** (GDPR/CPRA), and provide controls to mute topics.
+
+***
+
+## 🧱 Channels (Android) & Interruption Levels (iOS)
+
+*   **Android**: Create **Notification Channels** (e.g., `payments`, `security`) with proper importance. Users control per-channel settings.
+*   **iOS**: Set **interruption level** (iOS 15+) responsibly; most banking notifications should be **active** or **time-sensitive** only if justified. Use **relevance score** sparingly.
+
+***
+
+## 🧪 Testing
+
+*   **iOS**: Xcode device logs, `apns-topic` & `apns-push-type` correctness, A/B silent vs alert.
+*   **Android**: `adb shell cmd notification` tools; test background/Doze modes; OEM differences.
+*   **End-to-end**: Validate tap opens the intended screen (deep link), and that state is correct if the app was killed.
+
+***
+
+## 🧭 Design Choices (What to say in interviews)
+
+*   Use **FCM HTTP v1** for unified send (Android+iOS), but be aware of **APNs semantics** (e.g., `content-available`, `mutable-content`).
+*   Prefer **data-only** messages + **local notifications** for precise control and **privacy**.
+*   Implement **idempotent processing** (dedupe with `collapse_key`/`apns-id`/your own IDs).
+*   Handle **permission prompts** with UX (explain value, maybe “pre‑prompt” screen).
+*   Ensure **token lifecycle** (refresh, revoke on logout) and **topic hygiene**.
+
+***
+
+## Quick RN Checklist
+
+*   [ ] Request permissions (iOS & Android 13+).
+*   [ ] Obtain and sync **FCM token** to backend; handle refresh.
+*   [ ] Foreground, background, and cold start handlers wired.
+*   [ ] Local notifications for data messages; channels set up on Android.
+*   [ ] Deep links wired (tap → correct screen).
+*   [ ] No PII in payloads; NSE used if needed on iOS.
+*   [ ] Token unsubscribe on logout; topic manage per user.
+*   [ ] Tested on real devices, app killed, low battery, Doze, and poor network.
+
+  </details>
+
+  <details><summary>23. RN accessibility best practices (TalkBack/VoiceOver).</summary>
+
+Absolutely — here is a **clean, interview‑ready**, React Native–focused guide on **Accessibility (A11y)** with **TalkBack (Android)** and **VoiceOver (iOS)** best practices.  
+This is practical, easy for developers to apply, and strong enough for senior‑level interviews in banking/FinTech.
+
+***
+
+# ✅ **23. React Native Accessibility Best Practices (TalkBack / VoiceOver)**
+
+Accessibility in RN ensures your app works for users with visual, motor, cognitive, or hearing impairments. Both **TalkBack (Android)** and **VoiceOver (iOS)** rely on the **Accessibility Tree**, which you control via RN props.
+
+***
+
+# 🔹 1) Add correct accessibility labels
+
+Use `accessibilityLabel` to clearly describe the element’s purpose.
+
+```tsx
+<TouchableOpacity
+  accessibilityLabel="Send money to Rohan"
+  onPress={sendMoney}
+>
+  <Text>Send</Text>
+</TouchableOpacity>
+```
+
+**Best practices**
+
+*   Don’t repeat visual text if the button already has clear text.
+*   Provide context: “₹500 debited on 2 Feb” instead of “Transaction”.
+
+***
+
+# 🔹 2) Mark interactive elements as accessible
+
+```tsx
+<TouchableOpacity accessible>
+  <Text>Pay Now</Text>
+</TouchableOpacity>
+```
+
+**When to use `accessible`**
+
+*   Wraps multiple children that should behave like one control (e.g., cards, rows).
+
+Avoid nesting `accessible` elements—it confuses screen readers.
+
+***
+
+# 🔹 3) Use semantic roles (important!)
+
+```tsx
+<TouchableOpacity
+  accessibilityRole="button"
+  accessibilityState={{ disabled: isDisabled }}
+>
+  <Text>Login</Text>
+</TouchableOpacity>
+```
+
+**Common roles**
+
+*   `button`
+*   `link`
+*   `checkbox`
+*   `switch`
+*   `header`
+*   `text`
+*   `image`
+*   `tab`
+*   `menu`
+*   `progressbar`
+
+This gives TalkBack/VoiceOver proper meaning without extra words.
+
+***
+
+# 🔹 4) Respect focus order & control focus manually when needed
+
+Focus should move logically from top → bottom.
+
+Use:
+
+### **Auto-focus when screen loads**
+
+```tsx
+const ref = useRef<View>(null);
+
+useEffect(() => {
+  ref.current?.focus();
+}, []);
+```
+
+### **Move focus after an action (e.g., form error)**
+
+```tsx
+AccessibilityInfo.sendAccessibilityEvent({
+  type: 'announcement',
+  message: 'Invalid OTP entered'
+});
+```
+
+This is critical in banking apps (OTP, transaction failures).
+
+***
+
+# 🔹 5) Support Dynamic Type / Font scaling
+
+Never hard‑code `fontSize` without allowing scaling:
+
+```tsx
+<Text allowFontScaling adjustsFontSizeToFit numberOfLines={2}>
+  Account Balance
+</Text>
+```
+
+Avoid fixed heights that clip text when enlarged.
+
+***
+
+# 🔹 6) Describe images & icons correctly
+
+### Meaningful image
+
+```tsx
+<Image
+  accessibilityLabel="Profile photo of Harshal"
+  accessible
+/>
+```
+
+### Decorative image
+
+```tsx
+<Image
+  accessible={false}
+  importantForAccessibility="no"
+  accessibilityIgnoresInvertColors
+/>
+```
+
+**Do not** let decorative icons clutter the accessibility tree.
+
+***
+
+# 🔹 7) Use accessibility hints for interactions
+
+```tsx
+<TouchableOpacity
+  accessibilityLabel="Account Balance"
+  accessibilityHint="Double-tap to view detailed transactions"
+>
+  <Text>₹45,300</Text>
+</TouchableOpacity>
+```
+
+Hints tell users what happens next.
+
+***
+
+# 🔹 8) Avoid dynamic content without announcements
+
+When screen content changes automatically (e.g., after API loads):
+
+### Announce updates:
+
+```tsx
+AccessibilityInfo.announceForAccessibility('Balance updated');
+```
+
+### Mark changing content as “live region”:
+
+```tsx
+<Text accessibilityLiveRegion="polite">
+  {balance}
+</Text>
+```
+
+***
+
+# 🔹 9) Ensure Color Contrast (WCAG AA)
+
+*   Text contrast ratio **≥ 4.5:1**
+*   Large text ≥ 3:1
+*   Avoid color‑only indicators for validation (use icons + text).
+
+For example:
+❌ Red text only → “Incorrect PIN”  
+✅ Red error icon + text
+
+***
+
+# 🔹 10) Touch target size minimum 44×44 dp
+
+On both platforms:
+
+```tsx
+style={{ padding: 12 }} // ~44dp
+```
+
+Small buttons = unusable with TalkBack/VoiceOver.
+
+***
+
+# 🔹 11) Avoid hidden, off-screen, or duplicated elements being read
+
+Use:
+
+```tsx
+importantForAccessibility="no-hide-descendants"
+```
+
+to hide nested elements from the accessibility tree.
+
+Example: When a modal opens, hide background content.
+
+***
+
+# 🔹 12) Make modals & bottom sheets accessible
+
+*   Set initial focus into the modal.
+*   Trap focus inside modal.
+*   Disable background content:
+
+```tsx
+importantForAccessibility="no-hide-descendants"
+```
+
+Use libraries like **react-native-modal**, **gorhom/bottom-sheet** (they have built-in accessibility support).
+
+***
+
+# 🔹 13) Test with actual screen readers (critical!)
+
+### iOS (VoiceOver)
+
+*   Settings → Accessibility → VoiceOver → ON
+
+Key gestures:
+
+*   Swipe right/left = move focus
+*   Double tap = activate
+*   Three-finger swipe = scroll
+
+### Android (TalkBack)
+
+*   Settings → Accessibility → TalkBack
+*   Volume key shortcut (press & hold both volume keys)
+
+Also test:
+
+*   Dynamic Type (iOS)
+*   Large Font / Display Size (Android)
+*   High contrast mode (Android)
+*   Screen reader rotor (iOS)
+
+***
+
+# 🔹 14) Avoid passing encrypted or masked content incorrectly
+
+For financial apps:
+
+*   Mask sensitive text **visually AND in accessibility**.
+
+Example: Mask CVV:
+
+```tsx
+<Text
+  accessibilityLabel="CVV hidden for security"
+>
+  ***
+</Text>
+```
+
+Example: Mask account number:
+
+```tsx
+accessibilityLabel="Account ending with 1234"
+```
+
+Never speak full card numbers or OTP codes.
+
+***
+
+# 🔹 15) Ensure gesture-driven UI is accessible
+
+Custom swipe/drag gestures (like carousels or sliders) must have:
+
+*   Keyboard equivalent actions
+*   Accessible buttons (Next / Previous)
+*   Described current index: “Slide 2 of 5”
+
+***
+
+# 🎤 **Short Interview Answer**
+
+> In RN, accessibility means making your UI fully usable with TalkBack (Android) and VoiceOver (iOS).  
+> Use proper semantic roles (`accessibilityRole`), clear labels, hints, and ensure elements are focusable.  
+> Disable decorative elements from the a11y tree, support Dynamic Type, enforce touch target size, and announce dynamic updates.  
+> Manage focus when modals/screens open, avoid nested accessible elements, and mask sensitive financial information.  
+> Always test on actual devices with TalkBack and VoiceOver enabled.
+
+  </details>
+
+  <details><summary>24. When to use CodePush, and why banking apps may restrict it?</summary>
+
+Here’s a **clean, interview‑ready**, React Native–specific answer explaining **when to use CodePush** and **why banking/financial apps often restrict or forbid it**.  
+No search needed because this is conceptual knowledge.
+
+***
+
+# ✅ **24. When to use CodePush, and why banking apps may restrict it?**
+
+## **What is CodePush (Microsoft App Center CodePush)?**
+
+CodePush allows you to **push JavaScript and asset updates over‑the‑air (OTA)** to deployed RN apps **without going through App Store / Play Store review**.
+
+You can update:
+
+*   JS bundles
+*   Images/assets
+*   Minor UI tweaks
+*   Bug fixes  
+    BUT **NOT** native code (requires store release).
+
+***
+
+# ✅ **When to use CodePush (valid use cases)**
+
+### **1. Hotfixes for critical bugs**
+
+If you discover a:
+
+*   crash,
+*   navigation blocker,
+*   payment flow blocker,
+*   urgent UI bug
+
+…and you need to fix it within minutes/hours → OTA updates are useful.
+
+### **2. Minor UI changes**
+
+*   Text corrections
+*   Styles/layout adjustments
+*   Feature flags flip (UI-only)
+*   Non‑breaking component fixes
+
+### **3. A/B experiments (non‑native)**
+
+You can roll out **variations** of JS features to a percentage of users.
+
+### **4. Gradual rollouts**
+
+Roll out JS updates to 1% → 5% → 25% → 100% users to prevent wide impact.
+
+### **5. Reduce store review delays**
+
+Great for:
+
+*   Internal tools
+*   POCs
+*   Apps with simple JS changes
+*   Retail/non‑regulated apps
+
+***
+
+# ❌ **When NOT to use CodePush (especially in banking apps)**
+
+Banks, insurance, and fintech companies often **block CodePush entirely** or restrict it severely.
+
+Here’s why:
+
+***
+
+# 🔒 **1. Regulatory Compliance (App Store / Google Play)**
+
+Apple and Google require that apps **shipped via the store reflect the reviewed version**.
+
+*   Frequent OTA updates can be interpreted as **bypassing review**.
+*   This violates **App Store Review Guidelines 3.3.2** (no altering features outside what was reviewed).
+*   Google Play also restricts OTA updates that alter functionality.
+
+**Financial apps (regulated industry)** must strictly comply.
+
+***
+
+# 🔒 **2. Security & Risk (JS is executable code)**
+
+OTA updates push **new executable logic** without:
+
+*   review,
+*   regression testing at scale,
+*   security sign‑off.
+
+Risks include:
+
+*   Accidental security regression
+*   Fraud attack surface increased
+*   Logic changed without audit trail
+*   Weakening of control frameworks (SOX, PCI‑DSS, FFIEC)
+
+In banking, **every code change** must be:
+
+*   reviewed,
+*   approved,
+*   audited,
+*   versioned.
+
+OTA breaks this process unless heavily restricted.
+
+***
+
+# 🔒 **3. Code Validation & Integrity**
+
+Banks require:
+
+*   **Reproducible builds**
+*   **Checksums**
+*   **Immutable releases**
+*   **Signed artifacts**
+
+CodePush dynamically downloads JS → changes on device → version mismatch between:
+
+*   Compliance teams
+*   QA
+*   End users
+*   Crash logs
+
+This complicates debugging and violates many governance policies.
+
+***
+
+# 🔒 **4. Risk of introducing native‑JS mismatch**
+
+If you ship new JS that expects a **new native module**, OTA will break production users.
+
+Banks require deterministic behavior across versions.
+
+***
+
+# 🔒 **5. Legal & Audit Requirements**
+
+Banks must maintain:
+
+*   versioned artifacts,
+*   traceable deployments,
+*   rollback evidence,
+*   audit trails for regulations.
+
+CodePush updates are:
+
+*   invisible to App Store,
+*   not recorded as store version changes,
+*   ambiguous for auditors.
+
+This is often unacceptable.
+
+***
+
+# ⛔ **6. User trust & Detectability**
+
+iOS App Store reviewers can detect apps that mutate their logic post‑review.  
+Bank apps risk:
+
+*   **App rejection**
+*   **Forced removal**
+*   **Compliance escalations**
+
+So many banks either:
+
+*   Disable CodePush,
+*   Only allow it for certain low‑risk screens,
+*   Only use it internally.
+
+***
+
+# 💡 **7. Performance considerations**
+
+*   Large JS bundles pushed OTA → increased startup time.
+*   Poor rollback management can break app start.
+*   Updates must be downloaded & verified on launch.
+
+Banks prefer deterministic binary builds.
+
+***
+
+# 🏦 **So, why do banking apps restrict CodePush? (Interview Answer)**
+
+> Banking apps often restrict or prohibit CodePush because it bypasses the official App Store/Play Store review pipeline, which is required for regulatory, security, and audit compliance.  
+> OTA updates allow executable JS changes without formal approval, creating risk for fraud, unexpected behavior, and loss of traceability.  
+> Banks need deterministic, signed, versioned builds with strict governance, making CodePush risky except for extremely low‑impact, non‑functional updates (if allowed at all).
+
+***
+
+# 🧭 **If banks use CodePush at all, they apply strict rules:**
+
+✔ Only for **cosmetic UI fixes**  
+✔ No logic changes affecting:
+
+*   transactions,
+*   authentication,
+*   encryption,
+*   data validation,
+*   feature flags related to money movement
+
+✔ Approval through governance  
+✔ Strict rollback strategy  
+✔ CodePush packages signed & validated  
+✔ App Store/Play Store releases still required for functionality changes
+
+***
+
+# 🟢 **Alternative recommended for banking apps**
+
+Use **feature flag services** instead of CodePush:
+
+*   LaunchDarkly
+*   ConfigCat
+*   Firebase Remote Config
+
+But **keep all logic inside the shipped binary**.
+
+  </details>
 
 </details>
 
