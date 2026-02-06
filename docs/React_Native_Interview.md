@@ -5619,22 +5619,827 @@ But **keep all logic inside the shipped binary**.
 
 ***
 
-### **3) Expo vs React Native CLI (6 questions)**
+### ****
 
 <details>
   <summary>Expo vs React Native CLI (6)</summary>
 
-  <details><summary>25. When to choose Expo Managed vs Bare workflows?</summary></details>
+  <details><summary>25. When to choose Expo Managed vs Bare workflows?</summary>
 
-  <details><summary>26. Limitations of Expo for banking apps (background tasks, pinning).</summary></details>
+Here’s a **concise, interview‑ready answer** with clarity and practical guidance:
 
-  <details><summary>27. How to migrate from Expo Managed to Bare?</summary></details>
+***
 
-  <details><summary>28. What are Expo config plugins?</summary></details>
+## ✅ **25. When to choose Expo Managed vs Bare Workflows?**
 
-  <details><summary>29. How Expo Updates differ from CodePush?</summary></details>
+### **Expo Managed Workflow — When to Choose**
 
-  <details><summary>30. EAS Build vs Fastlane — when to prefer each?</summary></details>
+Use **Expo Managed** when:
+
+*   You want **fast development**, **zero native code**, and **easy setup**.
+*   Your app requirements fit within Expo’s pre‑built capabilities.
+*   OTA updates (Expo Updates) are beneficial.
+*   You are building **POCs, prototypes**, or **simple–medium complexity apps**.
+*   You don’t need custom native modules.
+*   You want cross‑platform consistency out of the box.
+
+**Good for:**
+
+*   Banking dashboards
+*   Basic authentication flows
+*   Card views, charts, forms
+*   Apps using standard device APIs (camera, secure storage, biometrics)
+
+***
+
+### **Expo Bare Workflow — When to Choose**
+
+Choose **Bare Workflow** when:
+
+*   You need **full native control** (Android/iOS).
+*   The project requires **custom native modules** not supported by Expo.
+*   There’s a need to integrate **advanced SDKs** (banking/fintech often needs this).
+*   App performance tuning at a native level is required.
+*   Deep native security compliance is needed.
+
+**Common banking use cases:**
+
+*   Custom encryption modules (AES hardware-backed keystore)
+*   Native security frameworks (e.g., App Attest, SafetyNet)
+*   Advanced mobile SDK integrations (Fraud detection, MDM, SSO, biometrics)
+*   Heavy background services or native threads
+*   Custom UI components (e.g., OTP auto-read on Android)
+
+***
+
+## 🔍 Interview-Friendly Summary
+
+> **Choose Expo Managed** for speed and simplicity when native capabilities are enough.  
+> **Choose Expo Bare** when your project needs custom native code, special SDKs, or deeper platform control — common in enterprise banking apps.
+
+***
+
+## 📌 Example Scenario
+
+### **Expo Managed (Ideal)**
+
+A banking client app with:
+
+*   Login, dashboard, transactions list
+*   Biometric login (Expo supports it)
+*   Secure storage (Expo SecureStore)
+
+```js
+import * as LocalAuthentication from 'expo-local-authentication';
+
+const authenticate = async () => {
+  const result = await LocalAuthentication.authenticateAsync({
+    promptMessage: "Login with Face ID",
+  });
+  console.log(result.success);
+};
+```
+
+***
+
+### **Bare Workflow (Required)**
+
+You need to integrate a **native fraud‑detection SDK** that Expo doesn’t support.
+
+```java
+// Android native module example
+public class FraudDetectionModule extends ReactContextBaseJavaModule {
+    @Override
+    public String getName() {
+        return "FraudDetection";
+    }
+
+    @ReactMethod
+    public void startDetection() {
+        FraudSDK.start();
+    }
+}
+```
+
+In JS:
+
+```js
+import { NativeModules } from "react-native";
+
+NativeModules.FraudDetection.startDetection();
+```
+
+  </details>
+
+  <details><summary>26. Limitations of Expo for banking apps (background tasks, pinning).</summary>
+
+Here’s a **concise, interview‑ready summary** of Expo’s **limitations for banking apps**, especially around **background tasks and certificate pinning** — the two areas banking clients often care about most.
+
+***
+
+## ✅ **26. Limitations of Expo for Banking Apps (Background Tasks, Pinning)**
+
+### **1️⃣ Background Tasks — Limited / Not Full Native Control**
+
+Expo Managed Workflow has major restrictions:
+
+#### **Limitations**
+
+*   ❌ Cannot run **continuous background services** (e.g., fraud monitoring, session heartbeat).
+*   ❌ No support for **true background execution** like long‑running tasks.
+*   ❌ Background Fetch works only within OS constraints and is **not reliable for mission‑critical flow**.
+*   ❌ No ability to write **custom native background code** (unless using Bare Workflow).
+
+**Why it matters for banking apps:**
+
+*   Banking apps often need:
+    *   Session monitoring
+    *   Silent token refresh
+    *   Fraud SDK background signals
+    *   Device security checks in background
+
+Expo Managed can’t support these.
+
+#### **Expo Background Fetch Example (Limited)**
+
+```js
+import * as BackgroundFetch from 'expo-background-fetch';
+import * as TaskManager from 'expo-task-manager';
+
+TaskManager.defineTask("fetch-transactions", async () => {
+  console.log("Running background task");
+  return BackgroundFetch.BackgroundFetchResult.NewData;
+});
+
+await BackgroundFetch.registerTaskAsync("fetch-transactions", {
+  minimumInterval: 15 * 60, // OS controlled, not guaranteed
+});
+```
+
+This is **not** suitable for banking-grade requirements.
+
+***
+
+### **2️⃣ SSL / Certificate Pinning — Not Possible in Managed Workflow**
+
+Expo Managed:
+
+*   ❌ Does **not allow certificate pinning** natively.
+*   ❌ You cannot modify the native networking stack (OkHttp for Android / NSURLSession for iOS).
+*   ❌ No native libraries like `react-native-pinch` can be added.
+
+**Why it matters:**
+Banking apps must prevent:
+
+*   MITM attacks
+*   Proxy-based interception
+*   Traffic tampering
+
+This requires deep native networking control → **Bare Workflow only**.
+
+#### **What it looks like (Bare Workflow Example using react-native-pinch)**
+
+```js
+import { usePinned } from "@react-native-pinch/pinch";
+
+const response = await fetch("https://bank-api.com", {
+  method: "GET",
+  sslPinning: {
+    certs: ["bank_cert"],
+  },
+});
+```
+
+This **cannot** be done in Expo Managed because it requires custom native installation.
+
+***
+
+## 🧩 Other Expo Limitations Important for Banking Clients
+
+Below are quick bullets useful in interviews:
+
+### **Security Restrictions**
+
+*   ❌ No ability to integrate advanced native security frameworks
+    *   Android SafetyNet / Play Integrity API
+    *   iOS DeviceCheck / App Attest
+    *   Runtime integrity checks
+*   ❌ No full root/jailbreak detection libraries (e.g., `react-native-jailbreak`)
+*   ❌ No native code obfuscation tools
+
+### **SDK Limitations**
+
+*   ❌ Cannot integrate 3rd‑party native SDKs often used in banking:
+    *   Fraud detection
+    *   Device fingerprinting
+    *   Secure OTP frameworks
+    *   CRM / Analytics native SDKs
+
+### **Performance / Architecture**
+
+*   🚫 JS-only architecture limits ability to optimize critical paths.
+*   🚫 Cannot create custom native UI components (important for secure PIN pads).
+
+***
+
+## 🟦 **Quick Interview Summary**
+
+> **Expo Managed** is not ideal for banking apps due to limitations in background tasks, certificate pinning, security SDKs, and custom native code.  
+> **Bare Workflow** is required for enterprise security and compliance.
+
+  </details>
+
+  <details><summary>27. How to migrate from Expo Managed to Bare?</summary>
+
+Here’s a **clear, concise, interview‑ready answer** explaining **how to migrate from Expo Managed to Bare**, with the steps developers actually follow in real projects.
+
+***
+
+# ✅ **27. How to migrate from Expo Managed to Bare?**
+
+Migrating from **Expo Managed** → **Expo Bare Workflow** is straightforward because Expo provides tooling for it.  
+Bare Workflow gives you full access to **native iOS/Android code**, needed for banking apps requiring **security, device checks, SSL pinning, custom SDKs**, etc.
+
+***
+
+# ✅ **Step-by-Step Migration Process**
+
+### **1️⃣ Run the eject command**
+
+This converts your Managed project into a full native (Android + iOS) project.
+
+```sh
+expo prebuild
+```
+
+or the older command:
+
+```sh
+expo eject
+```
+
+This does three things:
+
+*   Creates **android/** and **ios/** native directories.
+*   Generates native code for required Expo modules.
+*   Updates `app.json` → `expo-build-properties` configuration.
+
+***
+
+### **2️⃣ Install native dependencies needed for Bare**
+
+After ejecting, you must install packages the native apps rely on:
+
+```sh
+npm install
+npx pod-install
+```
+
+This generates:
+
+*   `ios/Pods`
+*   Xcode workspace
+*   Updated Android Gradle files
+
+***
+
+### **3️⃣ Update native configuration**
+
+Now you can modify:
+
+*   `android/app/build.gradle`
+*   `android/app/src/main/java/...`
+*   `ios/YourApp/AppDelegate.m`
+*   `ios/YourApp/Info.plist`
+
+Common banking additions:
+
+*   SSL pinning modules
+*   Native security SDKs
+*   Device root/jailbreak detection modules
+
+***
+
+### **4️⃣ Remove unsupported Expo modules (if any)**
+
+Some Managed-only libraries don’t work in Bare.
+
+If you see warnings like:
+
+❌ `"expo-dev-client is required"`  
+❌ `"This module is not compatible with Bare workflow"`
+
+Remove or replace with:
+
+*   Community libraries
+*   Custom native code
+
+***
+
+### **5️⃣ Add any custom native modules you need**
+
+Example: adding SSL pinning library in Android:
+
+`android/app/build.gradle`
+
+```gradle
+dependencies {
+    implementation project(':react-native-pinch')
+}
+```
+
+iOS:
+
+```ruby
+pod 'react-native-pinch', :path => '../node_modules/react-native-pinch'
+```
+
+***
+
+### **6️⃣ Build the native apps manually**
+
+Now you build like a typical React Native app.
+
+**iOS build:**
+
+```sh
+cd ios
+pod install
+xed .
+```
+
+Then build via Xcode.
+
+**Android build:**
+
+```sh
+cd android
+./gradlew assembleRelease
+```
+
+***
+
+### **7️⃣ Run the app**
+
+```sh
+npx react-native run-android
+npx react-native run-ios
+```
+
+Expo Go will **no longer** work—now you use a **custom dev client** or device simulators.
+
+***
+
+# 🧩 **Common Issues During Migration**
+
+| Issue                               | Solution                                   |
+| ----------------------------------- | ------------------------------------------ |
+| Missing Pods                        | Run `npx pod-install`                      |
+| Expo modules crash in Bare          | Add `"expo-dev-client"`                    |
+| Build fails after adding native SDK | Update Gradle / Xcode build settings       |
+| App icons/splash not applied        | Move config from `app.json` → native files |
+
+***
+
+# 🟦 **Interview-Ready Summary**
+
+> To migrate from Expo Managed to Bare, run `expo prebuild`, which generates native Android/iOS folders. Then install pods, fix incompatible libraries, configure native build files, integrate native SDKs you need, and run the app using regular React Native tooling instead of Expo Go. This is required whenever your app needs deeper platform access — like SSL pinning, advanced security, or custom native modules.
+
+  </details>
+
+  <details><summary>28. What are Expo config plugins?</summary>
+
+Here’s a **clean, short, interview‑friendly** explanation of **Expo Config Plugins**, with examples so developers can easily understand.
+
+***
+
+# ✅ **28. What are Expo Config Plugins?**
+
+Expo **Config Plugins** allow you to **customize native iOS/Android code** *without leaving the Expo ecosystem*.  
+They run during **`expo prebuild`** to automatically modify native files like:
+
+*   `AndroidManifest.xml`
+*   `Info.plist`
+*   `build.gradle`
+*   `Podfile`
+*   AppDelegate / MainActivity
+
+They are essential when using Expo Managed + Native modules together.
+
+***
+
+# 🟦 **Why Do Config Plugins Exist?**
+
+Expo Managed workflow doesn’t expose native folders by default.  
+But some libraries **need native configuration**, e.g.:
+
+*   Firebase
+*   Permissions
+*   SSL pinning
+*   Push notifications
+*   App security SDKs
+
+Config plugins give you a way to do this *safely* **without manually editing native code**.
+
+***
+
+# 🧩 **Simple Example: Adding a Permission (Android)**
+
+A config plugin modifies native files programmatically:
+
+### **plugin.js**
+
+```js
+const { withAndroidManifest } = require("@expo/config-plugins");
+
+module.exports = (config) => {
+  return withAndroidManifest(config, (config) => {
+    config.modResults.manifest.application[0]["uses-permission"] = [
+      { $: { "android:name": "android.permission.CAMERA" } },
+    ];
+    return config;
+  });
+};
+```
+
+Now when running:
+
+```sh
+expo prebuild
+```
+
+Expo injects this into the AndroidManifest automatically.
+
+***
+
+# 🟦 **Package.json Integration**
+
+```json
+{
+  "expo": {
+    "plugins": ["./plugin.js"]
+  }
+}
+```
+
+***
+
+# 🟩 **Real Banking Use Cases**
+
+Config plugins are required for banking app scenarios:
+
+### **1. Adding SSL Pinning native libraries**
+
+E.g., adjusting Gradle and Info.plist.
+
+### **2. Integrating Fraud Detection SDKs**
+
+Plugins add required native frameworks.
+
+### **3. Enforcing Device Security Configs**
+
+*   Disable screenshots
+*   Enable secure flags
+*   Jailbreak/root detection modules
+
+### **4. Custom permissions**
+
+e.g., biometrics, background tasks.
+
+***
+
+# ⭐ Interview‑Ready Summary
+
+> **Expo Config Plugins** let developers modify native iOS/Android project files during the Expo build process. They are needed when using native modules in Expo Managed apps — for permissions, SDK initialization, Gradle/Pod updates, or security configs — without manually editing native code.
+
+  </details>
+
+  <details><summary>29. How Expo Updates differ from CodePush?</summary>
+
+Here’s a **concise, interview‑ready comparison** of **Expo Updates vs CodePush**, specifically from a **React Native Banking App** perspective.
+
+***
+
+# ✅ **29. How Expo Updates differ from CodePush?**
+
+Expo Updates and CodePush both deliver **OTA (over‑the‑air) JS updates**, but they work very differently in terms of architecture, limitations, control, and enterprise suitability.
+
+***
+
+# 🟦 **1. Update Mechanism**
+
+### **Expo Updates**
+
+*   Ships updates through **Expo’s update service**.
+*   Updates delivered from **Expo servers** unless you host your own with EAS.
+*   Integrated into Expo’s build pipeline.
+
+### **CodePush**
+
+*   Provided by **Microsoft App Center**.
+*   Updates come from **your CodePush deployment** (Staging/Production).
+*   Works independently of Expo (pure React Native).
+
+***
+
+# 🟦 **2. Support for Native Code Changes**
+
+### **Expo Updates**
+
+❌ **Cannot** update native code or native modules.  
+❌ Requires full app store release if native dependencies change.
+
+### **CodePush**
+
+❌ Same limitation: **JS-only updates**.  
+✔️ But allows more flexibility in bundling JS and assets.
+
+**Interview Note:**
+
+> Both Expo Updates and CodePush only update JS/Assets — NOT native code.
+
+***
+
+# 🟦 **3. Banking-Specific Restrictions**
+
+### **Expo Updates**
+
+⚠️ Banking clients may reject Expo Updates because:
+
+*   OTA source is external (Expo servers) unless self-hosted.
+*   Not as granular in rollback or release channels.
+*   Harder to enforce strict deployment governance.
+
+### **CodePush**
+
+✔️ Popular in enterprise/mobile banking apps.  
+✔️ Supports strict release workflows:
+
+*   Mandatory updates
+*   Rollbacks
+*   Staged rollouts
+*   Separate Staging/Prod deployments
+
+***
+
+# 🟦 **4. Ease of Use**
+
+### **Expo Updates**
+
+✔️ Very easy, minimal config  
+✔️ One-line publishing
+
+```sh
+expo publish
+```
+
+### **CodePush**
+
+Requires:
+
+*   App Center account
+*   Installing SDK
+*   Manually linking keys/config
+*   Deploy via:
+
+```sh
+appcenter codepush release-react -a <appName> -d Production
+```
+
+***
+
+# 🟦 **5. Bundle Download Behavior**
+
+### **Expo Updates**
+
+*   Downloads updates **in the background**.
+*   Applies **on next app restart**.
+*   Supports:
+    *   Auto updates
+    *   Manual updates
+    *   Custom logic via `expo-updates`
+
+### **CodePush**
+
+More **granular control**:
+
+*   Apply immediately
+*   Apply on next restart
+*   Apply at custom app event
+*   Staged rollouts
+
+Example:
+
+```js
+codePush.sync({
+  installMode: codePush.InstallMode.IMMEDIATE,
+});
+```
+
+***
+
+# 🟦 **6. Flexibility & Customization**
+
+### **Expo Updates**
+
+*   Limited because it’s tied to the Expo ecosystem.
+*   Works best in Managed workflow.
+*   Bare workflow also works but requires config plugins.
+
+### **CodePush**
+
+*   Fully compatible with React Native CLI.
+*   Better when using custom native modules (common in banking).
+
+***
+
+# 🟦 **7. Security**
+
+### **Expo Updates**
+
+✔️ Supports update signing  
+✔️ Can self-host for enterprise  
+⚠️ External OTA server used by default  
+⚠️ Some banking clients disallow this
+
+### **CodePush**
+
+✔️ Strong enterprise adoption  
+✔️ Signed releases  
+✔️ Full control over infrastructure  
+✔️ Better suited for regulated industries
+
+***
+
+# 🟩 **Quick Summary (Best for Interview)**
+
+| Feature                           | Expo Updates                 | CodePush     |
+| --------------------------------- | ---------------------------- | ------------ |
+| Ease of setup                     | ⭐⭐⭐⭐⭐                        | ⭐⭐⭐          |
+| Control                           | Medium                       | High         |
+| Enterprise/BFSI suitability       | Medium                       | High         |
+| Works without native code changes | Yes                          | Yes          |
+| Requires Expo ecosystem           | Yes                          | No           |
+| Rollback / Staged rollout         | Basic                        | Strong       |
+| Update server control             | Limited (unless self-hosted) | Full control |
+
+***
+
+# ⭐ **Interview-Ready One-Liner Answer**
+
+> **Expo Updates is simpler and integrated with Expo, but less flexible and not always enterprise-friendly. CodePush offers more deployment control, better governance, and is widely used in enterprise/banking apps, but requires extra setup and works only with React Native CLI/Bare workflow.**
+
+  </details>
+
+  <details><summary>30. EAS Build vs Fastlane — when to prefer each?</summary>
+
+Here’s a **crisp, interview‑ready comparison** of **EAS Build vs Fastlane**, tailored for React Native + Banking/Enterprise scenarios.
+
+***
+
+# ✅ **30. EAS Build vs Fastlane — When to Prefer Each?**
+
+## 🟦 **What is EAS Build?**
+
+EAS Build (Expo Application Services) is a **cloud-based build system** built by Expo.
+
+Best when you want:
+
+*   No local environment setup
+*   Consistent cloud builds
+*   Automatic provisioning, signing
+*   Managed workflow builds
+*   OTA updates via Expo ecosystem
+
+***
+
+## 🟥 **What is Fastlane?**
+
+Fastlane is a **local/CI automation toolkit** for iOS/Android that gives **full control** over:
+
+*   Build pipelines
+*   Signing
+*   Store uploads
+*   Screenshots, beta deployments
+*   Custom scripts
+
+It’s widely used in enterprise CI/CD like Azure DevOps, Jenkins, GitHub Actions.
+
+***
+
+# 🟦 **When to Prefer EAS Build**
+
+Choose **EAS Build** when:
+
+### **1. Working with Expo Managed workflow**
+
+*   EAS is the only way to build Managed apps (since Expo Go doesn’t build standalone binaries).
+
+### \*\*2. You want **zero native build setup**
+
+*   No need for Xcode, Android Studio, certificates/keystores locally.
+
+### **3. Team looking for simplicity**
+
+*   Consistent cloud environment
+*   Easy to onboard new developers
+
+### **4. Cloud signing + managed credentials**
+
+```sh
+eas build --platform ios
+```
+
+### **5. Using EAS Update**
+
+EAS tightly integrates with Expo Updates for seamless OTA delivery.
+
+***
+
+# 🟥 **When to Prefer Fastlane**
+
+Choose **Fastlane** when:
+
+### **1. Building a banking/enterprise app needing full native control**
+
+Examples:
+
+*   SSL pinning native modules
+*   Fraud/Risk SDKs (ThreatMetrix, Appdome, Ravelin, etc.)
+*   Advanced device security checks
+*   Custom build flavors
+
+### **2. Your builds run in private CI/CD**
+
+*   Azure DevOps
+*   Jenkins
+*   GitHub Actions
+*   GitLab CI
+
+Fastlane fits perfectly into enterprise workflows.
+
+### **3. You need granular store automation**
+
+*   Automated iOS screenshot generation
+*   App Store metadata sync
+*   Beta uploads to TestFlight
+*   Controlled staged rollout
+*   Versioning scripts
+
+### **4. Compliance restrictions**
+
+Many banks don't allow code to pass through external cloud builders like EAS.
+
+***
+
+# 🟩 **Short Interview Summary**
+
+> **Use EAS Build** for simplicity, Expo Managed apps, and fast cloud builds.  
+> **Use Fastlane** when you need enterprise-level CI/CD control, native customizations, security compliance, and complex build pipelines.
+
+***
+
+# 🧩 **Simple Comparison Table**
+
+| Feature                 | EAS Build             | Fastlane      |
+| ----------------------- | --------------------- | ------------- |
+| Build Location          | Cloud                 | Local/CI      |
+| Setup Difficulty        | Easy                  | Medium/Hard   |
+| Works with Expo Managed | ✔️                    | ❌             |
+| Native Control          | Limited               | Full          |
+| Security/Banking apps   | Medium                | Excellent     |
+| Custom Pipelines        | Limited               | Unlimited     |
+| Store Automation        | Basic                 | Very advanced |
+| OTA Updates             | Built-in (EAS Update) | Not built-in  |
+| Dependency on Expo      | Yes                   | No            |
+
+***
+
+# 🟦 **Practical Example**
+
+### **EAS Build command:**
+
+```sh
+eas build --platform android
+```
+
+### **Fastlane lane example:**
+
+```ruby
+lane :playstore_release do
+  gradle(task: "assembleRelease")
+  upload_to_play_store(track: "production")
+end
+```
+
+***
+
+# ⭐ Final Interview-Friendly One-Liner
+
+> **EAS Build** is best for Expo workflows and simplicity;  
+> **Fastlane** is best for enterprise CI/CD, native flexibility, and compliance-heavy apps like banking.
+
+  </details>
 
 </details>
 
