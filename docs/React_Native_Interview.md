@@ -13870,33 +13870,2810 @@ export async function isDeviceCompromised() {
 <details>
   <summary>Security, Compliance &amp; Privacy (14)</summary>
 
-  <details><summary>69. Overview of OWASP MASVS for secure mobile apps.</summary></details>
+  <details><summary>69. Overview of OWASP MASVS for secure mobile apps.</summary>
 
-  <details><summary>70. PCI-DSS rules for financial mobile apps.</summary></details>
+Here’s a **clean, interview‑ready overview** of **OWASP MASVS** tailored for **React Native + financial/banking apps**. Short, crisp, and perfect for quick prep.
 
-  <details><summary>71. Threat modeling basics (STRIDE) for RN banking apps.</summary></details>
+***
 
-  <details><summary>72. Root/jailbreak detection techniques.</summary></details>
+# **69. Overview of OWASP MASVS (Mobile Application Security Verification Standard)**
 
-  <details><summary>73. Anti-tamper measures (anti-hooking, anti-debug).</summary></details>
+**OWASP MASVS** is the **global security standard** for building and testing secure mobile apps.  
+For banks/financial clients, MASVS is typically used as:
 
-  <details><summary>74. Secure screenshot prevention (FLAG_SECURE).</summary></details>
+*   **Security checklist** for mobile development teams
+*   **Benchmark** for pen‑testing & security audits
+*   **Compliance requirement** (PCI DSS, RBI, FFIEC, ISO 27001, SOC2)
 
-  <details><summary>75. Certificate pinning best practices.</summary></details>
+MASVS defines **security requirements across multiple levels** for both **mobile app architecture** and **defense‑in‑depth protections**.
 
-  <details><summary>76. Secure session timeout + token invalidation.</summary></details>
+***
 
-  <details><summary>77. How to handle sensitive logs & prevent PII leaks.</summary></details>
+# ✅ **MASVS Category Overview (Interview Shorthand)**
 
-  <details><summary>78. Secure biometric fallback flows.</summary></details>
+OWASP MASVS is divided into **8 categories**, each focusing on a different aspect of mobile security.
 
-  <details><summary>79. Risks of WebViews & how to harden them.</summary></details>
+Below is the **developer-friendly summary**:
 
-  <details><summary>80. GDPR/CPRA compliance basics.</summary></details>
+***
 
-  <details><summary>81. Permissions hardening (least privilege).</summary></details>
+## **1. MASVS-STORAGE**
 
-  <details><summary>82. Secure cryptography usage (don’t roll your own).</summary></details>
+### *Secure Data Storage*
+
+Ensures sensitive data is **never stored unencrypted** and storage is protected from extraction.
+
+Includes:
+
+*   Keychain (iOS) / Keystore (Android)
+*   AES-encrypted DB (SQLCipher/Realm)
+*   No PII in logs
+*   No tokens in AsyncStorage/MMKV
+
+👉 Banking apps MUST comply.
+
+***
+
+## **2. MASVS-CRYPTO**
+
+### *Secure Cryptography*
+
+Rules for encryption algorithms, key management, and avoiding custom crypto.
+
+Includes:
+
+*   AES‑256‑GCM / RSA‑2048+ / ECC
+*   Hardware-backed keys (TEE/SE)
+*   Proper random number generation
+*   Key rotation
+
+👉 Critical for storing session tokens, DEK/KEK, PII.
+
+***
+
+## **3. MASVS-AUTH**
+
+### *Authentication & Session Management*
+
+Protecting login, logout, tokens, and identity.
+
+Includes:
+
+*   Strong session lifecycle
+*   Token expiration + refresh flow
+*   Biometric auth (Keychain/Keystore-backed)
+*   Device binding
+
+👉 Required in banking apps for MFA and secure sessions.
+
+***
+
+## **4. MASVS-NETWORK**
+
+### *Secure Network Communication*
+
+Ensures data-in-transit protection.
+
+Includes:
+
+*   TLS 1.2+ only
+*   Certificate pinning
+*   No sending PII in URLs
+*   Preventing MITM attacks
+
+👉 Mandatory for financial services.
+
+***
+
+## **5. MASVS-PLATFORM**
+
+### *Interaction with OS & Platform Security Features*
+
+Ensures app respects platform security.
+
+Includes:
+
+*   Permissions hygiene
+*   Safe WebView usage
+*   No exporting sensitive activities
+*   Secure clipboard handling
+
+👉 Banks must whitelist minimal permissions.
+
+***
+
+## **6. MASVS-CODE**
+
+### *Secure Coding & Hardening*
+
+Protect apps from tampering & reverse engineering.
+
+Includes:
+
+*   Code obfuscation
+*   Root/jailbreak detection
+*   Anti-debugging
+*   Prevent screen recording
+
+👉 Protects API keys, logic, and business flows.
+
+***
+
+## **7. MASVS-RESILIENCE**
+
+### *Anti-Tampering & Runtime Protection*
+
+Ensures app resists hooking, instrumentation, and modifications.
+
+Includes:
+
+*   Detect Frida/Magisk/Xposed
+*   Detect repackaging
+*   Integrity checks
+*   Emulator detection
+
+👉 High‑risk mobile banking features MUST pass this.
+
+***
+
+## **8. MASVS-ARCHITECTURE**
+
+### *Secure Application Architecture*
+
+Ensures clean separation of concerns and threat modeling.
+
+Includes:
+
+*   Architectural threat modeling
+*   Data flow mapping
+*   Least privilege design
+*   Secure API contracts
+
+👉 Mandatory for enterprise compliance.
+
+***
+
+# 🎯 **MASVS Levels (MSTG-aligned)**
+
+MASVS defines **3 target levels**:
+
+| Level                      | Meaning                                   |
+| -------------------------- | ----------------------------------------- |
+| **L1 – Standard Security** | baseline security for any mobile app      |
+| **L2 – Defense-in-Depth**  | higher protection for sensitive data apps |
+| **R – Resilience**         | anti-tampering + anti-reversing           |
+
+For banking apps → **L2 + R** is REQUIRED.
+
+***
+
+# 🔥 **How MASVS Applies to React Native Banking Apps**
+
+| Area             | What to follow                                          |
+| ---------------- | ------------------------------------------------------- |
+| Storage          | SQLCipher/Realm encryption + Keystore/Keychain key mgmt |
+| Tokens           | Never in AsyncStorage/MMKV; always hardware-backed      |
+| Network          | TLS pinning (ssl‑pinning library), secure cookies       |
+| Crypto           | Do not implement custom AES; use native crypto          |
+| Code Hardening   | Obfuscate native + JS code; enable ProGuard/Hermes      |
+| Device Integrity | Root/jailbreak detection + Play Integrity/App Attest    |
+| Privacy          | No PII in logs/screenshots/clipboard                    |
+| Resilience       | Detect Frida/Hooking frameworks                         |
+
+***
+
+# ⚡ **30‑Second Interview Summary**
+
+> “OWASP MASVS is the global standard for secure mobile development.  
+> It defines requirements across secure storage, crypto, authentication, networking, secure coding, platform usage, app architecture, and anti-tampering.  
+> For banking, we target **MASVS‑L2 + MASVS‑R**, meaning strong encryption, secure session tokens, TLS pinning, Keychain/Keystore usage, jailbreak/root detection, and runtime protection against instrumentation.”
+
+  </details>
+
+  <details><summary>70. PCI-DSS rules for financial mobile apps.</summary>
+
+Here is a **clear, interview‑ready summary of PCI‑DSS requirements for financial mobile apps**, aligned to **PCI‑DSS v4.0.1 (2024–2025)** and using insights from verified sources.
+
+***
+
+# **70. PCI‑DSS Rules for Financial Mobile Apps (Developer‑Friendly Overview)**
+
+PCI‑DSS (Payment Card Industry Data Security Standard) defines **global rules for handling cardholder data** during **processing, transmission, and storage**.  
+For mobile apps, PCI‑DSS applies whenever the app **touches** credit/debit card data—even briefly.
+
+Below are the **key PCI‑DSS v4.0.1 requirements** relevant to React Native/banking apps.
+
+***
+
+# ✅ **1. Scope Minimization — Don’t Store PAN in App**
+
+**Primary Account Number (PAN) and Sensitive Authentication Data must NEVER be stored on the mobile device.**  
+✔ Use **early tokenization**  
+✔ Avoid passing raw PAN through the app  
+✔ Use PCI‑compliant SDKs (Stripe, Adyen, Braintree, etc.)
+
+[\[dev.to\]](https://dev.to/vaibhav_shakya_e6b352bfc4/pci-dss-compliance-checklist-for-android-apps-1m4i)
+
+***
+
+# ✅ **2. Strong Data Encryption (In‑Transit + At‑Rest)**
+
+### **In Transit**
+
+*   Must use **TLS 1.2+ (prefer TLS 1.3)**
+*   No cleartext requests
+*   Implement **certificate pinning**
+
+### **At Rest**
+
+*   Use **AES‑256** for any sensitive data the app must hold temporarily.
+*   Apply strong key management (Keychain/Keystore).
+
+[\[capgo.app\]](https://capgo.app/blog/pci-dss-compliance-for-mobile-apps-key-requirements/)
+
+***
+
+# ✅ **3. Secure Cryptographic Key Management**
+
+PCI requires:
+
+*   **Key rotation**
+*   Secure key storage (hardware-backed only)
+*   Never hardcode crypto keys
+*   Avoid custom encryption algorithms
+
+✔ Use **Android Keystore** / **iOS Secure Enclave** for key isolation.
+
+[\[capgo.app\]](https://capgo.app/blog/pci-dss-compliance-for-mobile-apps-key-requirements/)
+
+***
+
+# ✅ **4. Authentication & Session Security (Req. 8)**
+
+PCI‑DSS v4.0.1 adds stricter authentication rules:
+
+*   **Mandatory MFA** for accessing cardholder data
+*   **Stronger passwords (12+ chars)**
+*   Protect against phishing
+*   Biometric authentication must have a safe fallback
+*   Secure session lifecycle (auto‑expiry, token invalidation)
+
+[\[appaudix.com\]](https://www.appaudix.com/blog/pci-dss-v4-mobile-apps-changes)
+
+***
+
+# ✅ **5. No Sensitive Data in Logs / Caches**
+
+Apps must not leak card data through:
+
+*   Logs
+*   Analytics
+*   Crash reports
+*   Screenshots
+*   Clipboard
+*   Debugging output
+
+Typical rules:
+
+*   Mask PAN (only show last 4 digits)
+*   Disable screenshots on sensitive screens
+*   Remove PII from logs
+
+[\[dev.to\]](https://dev.to/vaibhav_shakya_e6b352bfc4/pci-dss-compliance-checklist-for-android-apps-1m4i)
+
+***
+
+# ✅ **6. Code Security (Req. 6) — Secure SDLC**
+
+PCI‑DSS now mandates:
+
+### **A. Automated Code Reviews**
+
+*   Static Analysis (SAST)
+*   Dynamic Analysis (DAST)
+*   Mobile app testing aligned with MASVS/MSTG
+
+### **B. SCA (Software Composition Analysis)**
+
+*   Track vulnerable third‑party libraries
+*   Maintain SDK inventory
+
+### **C. Secure-by-design development**
+
+[\[appaudix.com\]](https://www.appaudix.com/blog/pci-dss-v4-mobile-apps-changes)
+
+***
+
+# ✅ **7. Runtime Protection & Integrity (Req. 11.6.1)**
+
+Mobile apps must detect:
+
+*   App tampering
+*   Repackaging
+*   Unauthorized code changes
+*   Hooking frameworks (Frida/Magisk)
+*   Jailbroken/rooted devices
+
+This enables blocking high‑risk devices and preventing MITM or dynamic analysis.
+
+[\[appaudix.com\]](https://www.appaudix.com/blog/pci-dss-v4-mobile-apps-changes)
+
+***
+
+# ✅ **8. Network Security — Enforce Strong TLS**
+
+PCI‑DSS requires:
+
+*   TLS 1.2+ only
+*   HSTS enforcement
+*   Certificate pinning
+*   Rejecting invalid/expired certs
+*   No plaintext HTTP traffic
+
+[\[dev.to\]](https://dev.to/vaibhav_shakya_e6b352bfc4/pci-dss-compliance-checklist-for-android-apps-1m4i)
+
+***
+
+# ✅ **9. Targeted Risk Analysis (New in v4.0.1)**
+
+Organizations must perform **Targeted Risk Analysis** for:
+
+*   Frequency of security activities
+*   Custom code
+*   Tech-specific mobile behaviors
+
+React Native apps must document:
+
+*   Threat model
+*   Risk ratings
+*   Mobile architecture risks
+*   Third‑party SDK threats
+
+[\[appaudix.com\]](https://www.appaudix.com/blog/pci-dss-v4-mobile-apps-changes)
+
+***
+
+# ✅ **10. Strong Logging & Monitoring**
+
+PCI requires:
+
+*   Centralized audit logs
+*   Tamper‑resistant logging
+*   Continuous compliance monitoring
+*   Alerting for suspicious activity
+
+[\[appaudix.com\]](https://www.appaudix.com/blog/pci-dss-v4-mobile-apps-changes)
+
+***
+
+# ⚡ **Developer‑Friendly Summary (30 seconds)**
+
+> “For PCI‑DSS in mobile apps, I ensure the app never stores PAN or sensitive data.  
+> All transmitted data uses TLS 1.3 with certificate pinning, and any local-sensitive info uses AES‑256 with keys from the Keychain/Keystore.  
+> We implement MFA, secure session handling, SAST/DAST/SCA, and runtime protection (root/jailbreak detection + tamper detection).  
+> No card data goes into logs or screenshots.  
+> Our architecture and risk analysis follow PCI‑DSS v4.0.1 requirements.”
+
+  </details>
+
+  <details><summary>71. Threat modeling basics (STRIDE) for RN banking apps.</summary>
+
+Here’s a **clean, interview‑ready explanation** of **Threat Modeling Basics (STRIDE)** specifically tailored for **React Native banking apps**.  
+No need for a web search here — this is conceptual content.
+
+***
+
+# **71. Threat Modeling Basics (STRIDE) for React Native Banking Apps**
+
+**Threat modeling** helps identify potential security threats early in design so you can build secure mobile banking features proactively.
+
+The most widely used model is **STRIDE**, created by Microsoft. It classifies threats into **6 categories**:
+
+> **S**poofing  
+> **T**ampering  
+> **R**epudiation  
+> **I**nformation Disclosure  
+> **D**enial of Service  
+> **E**levation of Privilege
+
+Below is the **banking‑focused** explanation of each with React Native examples.
+
+***
+
+# ✅ **S – Spoofing**
+
+**Attacker pretends to be someone else (user/device/server).**
+
+### Examples in RN banking apps:
+
+*   Fake login using stolen tokens
+*   Intercepting biometrics fallback
+*   Spoofing device ID / push token
+*   Man‑in‑the-middle pretending to be your server (no TLS pinning)
+
+### Mitigations:
+
+*   MFA + biometric auth
+*   Access tokens stored ONLY in Keychain/Keystore
+*   TLS + certificate pinning
+*   Backend revalidates device binding (e.g., device fingerprint)
+
+***
+
+# ✅ **T – Tampering**
+
+**Unauthorized modification of code, data, or network traffic.**
+
+### Examples:
+
+*   Modified APK/IPA
+*   React Native JS bundle tampered
+*   SQLite/Realm DB tampered
+*   API requests altered before sending
+*   Over-the-air updates swapped
+
+### Mitigations:
+
+*   Code obfuscation (JS + native)
+*   Runtime integrity checks (detect tampering)
+*   Encrypted DB (SQLCipher/Realm encryption)
+*   Hash verification of JS bundle
+*   Detect Frida/Magisk/Xposed instrumentations
+
+***
+
+# ✅ **R – Repudiation**
+
+**User denies performing an action (no proof of action).**
+
+### Examples:
+
+*   User says “I didn’t trigger this fund transfer.”
+*   Logs manipulated on rooted devices
+*   No audit trail for risky operations
+
+### Mitigations:
+
+*   Server-side audit logs with timestamp + device ID
+*   Signed requests (HMAC with device key)
+*   Immutable logs on backend
+*   Disable client‑side trust for critical actions
+
+***
+
+# ✅ **I – Information Disclosure**
+
+**Leakage of sensitive information.**
+
+### Examples:
+
+*   PAN/PII stored in AsyncStorage/MMKV
+*   Sensitive info in logs, crash reports
+*   Screenshots of OTP/payment screen
+*   Intercepted traffic without TLS pinning
+
+### Mitigations:
+
+*   Encrypt at rest (AES‑256 DB encryption)
+*   No PII in logs/snapshots
+*   Disable screenshots on sensitive screens
+*   TLS 1.2+/1.3 + cert pinning
+*   Mask card numbers (show only last 4 digits)
+
+***
+
+# ✅ **D – Denial of Service (DoS)**
+
+**Blocking the app or backend from functioning.**
+
+### Examples:
+
+*   Flooding API endpoints with requests
+*   Large payloads causing memory crash
+*   Repeated invalid login attempts
+*   Local storage corruption causing app crash
+
+### Mitigations:
+
+*   Rate limiting at API gateway
+*   Input validation (size limits)
+*   Timeout thresholds
+*   Store data in resilient DB (Realm)
+*   Circuit breaker for API failures
+
+***
+
+# ✅ **E – Elevation of Privilege**
+
+**Attacker gains higher permissions than allowed.**
+
+### Examples:
+
+*   Root/jailbreak → access app sandbox
+*   Exploiting insecure deep links
+*   Injecting JS into WebViews
+*   Bypassing biometric screen to get tokens
+
+### Mitigations:
+
+*   Root/Jailbreak detection
+*   Protect deep links with authentication
+*   Disable JS in WebView unless required
+*   Keystore/Secure Enclave for key access
+*   Enforce re-authentication for sensitive actions
+
+***
+
+# 🔥 **STRIDE Applied to a React Native Banking App Architecture**
+
+| STRIDE Area     | Typical Threat     | RN Mitigation                        |
+| --------------- | ------------------ | ------------------------------------ |
+| Spoofing        | Stolen tokens      | Hardware key storage + re-auth       |
+| Tampering       | Modified JS bundle | Bundle signature checks, obfuscation |
+| Repudiation     | No audit logs      | Server-side logs + signed requests   |
+| Info Disclosure | PII in storage     | Encrypted DB + no debug logs         |
+| DoS             | API flooding       | Server rate limits + validation      |
+| EoP             | Rooting bypass     | Root detection + privilege checks    |
+
+***
+
+# 🎯 **How to Present in an Interview (20 seconds)**
+
+> “For threat modeling I use STRIDE.  
+> I map each banking feature to potential threats: spoofing for authentication, tampering for JS bundle/DB, data leakage for PII, DoS for APIs, and privilege escalation on rooted devices.  
+> Then I apply RN controls like Keychain/Keystore, DB encryption, TLS pinning, root detection, code obfuscation, and strict session handling.”
+
+  </details>
+
+  <details><summary>72. Root/jailbreak detection techniques.</summary>
+
+Here is a **clean, interview‑ready answer** for:
+
+# **72. Root/Jailbreak Detection Techniques (React Native Banking Apps)**
+
+*(Short, crisp, and aligned to real banking‑grade mobile security practices)*
+
+This is a **conceptual security topic**, so no external sourcing is required.
+
+***
+
+# ✅ **High‑Level Goal**
+
+Detect whether the device has been **rooted (Android)** or **jailbroken (iOS)** to prevent:
+
+*   Keychain/Keystore extraction
+*   SSL‑MITM attacks
+*   File-system tampering
+*   API hooking (Frida, Magisk, Xposed)
+*   Code injection & sandbox escape
+
+Banks typically **block** or **restrict** features on compromised devices.
+
+***
+
+# **A. iOS Jailbreak Detection Techniques**
+
+### **1. Check for existence of jailbreak files**
+
+Common jailbreak artifacts:
+
+*   `/Applications/Cydia.app`
+*   `/Library/MobileSubstrate/MobileSubstrate.dylib`
+*   `/usr/sbin/sshd`
+*   `/bin/bash`
+
+```js
+RNJailbreak.isJailbroken();
+```
+
+***
+
+### **2. Check sandbox escape**
+
+Jailbroken devices allow writes to restricted directories.
+
+```swift
+try "test".write(toFile: "/private/jb.txt", atomically: true, encoding: .utf8)
+```
+
+If write succeeds → jailbroken.
+
+***
+
+### **3. Check for suspicious symbolic links**
+
+Example:
+
+*   `/Applications` → symlink to `/private/var/stash/...`
+
+***
+
+### **4. Detect loaded dynamic libraries (dyld)**
+
+Look for:
+
+*   Cydia Substrate
+*   Substitute
+*   FridaGadget.dylib
+
+***
+
+### **5. Check for ability to call restricted syscalls**
+
+E.g., `fork()` on non-jailbroken devices should fail.
+
+***
+
+# **B. Android Root Detection Techniques**
+
+### **1. Check for su binary & busybox**
+
+Search common root paths:
+
+*   `/system/bin/su`
+*   `/system/xbin/su`
+*   `/sbin/su`
+*   `magisk` module paths
+
+```java
+new File("/system/bin/su").exists()
+```
+
+***
+
+### **2. Try executing su**
+
+If command executes successfully → device is rooted.
+
+```java
+Runtime.getRuntime().exec("su");
+```
+
+***
+
+### **3. Check system properties & permissions**
+
+*   `ro.debuggable = 1`
+*   `ro.secure = 0`
+*   SELinux in **permissive** mode
+
+***
+
+### **4. Check writable system partitions**
+
+Rooted devices often have:
+
+*   `/system` mounted as read-write
+*   Additional partitions exposed
+
+***
+
+### **5. Detect root management apps**
+
+Identify:
+
+*   Magisk Manager
+*   SuperSU
+*   Kingroot
+
+***
+
+### **6. Detect hooking frameworks**
+
+Look for:
+
+*   Xposed
+*   EdXposed
+*   LSPosed
+*   Frida (running processes, open ports)
+
+***
+
+# **C. Cross‑Platform Runtime Tampering Detection**
+
+### **1. Detect Frida dynamic instrumentation**
+
+*   Check for Frida server port (27042)
+*   Detect FridaGadget library
+*   Detect suspicious process names
+*   Monitor ptrace/anti-debug
+
+### **2. Anti-debugging**
+
+*   `isDebuggerConnected()`
+*   ptrace guard on native side
+*   Detect breakpoint traps
+
+***
+
+# **D. Integrity & Repackaging Detection**
+
+### **1. Verify app signature**
+
+Compare signing certificate with expected hash.
+
+### **2. Validate JS bundle hash (React Native)**
+
+On app launch:
+
+*   Compute SHA‑256 of packaged JS bundle
+*   Compare with expected hash embedded in native code
+
+Mismatch → app tampered.
+
+***
+
+# **E. React Native Libraries for Fast Implementation**
+
+### Popular production-ready libs:
+
+*   **react-native-root-detection**
+*   **react-native-jailbreak-detect**
+*   **react-native-device-info** (emulator detection)
+
+Typical usage:
+
+```ts
+import RootCheck from 'react-native-root-detection';
+
+const compromised = await RootCheck.isDeviceRooted();
+if (compromised) {
+  // block or restrict features
+}
+```
+
+***
+
+# **F. Banking‑Grade Response Strategy**
+
+When compromised device is detected:
+
+✔ Show security warning  
+✔ Allow only low‑risk screens (e.g., view offers)  
+✔ Block sensitive flows (login, payments, fund transfer)  
+✔ Disable session tokens  
+✔ Report event to fraud engine
+
+Many banks fully **block** app usage.
+
+***
+
+# **G. 20‑Second Interview Summary**
+
+> “I detect rooted/jailbroken devices using multiple checks:  
+> file-system anomalies, su binaries, writable system paths, dynamic library checks, sandbox escape attempts, and detection of tools like Magisk, Xposed, or Frida.  
+> I also verify app integrity with signature checks and JS bundle hashing.  
+> If the device is compromised, the app blocks high‑risk operations or denies access completely.”
+
+  </details>
+
+  <details><summary>73. Anti-tamper measures (anti-hooking, anti-debug).</summary>
+Here is a **crisp, interview‑ready**, banking‑grade answer for:
+
+# **73. Anti‑Tamper Measures (Anti‑Hooking, Anti‑Debugging) for React Native Banking Apps**
+
+These measures prevent attackers from **modifying**, **debugging**, or **hooking** your mobile app using tools like **Frida, Magisk, Xposed, Ghidra, objection**, or dynamic instrumentation.
+
+This is conceptual mobile security content, so no external sources are required.
+
+***
+
+# ✅ **A. Anti‑Debugging Techniques**
+
+### **1. Detect Debugger Attachment**
+
+Native layer (Java/Obj‑C/C++):
+
+```java
+if (Debug.isDebuggerConnected()) {
+    // Take action: exit or restrict
+}
+```
+
+iOS:
+
+```objc
+if (ptrace(PT_DENY_ATTACH, 0, 0, 0) != 0) {
+   // debugger detected
+}
+```
+
+**RN Strategy:**  
+Call these via native modules on app launch + periodically in background threads.
+
+***
+
+### **2. ptrace Anti‑Debug Hook**
+
+Prevents debuggers like LLDB/Android Studio from attaching.
+
+### **3. Detect Breakpoints & Traps**
+
+Scan for:
+
+*   SIGTRAP exceptions
+*   Suspicious syscalls
+*   Abnormal thread states
+
+### **4. Disable developer options (Android)**
+
+Check:
+
+*   `adb_enabled`
+*   USB debugging
+
+If enabled → restrict payments.
+
+***
+
+# ✅ **B. Anti‑Hooking Techniques**
+
+Most critical for banking apps because attackers use **Frida**, **Xposed**, **Magisk**, **LSPosed**, etc.
+
+### **1. Detect Hooking Frameworks**
+
+#### **Detect Frida**
+
+*   Scan for Frida server ports: `27042`, `27043`
+*   Look for processes:
+    *   `frida-server`
+    *   `re.frida.server`
+*   Check loaded libs for:
+    *   `frida-gadget`
+    *   `libfrida.so`
+
+#### **Detect Xposed / LSPosed**
+
+Check for classes in memory:
+
+```java
+Class.forName("de.robv.android.xposed.XposedBridge");
+```
+
+#### **Detect Magisk**
+
+Check for files:
+
+*   `/sbin/.magisk`
+*   `/data/adb/magisk`
+
+***
+
+### **2. Detect Suspicious Memory Maps**
+
+Hooking frameworks inject `.so` or `.dylib` into process memory.
+
+Check `/proc/self/maps` for:
+
+*   unexpected shared libs
+*   writable + executable segments (W+X)
+
+***
+
+### **3. Anti‑Instrumentation**
+
+Prevent dynamic instrumentation by:
+
+*   Sealing methods (Native)
+*   Using inline encryption
+*   Making API calls time‑based so hooking slows them down
+*   Obfuscating critical code paths
+
+***
+
+# ✅ **C. Anti‑Tamper / App Integrity Checks**
+
+### **1. Verify App Signature**
+
+Compare app signing certificate with expected SHA‑256.
+
+If tampered APK/IPA installed → block app.
+
+***
+
+### **2. Verify React Native JS Bundle Integrity**
+
+On app startup:
+
+*   Compute SHA‑256 hash of `index.bundle`
+*   Compare with hardcoded expected hash in native code
+
+If mismatch → terminate.
+
+```ts
+const actual = computeBundleHash();
+if (actual !== expected) exitApp();
+```
+
+***
+
+### **3. Resource Integrity**
+
+Check:
+
+*   Manifest tampering
+*   Modified Info.plist
+*   Replaced icons/splash screens
+*   Modified native .so/.dll
+
+***
+
+# ✅ **D. Root/Jailbreak Detection (Foundation for Anti‑Tamper)**
+
+Hooking + debugging succeed mostly on compromised devices.
+
+Use:
+
+*   Checks for Cydia/Substrate (iOS)
+*   su/busybox/magisk (Android)
+*   Sandbox escape tests
+*   Writable system directories
+*   Emulator detection
+
+If compromised → block login/payment flows.
+
+***
+
+# ✅ **E. Obfuscation & Code Hardening**
+
+### **1. Obfuscate Java/Kotlin/Obj‑C**
+
+*   ProGuard/R8 for Android
+*   iOS symbol stripping
+
+### **2. Obfuscate JavaScript Bundle**
+
+Use:
+
+*   **react-native-obfuscating-transformer**
+*   String encryption
+*   Dead‑code insertion
+
+### **3. Disable JS Remote Debugger**
+
+Prevent exposing JS via WebSocket port 8081.
+
+***
+
+# ✅ **F. Anti‑Reverse Engineering**
+
+Includes:
+
+*   String encryption (hide secrets & API endpoints)
+*   White‑box cryptography (for high‑sensitivity keys)
+*   Native code wrappers for sensitive logic
+*   Packing apps with hardened SDKs (Appdome, Zimperium, ProGuard Hardened mode)
+
+***
+
+# ✅ **G. React Native Implementation Strategy**
+
+### Combine these:
+
+*   **Native anti‑debugging hooks**
+*   **Native integrity checks**
+*   **JS bundle hash verification**
+*   **Root/jailbreak checks**
+*   **Frida/hooking detection**
+*   **Obfuscation**
+*   **Certificate pinning**
+
+Add a **security heartbeat loop**:
+
+```ts
+setInterval(() => {
+   if (deviceCompromised()) {
+      logoutUser();
+      showSecurityWarning();
+   }
+}, 5000);
+```
+
+***
+
+# 🔥 **20‑Second Interview Summary**
+
+> “For anti‑tamper security, I combine anti‑debugging (ptrace, debugger detection), anti‑hooking (Frida/Xposed/Magisk detection), and integrity checks (APK/IPA signature + JS bundle hash).  
+> I enforce root/jailbreak detection, obfuscate both native + JS code, and periodically run device integrity checks.  
+> If tampering or hooking is detected, the app blocks sensitive operations or fully locks down.”
+
+  </details>
+
+  <details><summary>74. Secure screenshot prevention (FLAG_SECURE).</summary>
+
+Here’s a **short, crisp, interview‑ready answer** for:
+
+# **74. Secure Screenshot Prevention (FLAG\_SECURE) in React Native Banking Apps**
+
+Mobile banking apps must prevent sensitive screens—like OTP, account details, balances, statements, and card info—from appearing in:
+
+*   Screenshots
+*   Screen recordings
+*   Recent‑apps thumbnails
+*   Casting/screen sharing
+
+The main mechanism for this is **Android FLAG\_SECURE** and **iOS screen capture detection**.
+
+Below is the exact explanation interviewers expect.
+
+***
+
+# ✅ **A. Android — Using `FLAG_SECURE` (Most Important)**
+
+Android provides a simple native flag that **completely blocks screenshots & screen recording** for an Activity.
+
+### **Native Implementation (Java/Kotlin)**
+
+```kotlin
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    window.setFlags(
+        WindowManager.LayoutParams.FLAG_SECURE,
+        WindowManager.LayoutParams.FLAG_SECURE
+    )
+}
+```
+
+### **React Native Implementation**
+
+Use a library like **react-native-flag-secure-android** or call native modules.
+
+```ts
+import FlagSecure from 'react-native-flag-secure-android';
+
+// Enable
+FlagSecure.activate();
+
+// Disable (rarely needed)
+FlagSecure.deactivate();
+```
+
+### What it protects:
+
+✔ Screenshots  
+✔ Screen recording  
+✔ Multitasking view preview (Recents screen)
+
+### What attackers see:
+
+*   A **blank black screen** or hidden content instead of app UI.
+
+***
+
+# ✅ **B. iOS — No `FLAG_SECURE`, But We Use Screen Capture Detection**
+
+iOS does **not** allow apps to block screenshots outright.
+
+Instead, we can detect screen capture and react:
+
+### **1. Detect screenshot events**
+
+```swift
+NotificationCenter.default.addObserver(
+    forName: UIApplication.userDidTakeScreenshotNotification,
+    object: nil,
+    queue: .main
+) { _ in
+    // Blur or hide sensitive content
+}
+```
+
+### **2. Detect screen recording**
+
+```swift
+if UIScreen.main.isCaptured {
+    // Hide sensitive screen or blur
+}
+```
+
+### **3. Blur sensitive screens**
+
+Show a placeholder/blurred overlay:
+
+```tsx
+const isCaptured = useIsScreenCaptured(); // custom hook bridging native
+return <>{isCaptured ? <BlurView /> : <ActualContent />}</>;
+```
+
+### Outcome on iOS:
+
+✔ Screenshots show a blurred/blank overlay  
+✔ Screen recording shows protected screen blurred
+
+***
+
+# ✅ **C. Best Practices for Banking Apps**
+
+### **1. Apply protection only on sensitive screens**
+
+*   Login/OTP
+*   Account summary
+*   Card details
+*   Payment confirmation
+*   Statements/PDF previews
+
+### **2. Prevent preview in app switcher**
+
+`FLAG_SECURE` fully hides it on Android.  
+On iOS, blur the screen in `AppState` background:
+
+```ts
+AppState.addEventListener("change", state => {
+  if (state === "background") showBlur();
+  else hideBlur();
+});
+```
+
+### **3. Prevent sensitive data snapshot in app linking**
+
+Ensure:
+
+*   No sensitive params in URLs
+*   Remove preview images in universal links handoff
+
+***
+
+# ✅ **D. Banking‑Grade Security Requirements**
+
+Banks often require:
+
+✔ Mandatory `FLAG_SECURE` across the entire app (Android)  
+✔ Blurred recent‑apps preview (iOS)  
+✔ Screenshot detection for risk analytics  
+✔ Disable screen casting (e.g., Google Cast) on sensitive screens  
+✔ Masking sensitive views with overlays/blur
+
+***
+
+# 🎯 **20‑Second Interview Summary**
+
+> “On Android, I enable `FLAG_SECURE` to block screenshots, screen recording, and recent‑apps previews.  
+> On iOS, since screenshots can’t be blocked, I detect screen capture and dynamically blur or hide sensitive UI.  
+> I wrap these into a reusable security component and apply them to OTP, account details, and payment screens for banking‑grade compliance.”
+
+  </details>
+
+  <details><summary>75. Certificate pinning best practices.</summary>
+
+Here’s a **clean, interview‑ready, banking‑grade answer** for:
+
+# **75. Certificate Pinning – Best Practices (React Native Banking Apps)**
+
+*(Fully conceptual — no external sources required)*
+
+Certificate pinning prevents **MITM attacks** by ensuring your app only trusts your **expected server certificate** or **public key**, not just any certificate signed by a trusted CA.
+
+Below is the **short, crisp, senior‑level answer** expected in financial/banking interviews.
+
+***
+
+# ✅ **1. Prefer Public Key Pinning (Not Certificate Pinning)**
+
+Because certificates **expire**, **renew**, and **rotate**, pinning the exact certificate can easily break the app.
+
+Public key pinning survives:
+
+*   Cert renewals
+*   Cert re-issuances
+*   Intermediate CA rotations
+
+### Example:
+
+Pin the SHA‑256 hash of the server's public key, not the cert.
+
+***
+
+# ✅ **2. Use Multiple Pins (Primary + Backup)**
+
+To avoid app outages during certificate rotation:
+
+*   **1 primary pin** → for current key
+*   **1 or 2 backup pins** → for upcoming keys
+
+If the server rotates certificates, app still works.
+
+***
+
+# ✅ **3. Rotate Pins Proactively (Before Expiry)**
+
+Banks rotate certificates *every 6–12 months*.  
+Your app should have:
+
+*   A configurable pin list
+*   Optional remote pin update (signed by backend)
+*   Forced app update if pin set becomes outdated
+
+***
+
+# ✅ **4. Pin At the Highest Layer (Networking Layer)**
+
+In React Native, pin at the native layer because JS is bypassable.
+
+### Options:
+
+*   **react-native-ssl-pinning**
+*   **axios + rn-fetch-blob** with pinning
+*   Native (OkHttp, NSURLSession) pinning inside modules
+
+**Never trust JS-only pinning**, which attackers can patch.
+
+***
+
+# ✅ **5. Always Validate the Entire TLS Chain**
+
+Pinning is an **extra**, not a replacement.
+
+You still must enforce:
+
+*   TLS 1.2+ / TLS 1.3
+*   CA validation
+*   Hostname verification
+
+A bank’s rule:
+
+> “Pinning is layered on top of normal TLS validation.”
+
+***
+
+# ✅ **6. Block Debug/Proxy Tools (Charles, Burp, mitmproxy)**
+
+Even with pinning, attackers may try bypassing using:
+
+*   Frida hooks
+*   SSL unpinning modules
+*   Custom patched APKs
+
+Mitigations:
+
+*   Anti‑Frida checks
+*   Anti‑hooking (Xposed/Magisk detection)
+*   App integrity checks
+*   Root/jailbreak detection
+*   Disable user-installed CAs (Android API) where possible
+
+Pinning + anti‑tamper = strong client-side security.
+
+***
+
+# ✅ **7. Handle Pin Failures Securely**
+
+On mismatch:
+
+*   Fail **closed** (block request)
+*   Show user-friendly message
+*   Log event to fraud backend
+*   Invalidate local session tokens
+
+Never bypass pinning by fallback → major compliance violation.
+
+***
+
+# ✅ **8. Avoid Hardcoding Pins Directly in JS**
+
+Reasons:
+
+*   JS can be reverse-engineered
+*   Attackers can patch JS bundle
+*   WebView/remote debugging exposure
+
+Store pin hashes:
+
+*   In native code
+*   With obfuscation
+*   Possibly encrypted inside NDK/Swift code
+
+Optional advanced:  
+Use **white-box cryptography** for storing pin lists in high-security apps.
+
+***
+
+# ✅ **9. Testing Strategy (Very Important)**
+
+Banks expect you to mention **testing**.
+
+### Test cases:
+
+*   Valid server cert → success
+*   MITM proxy → fail
+*   Expired cert → fail
+*   Wrong public key → fail
+*   Cert rotation event → app still works
+*   Rooted device + unpinning attempt → detect + block
+
+***
+
+# 📌 Sample React Native Pinning Example (Using react-native-ssl-pinning)
+
+```ts
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'https://api.mybank.com',
+  httpsAgent: {
+    pkPinning: true,
+    certs: ['mybank_public_key_sha256'], // stored securely
+  },
+});
+```
+
+***
+
+# 🎯 **20‑Second Interview Summary**
+
+> “For certificate pinning, I always pin **public keys**, not certificates, and keep multiple pins for rotation.  
+> I pin at the **native networking layer**, enforce TLS validation, and combine pinning with anti‑hooking, anti‑debugging, and root/jailbreak detection to stop SSL‑bypass attacks.  
+> Pinning failures must strictly fail closed.  
+> I also plan pin rotation and test against MITM tools like Charles/Burp.”
+
+  </details>
+
+  <details><summary>76. Secure session timeout + token invalidation.</summary>
+
+Here is a **crisp, interview‑ready, banking‑grade** answer for:
+
+# **76. Secure Session Timeout + Token Invalidation (React Native Banking Apps)**
+
+*(Conceptual mobile security topic — no external sources needed.)*
+
+Secure session handling in financial apps is **critical** because it protects user accounts from unauthorized access when devices are lost, shared, inactive, or compromised.
+
+Below is exactly what interviewers expect.
+
+***
+
+# ✅ **1. Key Principles of Secure Session Management**
+
+### **A. Short-Lived Access Tokens**
+
+*   Access tokens must be **short-lived (5–15 minutes)**.
+*   Reduces exposure if token is stolen.
+
+### **B. Long-Lived Refresh Tokens**
+
+*   Stored **only** in Keychain (iOS) / Keystore (Android).
+*   Cannot be accessed by JS or file system.
+
+### **C. Idle Timeout (User Inactivity)**
+
+Banks commonly enforce:
+
+*   **1–2 minutes** inactivity on sensitive screens (payment, account info)
+*   **3–5 minutes** for general app use
+
+### **D. Absolute Timeout (Max session lifetime)**
+
+Example:
+
+*   Maximum session = **15–30 minutes**
+*   User forced to re-authenticate after this period.
+
+***
+
+# ✅ **2. Detecting User Inactivity (Idle Timeout)**
+
+Track user interactions globally:
+
+*   Touch events
+*   Screen transitions
+*   API calls
+*   AppState changes
+
+Example RN logic:
+
+```ts
+let timer;
+
+function resetTimer() {
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    logoutUser(); // secure logout
+  }, 3 * 60 * 1000); // 3 mins idle
+}
+
+const events = ['touchstart', 'click', 'scroll'];
+
+events.forEach(event => {
+  document.addEventListener(event, resetTimer);
+});
+
+resetTimer();
+```
+
+> In RN, implement this via gesture handlers, navigation listeners, and AppState.
+
+***
+
+# ✅ **3. App Background Timeout**
+
+When app goes to background:
+
+```ts
+AppState.addEventListener("change", nextState => {
+  if (nextState === "background") {
+    startBackgroundTimer();
+  }
+  if (nextState === "active") {
+    verifyIfTimeoutOccurred();
+  }
+});
+```
+
+Rules:
+
+*   If app is backgrounded > **X minutes**, invalidate session.
+*   Require biometric unlock before restoring session.
+
+***
+
+# ✅ **4. Token Invalidation Strategy (Very Important)**
+
+When session expires or user logs out:
+
+### **A. Access Token**
+
+*   Delete from memory immediately
+*   Remove from API client headers
+*   Never store in local storage / MMKV / AsyncStorage
+
+### **B. Refresh Token**
+
+*   Delete securely from Keychain/Keystore:
+    ```ts
+    await Keychain.resetGenericPassword();
+    ```
+
+### **C. Backend Must Invalidate Tokens**
+
+On logout or timeout, API should:
+
+*   Mark refresh token as **revoked**
+*   Block reuse (even if stolen)
+*   Rotate keys and require re-login
+
+### **D. Token Rotation**
+
+After each refresh:
+
+*   Issue new access + refresh token pair
+*   Invalidate previous refresh token
+
+This prevents **refresh token replay attacks**.
+
+***
+
+# ✅ **5. Secure Auto-Logout Flow (Banking Standard)**
+
+### Trigger logout if:
+
+*   Idle timeout reached
+*   Background timeout exceeded
+*   Device integrity failure (root/jailbreak detected)
+*   PIN/biometric lock failed
+*   Token refresh fails
+*   Certificate pinning fails
+*   App tampering detected
+*   User logs out manually
+
+### Actions during secure logout:
+
+```ts
+await Keychain.resetGenericPassword(); // refresh token
+realm.write(() => realm.deleteAll());  // encrypted DB
+MMKV.clearAll();                        // non-sensitive prefs
+```
+
+*   Clear navigation stack
+*   Redirect to login
+*   Force MFA again
+
+***
+
+# ✅ **6. Preventing Token Leakage**
+
+### Best Practices:
+
+*   Keep tokens in **memory only**, not JS global state
+*   Never store access tokens anywhere persistent
+*   Don’t send tokens to analytics or crash logs
+*   Mask sensitive logs in production
+*   Use HTTPS/TLS 1.2+ with pinning for all token refresh calls
+
+***
+
+# ✅ **7. Banking-Grade Enhancements**
+
+### **A. Just-In-Time Token Loading**
+
+Retrieve token from Keychain **right before** API call.  
+Don’t keep long-lived token references.
+
+### **B. Step-Up Authentication**
+
+For high-risk actions:
+
+*   Ask for biometric again
+*   Even if session is active
+
+### **C. Fraud Engine Integration**
+
+Send session timeout + invalidation events to backend for audit logs.
+
+### **D. Remote Session Revocation**
+
+If backend flags risk:
+
+*   Force logout on mobile instantly
+*   Clear tokens + DB
+
+***
+
+# 🔥 **20-Second Interview Summary**
+
+> “I implement strong session security using short-lived access tokens, long-lived refresh tokens stored only in Keychain/Keystore, and strict idle + absolute timeouts.  
+> When timeout occurs, I perform secure logout: clear tokens, clear encrypted DB, clear navigation stack, and revoke tokens server-side.  
+> I also use token rotation, background-timeout, biometric re-auth, and anti-tamper checks to ensure session integrity in a banking environment.”
+
+  </details>
+
+  <details><summary>77. How to handle sensitive logs & prevent PII leaks.</summary>
+
+Here is a **clean, interview‑ready**, banking‑grade explanation for:
+
+# **77. How to Handle Sensitive Logs & Prevent PII Leaks (React Native Banking Apps)**
+
+*(Conceptual security topic — no web search needed.)*
+
+Preventing sensitive data leakage is a **critical MASVS + PCI‑DSS + RBI compliance requirement** in financial apps.  
+Logs are one of the most common accidental leak channels during development.
+
+Below is a concise, developer‑friendly answer expected in interviews.
+
+***
+
+# ✅ **1. Never Log PII or Sensitive Data**
+
+**Do NOT log:**
+
+*   PAN/card number (even masked incorrectly)
+*   CVV, expiry date
+*   Account number / IFSC
+*   Aadhaar / SSN / govt IDs
+*   User name / mobile / email
+*   OTP, session tokens, refresh tokens
+*   JWT payloads
+*   Transaction IDs or customer reference numbers
+
+**Golden rule:**
+
+> If it can identify a user or financial action → **never log it**.
+
+***
+
+# ✅ **2. Disable Logs in Production (Very Important)**
+
+### Recommended approach:
+
+*   Wrap all logs in a custom logger utility
+*   Log only in **dev** or **internal QA builds**
+
+Example:
+
+```ts
+const isProd = process.env.NODE_ENV === "production";
+
+export const log = (...args) => {
+  if (!isProd) console.log(...args);
+};
+```
+
+**Don’t leave console.log spread across components.**  
+Centralize logging.
+
+***
+
+# ✅ **3. Mask Sensitive Fields Automatically**
+
+If logging structured data (e.g., API errors), mask sensitive fields:
+
+```ts
+function maskPII(data) {
+  return {
+    ...data,
+    card: data.card ? `XXXX-XXXX-XXXX-${data.card.slice(-4)}` : undefined,
+    phone: data.phone ? data.phone.replace(/\d(?=\d{2})/g, "*") : undefined,
+  };
+}
+```
+
+Never log raw JSON payloads from payments or KYC endpoints.
+
+***
+
+# ✅ **4. Encrypt Crash Logs (Sentry / Firebase Crashlytics)**
+
+Crash log platforms may capture sensitive runtime state.  
+To prevent leaks:
+
+*   Disable breadcrumbs containing PII
+*   Use `beforeSend` hooks to sanitize events
+*   Mask context, user identifiers, and custom keys
+*   Never set user email/phone ID in analytics/crash tools
+
+Example (Sentry):
+
+```ts
+Sentry.init({
+  beforeSend(event) {
+    delete event.user;
+    delete event.request?.headers;
+    delete event.contexts;
+    return event;
+  }
+});
+```
+
+***
+
+# ✅ **5. Disable Network Logging / Debug Interceptors**
+
+RN dev tools, Axios interceptors, and tools like Flipper can leak sensitive data.
+
+### In production:
+
+❌ Disable Flipper  
+❌ Disable Axios request/response interceptors  
+❌ Remove Charles/Burp proxy support  
+❌ Ensure no plaintext logging of API payloads
+
+***
+
+# ✅ **6. Sensitive Screens Must Not Leak via Screenshots**
+
+Combine logs + screenshot protections:
+
+*   Use `FLAG_SECURE` (Android)
+*   Blur UI on iOS when screen-capture detected
+*   Remove sensitive data from in-memory Redux/state before logging
+
+(Relates to Q74.)
+
+***
+
+# ✅ **7. Avoid Logging Full Error Objects**
+
+Backend errors may contain:
+
+*   Customer identifiers
+*   PAN masks
+*   Payment references
+*   Internal debug IDs
+
+Always sanitize:
+
+```ts
+catch (err) {
+  log("API Error:", {
+    code: err.code,
+    message: err.message,
+  });
+}
+```
+
+Never log the full `err.response`.
+
+***
+
+# ✅ **8. Don’t Store Logs Persistently on Device**
+
+Avoid:
+
+*   Writing logs to filesystem
+*   Storing debug files
+*   Writing raw error objects to SQLite/MMKV/AsyncStorage
+
+If persistent logs are required (rare):
+
+*   Encrypt them
+*   Apply strict retention (e.g., clear after 24 hours)
+
+***
+
+# ✅ **9. Ensure Backend Error Messages Are Sanitized Too**
+
+PII leaks often come from server logs returned in API errors.
+
+Rules:
+
+*   Backend logs must not include PAN, account numbers, tokens
+*   Client should never display server stack traces
+*   Restrict verbose errors to staging environments only
+
+***
+
+# ✅ **10. Team & CI/CD Policy (Often Asked in Interviews)**
+
+You should mention process-level controls:
+
+*   Logging guidelines documented and enforced
+*   PR reviews include **log inspection**
+*   CI tools check for banned keywords (regex for PAN, Aadhaar, tokens)
+*   Remove debug flags in release builds
+*   Conduct periodic log audits
+
+***
+
+# 🔥 **20‑Second Interview Summary**
+
+> “I ensure that no PII or financial data is ever logged.  
+> All logs are disabled in production, crash logs are sanitized, network logs are removed, and sensitive screens are protected.  
+> I mask any data that must be logged, scrub error objects, prevent persistent log storage, and enforce secure logging via PR reviews and CI checks.  
+> This prevents PII leaks and meets banking‑grade MASVS + PCI‑DSS requirements.”
+
+  </details>
+
+  <details><summary>78. Secure biometric fallback flows.</summary>
+
+Here is a **crisp, interview‑ready, banking‑grade explanation** for:
+
+# **78. Secure Biometric Fallback Flows (React Native Banking Apps)**
+
+*(Purely conceptual mobile security topic—no external sources needed.)*
+
+In banking apps, biometrics (Face ID / Touch ID / Android Biometrics) are used to **unlock sessions**, **authorize payments**, or **re-authenticate** sensitive actions.  
+A secure fallback flow ensures the app remains usable **without lowering security**, even when:
+
+*   Biometric fails
+*   Device doesn’t support biometrics
+*   User disables biometrics
+*   Spoofing/tampering attempts are detected
+
+Below is the exact answer interviewers expect.
+
+***
+
+# ✅ **1. Core Rules of Secure Biometric Fallback**
+
+### **A. Never fall back to “just continue without auth”** (big compliance violation)
+
+Fallback must ALWAYS be:
+
+*   **App PIN** (6‑digit minimum)
+*   **Password + MFA**
+*   **Server-side verification**
+
+### **B. Fallback should NEVER be automatic**
+
+If biometric fails → user must **explicitly choose fallback**.  
+This prevents brute-force spoofing attempts.
+
+### **C. Both biometric + fallback credential MUST be verified server-side**
+
+Even if biometric is device‑local, once fallback is used:
+
+*   Server must revalidate the session
+*   Tokens must rotate
+*   Risk engine gets notified
+
+***
+
+# ✅ **2. Typical Secure Fallback Flow (Banking Standard)**
+
+### **Step 1 — User attempts biometric unlock**
+
+```ts
+LocalAuthentication.authenticateAsync();
+```
+
+### **Step 2 — Biometric fails (lockout/frustrated attempts)**
+
+Show UI:
+
+> “Biometric authentication failed. Use app PIN to continue.”
+
+### **Step 3 — User enters App PIN**
+
+*   PIN stored as **PBKDF2/Scrypt hash**
+*   Compare hash locally
+*   On success → call backend to re-validate
+*   Backend issues new JWT / session token
+
+### **Step 4 — Recreate new secure session**
+
+*   Access token in memory only
+*   Refresh token in Keychain/Keystore
+*   Rotate tokens (invalidate previous ones)
+
+### **Step 5 — Apply anti-hammering**
+
+If PIN fails multiple times:
+
+*   Temporarily lock account
+*   Force full login with password + OTP
+
+***
+
+# ✅ **3. Secure Scenarios You MUST Handle**
+
+### **A. User device has *no* biometrics**
+
+→ Default to App PIN or password + OTP  
+→ Biometrics screen should not appear at all
+
+### **B. Biometric disabled by OS (Face ID disabled)**
+
+→ Require immediate fallback to PIN/password
+
+### **C. Too many failed biometrics (lockout)**
+
+→ Show fallback screen immediately  
+→ Disable biometrics until next app start or timeout
+
+### **D. Rooted/jailbroken environment**
+
+→ Block biometric unlock (spoofing risk)  
+→ Force fallback to PIN + MFA  
+→ Inform backend for risk scoring
+
+### **E. Reset/ reinstall app**
+
+→ Delete biometric keys (invalidate local keys)  
+→ Full login only (no fallback allowed)
+
+***
+
+# ✅ **4. Technical Implementation Best Practices**
+
+### **1. Use secure OS‑backed biometric APIs**
+
+*   **Android:** BiometricPrompt + CryptoObject
+*   **iOS:** LAContext with device-bound keys
+*   **React Native:** expo-local-authentication or react-native-biometrics
+
+### **2. Bind biometric to Keystore/Keychain keys**
+
+*   Generate a symmetric crypto key
+*   Protect it with biometric gating
+*   On success → decrypt session key
+
+This ensures:
+
+*   Biometrics unlock **cryptographic capability**, not “app access”
+
+### **3. PIN Storage Must Be Highly Secure**
+
+*   Store **one-way salted hash** only
+*   Derive using **PBKDF2/Scrypt/Argon2**
+*   Never store plaintext PIN
+*   Store hash in encrypted storage (Keychain/Keystore)
+
+### **4. Ensure fallback login resets biometrics**
+
+If user logs in via PIN/password:
+
+*   Rotate biometric keys
+*   Re-enroll biometric credential for next time
+
+***
+
+# ✅ **5. Security Controls to Prevent Biometric Bypass Attacks**
+
+### **A. Block biometrics on compromised devices**
+
+*   Jailbreak/root detection
+*   Hooking detection (Frida/Magisk/Xposed)
+*   Device integrity API (Play Integrity / App Attest)
+
+### **B. Prevent replay attacks**
+
+*   Biometric result must not directly unlock session token
+*   Instead → unlock a cryptographic key to fetch token from Keychain
+
+### **C. Step-up authentication**
+
+For payments > threshold:
+
+*   Ask user to authenticate again (biometric > PIN)
+*   Even if session is active
+
+***
+
+# ✅ **6. Recommended UX for Banking Apps**
+
+✔ Show error only ONCE for biometric failure  
+✔ Immediately show “Try biometrics again” + “Use PIN instead”  
+✔ Keep fallback input simple (6-digit PIN)  
+✔ For sensitive operations → show biometric prompt again  
+✔ Block fallback entirely when device integrity is compromised
+
+***
+
+# 🔥 **20‑Second Interview Summary**
+
+> “A secure biometric fallback flow must never downgrade security.  
+> When biometrics fail, I fall back to app PIN or password + MFA, verify credentials server-side, rotate tokens, and re-establish a new secure session.  
+> Biometric keys are stored in Keystore/Keychain, PINs are hashed with PBKDF2/Scrypt, and biometrics are disabled entirely on rooted/jailbroken devices.  
+> This ensures both usability and banking-grade security.”
+
+  </details>
+
+  <details><summary>79. Risks of WebViews & how to harden them.</summary>
+
+Here’s a **clean, interview‑ready answer** for:
+
+# **79. Risks of WebViews & How to Harden Them (React Native Banking Apps)**
+
+*(Pure mobile‑security knowledge → no external search needed)*
+
+WebViews are one of the **highest‑risk attack surfaces** in mobile banking apps because they combine **web security risks + mobile execution risks**.\
+If not hardened, attackers can inject JS, load malicious pages, steal tokens, or perform phishing inside the app.
+
+Below is the precise, banking‑grade explanation expected in interviews.
+
+***
+
+# ✅ **A. Key Risks of Using WebViews in Banking Apps**
+
+## **1. JavaScript Injection / XSS inside WebView**
+
+If the WebView loads dynamic HTML or remote content:
+
+*   Attacker can inject JS
+*   Access DOM
+*   Read inputs (OTP, password)
+*   Hijack navigation
+*   Exfiltrate data
+
+***
+
+## **2. Unsafe `window.postMessage` / JS bridge**
+
+React Native WebView exposes:
+
+```ts
+injectedJavaScript
+onMessage
+```
+
+If misconfigured → native ↔ web bridge becomes an attack vector.
+
+Attackers can:
+
+*   Call native functions
+*   Steal tokens/PII
+*   Execute unauthorized native operations
+
+***
+
+## **3. Loading arbitrary URLs → Phishing**
+
+If WebView can load any URL:
+
+*   Attacker can redirect to phishing page inside the app
+*   User thinks it's secure (bank app chrome)
+*   Enters credentials/OTP
+*   Credentials stolen
+
+***
+
+## **4. Mixed content (HTTP + HTTPS)**
+
+If WebView allows HTTP:
+
+*   MITM can inject malicious HTML/JS
+*   Sensitive data can leak
+
+***
+
+## **5. File system access**
+
+Android WebViews can access:
+
+*   File URLs
+*   External storage
+*   Local HTML → becomes XSS target
+
+***
+
+## **6. Cookie theft**
+
+If using WebView sessions:
+
+*   Cookies may be stored in shared cookie jar
+*   Risky: WebView → App → Browser cookie contamination
+
+***
+
+## **7. Debugging enabled in production**
+
+WebViews can expose:
+
+*   DevTools
+*   Remote debugging ports
+*   JS injection interface
+
+Huge attack surface.
+
+***
+
+# ✅ **B. How to Harden WebViews (Banking‑Grade)**
+
+Below are the **mandatory** controls for any financial app.
+
+***
+
+# **1. Disable JavaScript unless absolutely needed**
+
+```tsx
+<WebView javaScriptEnabled={false} />
+```
+
+If JS needed → restrict with CSP + controlled injection.
+
+***
+
+# **2. Disable dangerous APIs**
+
+```tsx
+<WebView
+  domStorageEnabled={false}
+  allowFileAccess={false}
+  allowUniversalAccessFromFileURLs={false}
+  allowFileAccessFromFileURLs={false}
+/>
+```
+
+This prevents:
+
+*   Local file XSS
+*   Reading customer files
+*   HTML injection
+
+***
+
+# **3. Restrict Navigation (Allowlisting Only)**
+
+### Best practice:
+
+Allow only *specific* trusted domains.
+
+```tsx
+const allowed = ["https://mybank.com", "https://secure.mybank.com"];
+
+const onShouldStartLoadWithRequest = (req) => {
+  return allowed.some(domain => req.url.startsWith(domain));
+};
+```
+
+Block:
+
+*   External URLs
+*   Unknown redirects
+*   Deep links to malicious sites
+
+***
+
+# **4. Disable Mixed Content**
+
+Prevent HTTP inside HTTPS session:
+
+```tsx
+androidHardwareAccelerationDisabled={true}
+mixedContentMode="never"
+```
+
+***
+
+# **5. Use Strict Content-Security-Policy (CSP)**
+
+If loading remote pages you own:
+
+*   No inline JS
+*   No external JS from unknown CDNs
+*   Restrict script-src, frame-src, connect-src
+
+Example CSP:
+
+    default-src 'none';
+    script-src 'self';
+    style-src 'self';
+    img-src 'self';
+    connect-src https://api.mybank.com;
+    frame-ancestors 'none';
+
+***
+
+# **6. Secure JS <-> Native Bridge**
+
+### A. Validate messages
+
+```tsx
+onMessage={(event) => {
+  const msg = JSON.parse(event.nativeEvent.data);
+  if (!isValidMessage(msg)) return;
+}}
+```
+
+### B. Don’t expose sensitive native methods
+
+Never expose:
+
+*   Token access
+*   Payment actions
+*   DB operations
+*   Sensitive settings
+
+### C. Prefer one-way messaging
+
+Avoid receiving arbitrary instructions from JS.
+
+***
+
+# **7. Disable Remote Debugging In Production**
+
+**Android**
+
+```kotlin
+WebView.setWebContentsDebuggingEnabled(false)
+```
+
+**iOS**
+Automatic: iOS does NOT allow remote debugging in release builds.
+
+***
+
+# **8. Prevent Screenshot / Recording**
+
+Combine WebView with FLAG\_SECURE / blur overlays (as covered in Q74).
+
+***
+
+# **9. Harden SSL/TLS (Very Important)**
+
+If WebView loads HTTPS pages:
+
+*   Enable TLS 1.2+
+*   Enforce certificate pinning at WebView/network layer
+*   Block invalid certificates
+*   Reject user-installed CAs on Android (Network Security Config)
+
+***
+
+# **10. Isolate WebView Session**
+
+Never share cookies between:
+
+*   WebView
+*   Mobile app
+*   Browser
+
+Use:
+
+```tsx
+sharedCookiesEnabled={false}
+thirdPartyCookiesEnabled={false}
+```
+
+And isolate web session to prevent Cookie Fixation attacks.
+
+***
+
+# **11. Disable Keyboard Suggestions on Sensitive Inputs**
+
+Inside WebView forms:
+
+
+
+Prevent saving sensitive inputs into keyboard dictionary.
+
+***
+
+# **12. Perform Server-Side Risk Checks**
+
+When loading WebView content:
+
+*   Validate JWT session
+*   Check device integrity (root/jailbreak)
+*   Validate user account state
+*   Inform fraud engine if WebView errors occur
+
+***
+
+# 🎯 **20‑Second Interview Summary**
+
+> “WebViews are dangerous because of JS injection, unsafe bridges, mixed content, phishing, and cookie leaks.\
+> To harden them, I disable JS unless required, block file access, enforce allowlisted URLs, disable mixed content, isolate cookies, apply CSP, close debugging, validate bridge messages, and use certificate pinning.\
+> For sensitive flows like payments, I prefer native screens and avoid WebViews entirely.”
+
+  </details>
+
+  <details><summary>80. GDPR/CPRA compliance basics.</summary>
+
+Here’s a **short, crisp, interview‑ready** explanation for:
+
+# **80. GDPR / CPRA Compliance Basics (For Mobile Banking Apps)**
+
+*(Conceptual privacy + security topic — no external sourcing needed.)*
+
+Financial apps must follow **GDPR (EU)** and **CPRA/CCPA (California)** when handling personal data. These regulations govern *how you collect, store, process, retain, and delete user data*. Below is the clean, banking‑grade explanation expected in interviews.
+
+***
+
+# ✅ **1. Core Principles (Both GDPR & CPRA)**
+
+### **A. Data Minimization**
+
+Only collect what you absolutely need:
+
+*   No unnecessary PII in API payloads
+*   Avoid storing full DOB, PAN, Aadhaar, SSN unless required
+*   Don’t store telemetry with identifiers
+
+### **B. Purpose Limitation**
+
+Use data **only** for the stated purpose:
+
+> “Collect phone number for login only” → cannot reuse it for marketing without consent.
+
+### **C. Storage Limitation**
+
+*   Don't store data forever
+*   Delete/expire old logs, cache, and analytics data
+
+### **D. Transparency**
+
+Explain:
+
+*   What data you collect
+*   Why you collect it
+*   Who you share it with
+*   How long you keep it
+
+Shown via:
+
+*   Privacy Notice
+*   Consent screens
+*   Just‑in‑time notifications
+
+***
+
+# ✅ **2. User Rights (You Must Implement in Banking Apps)**
+
+## **GDPR Rights**
+
+*   **Right to Access** → Users can request all data you hold
+*   **Right to Rectification** → Fix incorrect data
+*   **Right to Erasure (“Right to be forgotten”)**
+*   **Right to Restrict Processing**
+*   **Right to Data Portability**
+*   **Right to Object (opt‑out)**
+*   **Right Not to Be Profiled / Automated Decisions**
+
+## **CPRA Rights**
+
+*   **Right to Know** what is collected
+*   **Right to Delete**
+*   **Right to Correct**
+*   **Right to Opt‑Out of Sale/Sharing**
+*   **Right to Limit Use of Sensitive Data**
+*   **Right to Non‑Discrimination**
+
+***
+
+# ✅ **3. What “Personal Data” means (very important)**
+
+Includes:
+
+*   Name
+*   Phone/email
+*   Device ID / IP address
+*   Biometrics
+*   Location
+*   Transaction history
+*   Account numbers
+*   Online identifiers (cookies, analytics IDs)
+
+Anything that identifies a person directly or indirectly = **Personal Data**.
+
+***
+
+# ✅ **4. Mobile‑Specific Privacy Requirements**
+
+### **A. No PII in Logs (related to Q77)**
+
+GDPR/CPRA strictly prohibit accidental leakage.
+
+### **B. Explicit Consent for Sensitive Data**
+
+Need **opt‑in** for:
+
+*   Biometrics
+*   Location
+*   Analytics tracking
+*   Crash reporting with metadata
+
+### **C. Data Encryption**
+
+*   Encrypt at-rest via Keychain/Keystore
+*   Encrypt in-transit via TLS 1.2+/1.3
+*   No plaintext storage
+
+### **D. Prevent Unauthorized Access**
+
+*   Secure session timeout
+*   Token invalidation
+*   PIN/biometric re-auth for sensitive screens
+
+### **E. Data Retention Policies**
+
+*   Auto-delete old data
+*   Define retention for logs, cache, analytics
+*   Purge on logout/reinstall
+
+***
+
+# ✅ **5. Data Subject Requests (DSR) Workflow**
+
+Your backend + mobile app must support:
+
+### **1. Export My Data**
+
+Provide a JSON/CSV with:
+
+*   Profile info
+*   Transaction data
+*   KYC data
+
+### **2. Delete My Data**
+
+App triggers deletion workflow:
+
+*   Remove all local storage (MMKV/Realm/SQLite)
+*   Backend flags for wipe
+*   Persist only what regulators require (KYC retention)
+
+### **3. Opt-Out Preferences**
+
+*   Opt-out of sharing data for analytics/marketing
+*   Disable personalized offers
+*   Respect device-level OS permissions
+
+***
+
+# ✅ **6. Third‑Party SDK Compliance (Very important in interviews)**
+
+GDPR/CPRA require you to:
+
+*   Audit SDKs (Analytics, Crashlytics, Ads, Chat, Social login)
+*   Disable PII collection unless user consents
+*   Ensure SDK is not “selling data” (CPRA term)
+*   Provide list of third parties in privacy policy
+*   Respect “Do Not Track / Opt-Out” settings
+
+For banking apps → avoid or heavily restrict third‑party SDKs.
+
+***
+
+# ✅ **7. Secure Data Handling in React Native**
+
+### On device:
+
+*   Use **Keychain/Keystore** for tokens
+*   Use **encrypted DB (SQLCipher/Realm)** for PII
+*   No PII in AsyncStorage/MMKV
+*   Protect screenshots (FLAG\_SECURE)
+
+### In network:
+
+*   TLS 1.2+
+*   Certificate pinning
+*   No passing sensitive data in query params
+*   Short‑lived tokens + rotation
+
+### In analytics/crash logs:
+
+*   Remove user identifiers
+*   Mask or disable breadcrumbs
+*   Ask consent before enabling tracking
+
+***
+
+# ✅ **8. Compliance Documentation (Often asked!)**
+
+You must maintain:
+
+*   Data Flow Diagram (DFD)
+*   Records of Processing Activities (ROPA)
+*   Privacy Impact Assessments (PIA/DPIA)
+*   Retention policy
+*   Consent logs
+*   Vendor/SDK assessments
+*   Breach response plan
+
+***
+
+# 🎯 **20‑Second Interview Summary**
+
+> “GDPR and CPRA require data minimization, explicit consent, transparency, and strong user rights like access, deletion, and opt‑out.  
+> In mobile banking apps, I ensure no PII in logs, encrypt all sensitive data, prevent screenshot leaks, limit retention, and store tokens only in hardware-backed keystores.  
+> I also honor user rights, audit third‑party SDKs, and ensure secure session and token handling to maintain privacy compliance end‑to‑end.”
+
+  </details>
+
+  <details><summary>81. Permissions hardening (least privilege).</summary>
+
+Here’s a **short, crisp, interview‑ready answer** for:
+
+# **81. Permissions Hardening (Least Privilege) for React Native Banking Apps**
+
+Mobile banking apps must follow the **principle of least privilege**:
+
+> *Request only the permissions that are absolutely required, only when needed, and never pre‑grant broad access.*
+
+This is a core requirement in **MASVS‑PLATFORM**, **GDPR/CPRA**, and multiple banking regulators’ guidelines.
+
+Below is the exact, banking‑grade explanation expected in interviews.
+
+***
+
+# ✅ **1. Request the Minimum Permissions Possible**
+
+Banking apps should **avoid** these unless absolutely necessary:
+
+*   **Camera** → Only for KYC, cheque scanning (on-demand)
+*   **Location** → Only if required for compliance (ATM finder OK), never “Always”
+*   **Contacts** → Generally *forbidden*
+*   **Storage** → Avoid legacy “READ/WRITE\_EXTERNAL\_STORAGE”; use scoped storage
+*   **Phone state** → Avoid unless regulatory need
+*   **Bluetooth / Nearby devices** → Rarely justified
+
+**Default rule:**
+
+> If a feature can be done without a permission → do it without permission.
+
+***
+
+# ✅ **2. Ask Permissions Just‑In‑Time (Not on App Launch)**
+
+Permissions must be requested **at the moment** the user triggers the feature.
+
+Examples:
+
+*   KYC → Ask Camera permission only when user taps “Start KYC”
+*   ATM Locator → Ask Location only when user opens the map
+*   Cheque Deposit → Ask Camera + Storage only right before capture
+
+This reduces scope, improves compliance, and avoids “blanket permissions”.
+
+***
+
+# ✅ **3. Use Permission Explanation Screens (Regulatory Requirement)**
+
+Provide:
+
+*   **Why** you need the permission
+*   **How** the data is used
+*   **What happens if user denies**
+
+Example:
+
+> “We need Camera permission to verify identity for KYC. Photos stay encrypted and never stored on device.”
+
+This supports **GDPR transparency**, **CPRA notice**, and **MASVS-L1/L2**.
+
+***
+
+# ✅ **4. Deny Access if Permission Missing – Never Gracefully Degrade Security**
+
+If a user denies permission for a **security feature**, the app must:
+
+*   Block that action
+*   Show fallback
+*   Not bypass or weaken security
+
+Example:  
+If camera denied for cheque scanning → do NOT allow upload from gallery (risk of fraud).
+
+***
+
+# ✅ **5. Avoid Dangerous & Legacy Permissions**
+
+### ❌ Never use (unless mandated):
+
+*   `WRITE_EXTERNAL_STORAGE`
+*   `READ_SMS`
+*   `READ_CONTACTS`
+*   `READ_PHONE_STATE`
+
+Use:
+
+*   Scoped storage
+*   Intent-based file access
+*   OS-provided pickers
+
+Android 12+ and 13+ have stricter enforcement—good for banking security.
+
+***
+
+# ✅ **6. Harden Web-Based Permissions (WebView)**
+
+If using WebViews:
+
+*   Disable geolocation inside WebView
+*   Disable camera/mic unless absolutely required
+*   Block JavaScript APIs like `getUserMedia`
+*   Use URL allowlisting to prevent permission abuse  
+    (Related to Q79)
+
+***
+
+# ✅ **7. iOS-Specific Hardening**
+
+*   Use **NSPrivacyUsageDescription** keys with precise messaging
+*   Don’t use broad-purpose permissions (e.g., Photo Library “Add Only” instead of full access)
+*   Avoid “Always On Location”; use “When In Use”
+
+iOS App Store Compliance strongly enforces privacy minimization.
+
+***
+
+# ✅ **8. Android-Specific Hardening**
+
+*   Use Android’s **runtime permissions**
+*   Use **foreground service** permissions sparingly
+*   Follow **Permission Groups** & avoid auto-granted dangerous permissions
+*   Use **MANAGE\_EXTERNAL\_STORAGE** only if regulator-required (rare)
+
+***
+
+# ✅ **9. Audit & Remove Unused Permissions**
+
+Tools:
+
+*   Android Lint
+*   iOS Privacy Report
+*   Mobile AppSec scanners
+*   Manual code review
+
+Banks typically require:
+
+*   Permission inventory
+*   Justifications for each
+*   Annual recertification
+
+***
+
+# 🎯 **10. Banking‑Grade Restrictions (From Real FIs)**
+
+Most banks enforce:
+
+✔ Zero permissions on app install  
+✔ Only on-demand permissions  
+✔ No background location  
+✔ No access to contacts  
+✔ No audio recording  
+✔ No broad storage access  
+✔ Strict privacy disclosures  
+✔ Only OS-native pickers for files/images
+
+***
+
+# 🔥 **20‑Second Interview Summary**
+
+> “I follow least privilege: request only the permissions needed, only at the moment they’re required, and never ask for broad or unnecessary access.  
+> I use just-in-time permission prompts, transparent explanations, avoid dangerous legacy permissions, remove unused permissions, and harden WebView/browser permissions.  
+> This meets MASVS, GDPR/CPRA, and banking audit requirements for minimal, purpose‑bound permission usage.”
+
+  </details>
+
+  <details><summary>82. Secure cryptography usage (don’t roll your own).</summary>
+
+Here is a **short, crisp, interview‑ready**, banking‑grade explanation for:
+
+# **82. Secure Cryptography Usage (Don’t Roll Your Own)**
+
+*(Conceptual security topic → no external sourcing needed.)*
+
+In financial apps, cryptography is **never implemented manually** because custom crypto is predictable, flawed, and easily broken. Banks must follow **NIST**, **OWASP MASVS-CRYPTO**, and **PCI‑DSS** guidance for approved algorithms, key management, and secure implementation.
+
+Below is the exact answer interviewers expect.
+
+***
+
+# ✅ **1. Don’t Roll Your Own Crypto — What This Means**
+
+**Never:**
+
+*   Write your own AES/RSA/ECC implementation
+*   Invent custom padding schemes
+*   Develop proprietary hashing or key derivation
+*   Create custom obfuscation and call it “encryption”
+*   Build homemade token formats
+
+**Always:**
+
+*   Use platform‑provided, proven, vetted crypto libraries
+*   Use standard algorithms with correct modes and padding
+*   Follow strict key‑management rules
+
+Because even experienced developers make mistakes with:
+
+*   Padding
+*   IV generation
+*   Randomness
+*   Key rotation
+*   Authentication tags
+*   Mode selection
+
+One mistake → **banking data breach**.
+
+***
+
+# ✅ **2. Approved Algorithms (Banking Standards)**
+
+### **Symmetric Encryption**
+
+*   **AES‑256‑GCM** (preferred)
+*   AES‑256‑CBC (only if authenticated with HMAC)
+
+### **Asymmetric Encryption**
+
+*   **RSA‑2048+**
+*   **ECDSA/ECDH (P‑256, P‑384)**
+
+### **Hashing**
+
+*   **SHA‑256**
+*   **SHA‑512**
+
+### **Password/PIN Storage**
+
+*   **PBKDF2**, **Scrypt**, **Argon2**
+*   Never SHA‑1, MD5, plaintext
+
+### **Randomness**
+
+*   Only use **CSPRNG** (Cryptographically Secure Random Number Generators)
+*   Never `Math.random()`
+
+***
+
+# ✅ **3. Use Hardware‑Backed Keystores for Keys**
+
+React Native banking apps must use:
+
+### **iOS**
+
+*   Secure Enclave + Keychain
+*   Non‑exportable private keys
+*   Biometric-gated keys when needed
+
+### **Android**
+
+*   Android Keystore (TEE / StrongBox if available)
+*   Key material never leaves secure hardware
+
+**Never store keys in:**
+
+*   AsyncStorage
+*   MMKV (unencrypted)
+*   JS variables
+*   SQLite
+*   Redux state
+
+> Key storage is **more important** than the encryption algorithm.
+
+***
+
+# ✅ **4. Use Standard Libraries (Platform or Well‑Audited)**
+
+### **iOS**
+
+*   CommonCrypto
+*   CryptoKit (preferred)
+
+### **Android**
+
+*   javax.crypto
+*   BouncyCastle (if needed)
+*   Tink (Google’s vetted crypto library)
+
+### **React Native**
+
+Use native modules or secure wrappers:
+
+*   `react-native-keychain`
+*   `react-native-encrypted-storage`
+*   No pure‑JS crypto for sensitive operations
+
+***
+
+# ✅ **5. Cryptographic Best Practices (MASVS‑CRYPTO)**
+
+### ✔ Use authenticated encryption
+
+Always use **AES‑GCM** to prevent tampering.
+
+### ✔ Never reuse IVs
+
+Generate a random IV for every encryption.
+
+### ✔ Use envelope encryption
+
+*   KEK (hardware) → encrypts DEK (AES key)
+*   DEK → encrypts data  
+    Enables secure key rotation.
+
+### ✔ Rotate keys regularly
+
+Rotate:
+
+*   Encryption keys
+*   Biometric keys
+*   Token signing keys
+*   API secret keys
+
+### ✔ Do not encrypt everything blindly
+
+Classify data:
+
+*   Tokens → Keychain/Keystore
+*   PII → Encrypted DB
+*   Preferences → MMKV (plaintext OK)
+
+***
+
+# ✅ **6. Secure Crypto Workflows in Banking Apps**
+
+### **A. Secure Local Storage**
+
+*   Encrypt sensitive data with AES‑GCM
+*   Store DEK encrypted via Keystore/Keychain
+*   Keep IV + auth tag with ciphertext
+
+### **B. Secure Network Layer**
+
+*   TLS 1.2/1.3 only
+*   Certificate pinning
+*   Strong cipher suites
+*   HSTS enforced
+
+### **C. Secure Token Handling**
+
+*   JWTs must be signed with RSA/ECDSA
+*   Short-lived access tokens
+*   Refresh tokens stored only in secure hardware
+*   Avoid custom token formats
+
+### **D. Secure Biometric/Gated Keys**
+
+*   Bind AES key to biometric prompt
+*   Use secure enclave to protect operations
+
+***
+
+# ✅ **7. What NOT to Do (Common Mistakes)**
+
+❌ Using Base64 and calling it “encryption”  
+❌ Hardcoding keys in JS  
+❌ Using AES-CBC without HMAC  
+❌ Using Math.random() for IVs  
+❌ Creating custom hashing  
+❌ Compress → encrypt → sign order mistakes  
+❌ JSON.stringify sensitive objects before encryption without sanitization  
+❌ Storing private keys in Redux/MMKV/AsyncStorage  
+❌ Encrypting with a static password in code
+
+***
+
+# 🔥 **8. 30‑Second Interview Summary**
+
+> “In financial apps, I never roll my own crypto.  
+> I use approved algorithms like AES‑256‑GCM, RSA‑2048, or ECDH, and rely on platform‑provided libraries with hardware‑backed keystores.  
+> Keys never leave the Secure Enclave/TEE; only encrypted data does.  
+> I use PBKDF2/Scrypt for PINs, rotate keys regularly, use envelope encryption, generate IVs securely, and ensure authenticated encryption.  
+> This follows OWASP MASVS‑CRYPTO and banking compliance best practices.”
+
+  </details>
 
 </details>
 
