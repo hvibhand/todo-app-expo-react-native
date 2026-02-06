@@ -2,7 +2,7 @@
 
 ***
 
-### **1) JavaScript & TypeScript (12 questions)**
+### 1) JavaScript & TypeScript (12 questions)
 
 <details>
   <summary>JavaScript &amp; TypeScript — Core + Advanced (12)</summary>
@@ -11,9 +11,9 @@
 
   <details><summary>1. Explain <code>var</code>, <code>let</code>, <code>const</code> and hoisting (TDZ).</summary>
 
-## 1) `var`, `let`, `const` + Hoisting & TDZ (Temporal Dead Zone)
+### 1) `var`, `let`, `const` + Hoisting & TDZ (Temporal Dead Zone)
 
-### Scope & Re-assignment
+##### Scope & Re-assignment
 
 *   **`var`**
     *   **Function-scoped** (or global if declared outside functions).
@@ -26,7 +26,7 @@
     *   **Block-scoped**.
     *   **Cannot be re-declared or re-assigned** (but **objects/arrays are still mutable**—binding is constant, not value).
 
-### Hoisting & TDZ
+##### Hoisting & TDZ
 
 *   **Hoisting** = variable declarations are moved to the top of their scope *at compile time*.
 *   `var` is hoisted and initialized to **`undefined`** → accessing it **before declaration** doesn’t throw, but gives `undefined`.
@@ -34,9 +34,9 @@
 
 ***
 
-## Quick Examples
+### Quick Examples
 
-### 1) Scope differences
+#### 1) Scope differences
 
 ```js
 function test() {
@@ -52,7 +52,7 @@ function test() {
 test();
 ```
 
-### 2) Hoisting behavior
+#### 2) Hoisting behavior
 
 ```js
 console.log(x); // undefined (var is hoisted & initialized)
@@ -65,7 +65,7 @@ console.log(z); // ReferenceError (TDZ)
 const z = 30;
 ```
 
-### 3) Re-declaration & re-assignment
+#### 3) Re-declaration & re-assignment
 
 ```js
 var a = 1;
@@ -81,7 +81,7 @@ const c = 1;
 // c = 2;       // TypeError (cannot re-assign)
 ```
 
-### 4) `const` with objects/arrays
+#### 4) `const` with objects/arrays
 
 ```js
 const user = { name: 'Harshal' };
@@ -92,7 +92,7 @@ const arr = [1, 2];
 arr.push(3); // OK
 ```
 
-### 5) Common bug: `var` in loops (closures)
+#### 5) Common bug: `var` in loops (closures)
 
 ```js
 // Problem: all logs '3' due to function-scoped var
@@ -105,7 +105,7 @@ for (let j = 0; j < 3; j++) {
 }
 ```
 
-### 6) TDZ with default parameters
+#### 6) TDZ with default parameters
 
 ```js
 let a = 1;
@@ -115,7 +115,7 @@ function f(a = 1) { return a; } // Safe
 
 ***
 
-## Practical Guidelines (Interview-ready)
+### Practical Guidelines (Interview-ready)
 
 *   Use **`const` by default**, switch to **`let`** when you need reassignment.
 *   **Avoid `var`**—it causes tricky scope/hoisting bugs, especially in loops and async code.
@@ -128,7 +128,7 @@ function f(a = 1) { return a; } // Safe
 
   <details><summary>2. How do closures work? Example of stale state in React hooks.</summary>
 
-## Closures (Quick Refresher)
+### Closures (Quick Refresher)
 
 A **closure** is when a function “remembers” the variables from its **lexical scope** even after that function has returned.
 
@@ -150,11 +150,11 @@ In React, closures show up in **event handlers, effects, and async callbacks**�
 
 ***
 
-## Stale State in React Hooks (What & Why)
+### Stale State in React Hooks (What & Why)
 
 **Stale state** happens when a callback created in an earlier render **closes over** old `state`/`props` and then runs later (e.g., a timer, promise, subscription).
 
-### ❌ Classic Bug: `setInterval` closing over old state
+#### ❌ Classic Bug: `setInterval` closing over old state
 
 ```jsx
 function Timer() {
@@ -175,7 +175,7 @@ function Timer() {
 
 **Symptoms**: `count` only goes 0 → 1 and then stops, or increments erratically.
 
-### ✅ Fix 1: Functional state updates (recommended)
+#### ✅ Fix 1: Functional state updates (recommended)
 
 Use the **updater function** to read the **latest** state at call time:
 
@@ -194,7 +194,7 @@ React.useEffect(() => {
 
 ***
 
-### ❌ Bug: Async callbacks with stale state
+#### ❌ Bug: Async callbacks with stale state
 
 ```jsx
 function SearchBox() {
@@ -208,7 +208,7 @@ function SearchBox() {
 }
 ```
 
-### ✅ Fix 2: Rely on fresh values (read at call time)
+#### ✅ Fix 2: Rely on fresh values (read at call time)
 
 Pass the current value into the async function at the time you call it:
 
@@ -224,7 +224,7 @@ const onSearch = async (q) => {
 
 ***
 
-### ❌ Bug: Event handler closes over stale `props`
+#### ❌ Bug: Event handler closes over stale `props`
 
 ```jsx
 function Item({ id, onDelete }) {
@@ -238,7 +238,7 @@ function Item({ id, onDelete }) {
 
 This is often fine, but can bite when handlers live long (e.g., registered globally) or are memoized incorrectly.
 
-### ✅ Fix 3: Keep stable handler but access latest values via refs
+#### ✅ Fix 3: Keep stable handler but access latest values via refs
 
 ```jsx
 function Item({ id, onDelete }) {
@@ -255,7 +255,7 @@ function Item({ id, onDelete }) {
 
 ***
 
-## Patterns to Prevent Stale Closures
+### Patterns to Prevent Stale Closures
 
 1.  **Functional updates** for state that depends on previous state:
     ```jsx
@@ -292,7 +292,7 @@ function Item({ id, onDelete }) {
 
 ***
 
-## Quick RN-specific Example: Stale state in API polling
+### Quick RN-specific Example: Stale state in API polling
 
 ```jsx
 function Balances() {
@@ -316,7 +316,7 @@ function Balances() {
 
 ***
 
-## (Interview Soundbite)
+### (Interview Soundbite)
 
 *   Closures capture variables from their defining render.
 *   **Stale state** happens when long-lived callbacks (timers, async, subscriptions) use **old captured values**.
@@ -328,7 +328,7 @@ function Balances() {
 
   <details><summary>3. Explain event loop, microtasks vs macrotasks using Promises and setTimeout.</summary>
 
-# ✅ **3. Explain Event Loop, Microtasks vs Macrotasks using Promises and setTimeout**
+### ✅ 3. Explain Event Loop, Microtasks vs Macrotasks using Promises and setTimeout
 
 The **Event Loop** controls *how JavaScript executes code*, especially when mixing **sync code**, **Promises**, **setTimeout**, **fetch**, and other async tasks.
 
@@ -336,7 +336,7 @@ JavaScript is **single-threaded** → it can run **one thing at a time**, and th
 
 ***
 
-# 🧠 **Event Loop Overview**
+### 🧠 **Event Loop Overview**
 
 JavaScript has:
 
@@ -353,7 +353,7 @@ JavaScript has:
         *   `I/O` callbacks
         *   UI rendering tasks
 
-### ⭐ Order of execution:
+#### ⭐ Order of execution:
 
     Synchronous code
     ↓
@@ -367,7 +367,7 @@ JavaScript has:
 
 ***
 
-# 📌 **Microtasks vs Macrotasks**
+### 📌 **Microtasks vs Macrotasks**
 
 | Type           | Examples                                               | Priority  |
 | -------------- | ------------------------------------------------------ | --------- |
@@ -376,7 +376,7 @@ JavaScript has:
 
 ***
 
-# 🔍 Example 1 — Promises vs setTimeout
+### 🔍 Example 1 — Promises vs setTimeout
 
 ```js
 console.log("A");
@@ -392,14 +392,14 @@ Promise.resolve().then(() => {
 console.log("D");
 ```
 
-### Output order:
+#### Output order:
 
     A
     D
     C - Promise   (microtask)
     B - Timeout   (macrotask)
 
-### Why?
+#### Why?
 
 1.  Sync → A, D
 2.  **Promise microtask** → C
@@ -407,7 +407,7 @@ console.log("D");
 
 ***
 
-# 🔍 Example 2 — Multiple microtasks before any macrotask
+### 🔍 Example 2 — Multiple microtasks before any macrotask
 
 ```js
 setTimeout(() => console.log("Timeout"), 0);
@@ -416,7 +416,7 @@ Promise.resolve().then(() => console.log("Promise 1"));
 Promise.resolve().then(() => console.log("Promise 2"));
 ```
 
-### Output:
+#### Output:
 
     Promise 1
     Promise 2
@@ -426,7 +426,7 @@ Promise.resolve().then(() => console.log("Promise 2"));
 
 ***
 
-# 🔍 Example 3 — Microtask inside a macrotask
+### 🔍 Example 3 — Microtask inside a macrotask
 
 ```js
 setTimeout(() => {
@@ -440,7 +440,7 @@ setTimeout(() => {
 console.log("C - Sync");
 ```
 
-### Output:
+#### Output:
 
     C - Sync
     A - Timeout
@@ -452,7 +452,7 @@ Why?
 
 ***
 
-# 🔍 Example 4 — React Native Scenario (API + UI update)
+### 🔍 Example 4 — React Native Scenario (API + UI update)
 
 ```js
 console.log("Start");
@@ -467,7 +467,7 @@ setTimeout(() => {
 console.log("End");
 ```
 
-### Output:
+#### Output:
 
     Start
     End
@@ -476,7 +476,7 @@ console.log("End");
 
 ***
 
-# 🔥 RN-Specific Explanation (Interview Gold)
+### 🔥 RN-Specific Explanation (Interview Gold)
 
 In **React Native**, the event loop affects:
 
@@ -495,7 +495,7 @@ updates the UI **before** any timer callbacks.
 
 ***
 
-# 🎤 **Short Interview Version (Perfect Answer)**
+### 🎤 **Short Interview Version (Perfect Answer)**
 
 > JavaScript runs in a single thread.  
 > The **event loop** decides what runs next by prioritizing **microtasks** over **macrotasks**.
@@ -521,9 +521,9 @@ updates the UI **before** any timer callbacks.
 
   <details><summary>4. Deep vs shallow copy — how do you update deeply nested state safely?</summary>
 
-## 4) Deep vs Shallow Copy — Safely Updating Deeply Nested State
+### 4) Deep vs Shallow Copy — Safely Updating Deeply Nested State
 
-### 🔹 Shallow Copy
+#### 🔹 Shallow Copy
 
 Copies **only the first level**. Nested objects/arrays still **reference the same memory**.
 
@@ -540,7 +540,7 @@ console.log(orig.b.c); // 3  ❌ mutated original!
 
 ***
 
-### 🔹 Deep Copy
+#### 🔹 Deep Copy
 
 Copies **the entire graph** (recursively). Nested structures are **independent**.
 
@@ -559,9 +559,9 @@ Common options:
 
 ***
 
-## ✅ How to Update Deeply Nested State Safely (React/RN)
+### ✅ How to Update Deeply Nested State Safely (React/RN)
 
-### 1) **Manual immutable update** with spreads
+#### 1) **Manual immutable update** with spreads
 
 Good for small changes; verbose for deep trees.
 
@@ -601,7 +601,7 @@ setState(prev => ({
 
 ***
 
-### 2) **Immer** (`immer` or via Redux Toolkit) – cleanest for deep updates
+#### 2) **Immer** (`immer` or via Redux Toolkit) – cleanest for deep updates
 
 Write “mutating” code; Immer produces **immutable** copies under the hood.
 
@@ -625,7 +625,7 @@ setState(prev =>
 
 ***
 
-### 3) **Normalize state** (flatten nested entities)
+#### 3) **Normalize state** (flatten nested entities)
 
 Best for **large apps** (Redux/React Query + selectors). Avoids deep trees entirely.
 
@@ -662,13 +662,13 @@ setState(prev => ({
 
 ***
 
-### 4) **Refs for large mutable structures** (advanced)
+#### 4) **Refs for large mutable structures** (advanced)
 
 If a big object changes frequently but **shouldn’t trigger re-renders**, keep it in a `useRef` and copy only the parts bound to UI state. This is more advanced and situational (e.g., caches).
 
 ***
 
-### 5) **Avoid common pitfalls**
+#### 5) **Avoid common pitfalls**
 
 *   ❌ **Direct mutation**: `state.user.profile.city = '...'`  
     React won’t detect changes reliably → stale UI/re-renders won’t happen as expected.
@@ -677,9 +677,9 @@ If a big object changes frequently but **shouldn’t trigger re-renders**, keep 
 
 ***
 
-## Quick Patterns (Copy/Paste)
+### Quick Patterns (Copy/Paste)
 
-### Update object in a nested array by id
+#### Update object in a nested array by id
 
 ```js
 setState(prev => ({
@@ -690,7 +690,7 @@ setState(prev => ({
 }));
 ```
 
-### Add/remove in nested array
+#### Add/remove in nested array
 
 ```js
 // add
@@ -706,13 +706,13 @@ setState(prev => ({
 }));
 ```
 
-### Replace deep path with Immer
+#### Replace deep path with Immer
 
 ```js
 setState(prev => produce(prev, d => { d.a.b.c.list[index].flag = true; }));
 ```
 
-### Safely increment nested numeric field
+#### Safely increment nested numeric field
 
 ```js
 setState(prev => ({
@@ -729,7 +729,7 @@ setState(prev => ({
 
 ***
 
-## RN Performance Tips
+### RN Performance Tips
 
 *   Prefer **functional `setState`** (`setState(prev => ...)`) to avoid stale closures.
 *   Memoize heavy child components; pass stable props.
@@ -738,7 +738,7 @@ setState(prev => ({
 
 ***
 
-## (Interview Answer)
+### (Interview Answer)
 
 *   **Shallow copy** copies the first level; nested references remain shared.
 *   **Deep copy** recursively copies all levels.
@@ -751,27 +751,27 @@ setState(prev => ({
 
   <details><summary>5. What is debouncing vs throttling? Give real RN use cases.</summary>
 
-# ✅ **5. What is Debouncing vs Throttling? (With Real React Native Use Cases)**
+### ✅ **5. What is Debouncing vs Throttling? (With Real React Native Use Cases)**
 
 Both **debouncing** and **throttling** are techniques to control **how often a function runs**, especially when triggered repeatedly (typing, scrolling, gestures, network calls).
 
 ***
 
-# 🔵 **Debouncing**
+### 🔵 **Debouncing**
 
 **Debounce = wait until the user *stops* doing something.**
 
 A function runs **only after a pause** in activity.
 
-### ⏱ How it works:
+#### ⏱ How it works:
 
 *   User triggers events rapidly (typing, scrolling).
 *   Timer resets on every call.
 *   Function runs *only once*, after X ms of no further calls.
 
-### 📌 Real RN Use Cases
+#### 📌 Real RN Use Cases
 
-#### **1) Search-as-you-type API calls**
+##### **1) Search-as-you-type API calls**
 
 Avoid hitting `/search?q=` on every keystroke.
 
@@ -785,29 +785,29 @@ const search = debounce((text) => {
 <TextInput onChangeText={search} />
 ```
 
-#### **2) Autocomplete suggestions**
+##### **2) Autocomplete suggestions**
 
 Google Places, user directories, product search.
 
-#### **3) Prevent double button taps**
+##### **3) Prevent double button taps**
 
 (Though usually solved with disabled states)
 Debounce ensures the action fires once after tapping stops.
 
 ***
 
-# 🟢 **Throttling**
+### 🟢 **Throttling**
 
 **Throttle = run the function at most *every X ms*, no matter how many times it’s triggered.**
 
-### ⏱ How it works:
+#### ⏱ How it works:
 
 *   Event fires repeatedly (scrolling, dragging).
 *   Throttle ensures the function executes **at a fixed rate**.
 
-### 📌 Real RN Use Cases
+#### 📌 Real RN Use Cases
 
-#### **1) Scroll event handlers (FlatList/ScrollView)**
+##### **1) Scroll event handlers (FlatList/ScrollView)**
 
 Prevent re-render explosions:
 
@@ -821,7 +821,7 @@ const onScroll = throttle((e) => {
 <ScrollView onScroll={onScroll} scrollEventThrottle={16} />
 ```
 
-#### **2) Tracking drag/gesture movements**
+##### **2) Tracking drag/gesture movements**
 
 Use throttle to limit updates for:
 
@@ -829,13 +829,13 @@ Use throttle to limit updates for:
 *   Reanimated gesture handlers
 *   Map panning
 
-#### **3) Analytics/telemetry events**
+##### **3) Analytics/telemetry events**
 
 Avoid logging hundreds of events per second when user scrolls/dragging.
 
 ***
 
-# 🔥 **Side-by-Side Difference (Simple Summary)**
+### 🔥 **Side-by-Side Difference (Simple Summary)**
 
 | Concept      | When it fires                 | Goal                    | RN Example                        |
 | ------------ | ----------------------------- | ----------------------- | --------------------------------- |
@@ -844,7 +844,7 @@ Avoid logging hundreds of events per second when user scrolls/dragging.
 
 ***
 
-# 🧠 **Interview-Safe Explanation (Short Version)**
+### 🧠 **Interview-Safe Explanation (Short Version)**
 
 > Debouncing delays a function until the activity stops—great for search inputs or preventing double taps.
 >
@@ -854,7 +854,7 @@ Avoid logging hundreds of events per second when user scrolls/dragging.
 
 ***
 
-# 🛠 Bonus: Native Example (Custom Debounce)
+### 🛠 Bonus: Native Example (Custom Debounce)
 
 (If they ask you to implement it manually)
 
@@ -876,7 +876,7 @@ function debounce(fn, delay) {
 
 ***
 
-## ✅ What is Tree‑Shaking?
+### ✅ What is Tree‑Shaking?
 
 **Tree‑shaking** is **dead code elimination**: the bundler analyzes your imports/exports statically and **removes any code that isn’t actually used (unreferenced)** in your app.
 
@@ -890,7 +890,7 @@ In RN, Metro (the bundler) + minifier (and then Hermes bytecode) benefit from tr
 
 ***
 
-## 🧠 How Tree‑Shaking Works (Conceptual)
+### 🧠 How Tree‑Shaking Works (Conceptual)
 
 1.  **Static analysis** of the module graph (ESM import/export).
 2.  Mark **reachable** symbols starting from your app’s entry point.
@@ -901,9 +901,9 @@ In RN, Metro (the bundler) + minifier (and then Hermes bytecode) benefit from tr
 
 ***
 
-## 🔧 What Helps / Breaks Tree‑Shaking in React Native
+### 🔧 What Helps / Breaks Tree‑Shaking in React Native
 
-### ✅ Helps
+#### ✅ Helps
 
 *   **Named ESM imports**:
     ```ts
@@ -930,7 +930,7 @@ In RN, Metro (the bundler) + minifier (and then Hermes bytecode) benefit from tr
     export { fmtCurrency } from './fmtCurrency';
     ```
 
-### ❌ Hurts
+#### ❌ Hurts
 
 *   **CommonJS** patterns (harder to shake):
     ```js
@@ -945,7 +945,7 @@ In RN, Metro (the bundler) + minifier (and then Hermes bytecode) benefit from tr
 
 ***
 
-## 📦 Practical Impact on RN Bundle Size
+### 📦 Practical Impact on RN Bundle Size
 
 *   Using ESM or cherry-picked imports from big libs (e.g., `lodash-es`, `date-fns`, `ramda`) can reduce dozens/hundreds of KB.
 *   Replacing **Moment.js** with **Day.js**/**date‑fns** can save \~100–200 KB (varies).
@@ -956,9 +956,9 @@ In RN, Metro (the bundler) + minifier (and then Hermes bytecode) benefit from tr
 
 ***
 
-## 🧩 RN‑Focused Examples
+### 🧩 RN‑Focused Examples
 
-### 1) Prefer ESM / Cherry-Picking
+#### 1) Prefer ESM / Cherry-Picking
 
 ```ts
 // ❌ Bad: imports entire lodash
@@ -973,7 +973,7 @@ const r = debounce(fn, 200);
 import { debounce } from 'lodash-es';
 ```
 
-### 2) Avoid dynamic re-exports (barrels)
+#### 2) Avoid dynamic re-exports (barrels)
 
 ```ts
 // ❌ utils/index.ts
@@ -986,14 +986,14 @@ export { formatCurrency } from './format';
 export { sum } from './math';
 ```
 
-### 3) Pure annotation for factories
+#### 3) Pure annotation for factories
 
 ```ts
 // A factory that returns a heavy object only used in one branch
 const heavy = /*#__PURE__*/ createHeavyThing();
 ```
 
-### 4) Keep imports leaf-like
+#### 4) Keep imports leaf-like
 
 ```ts
 // ❌ Bad: importing root that re-exports many modules
@@ -1005,7 +1005,7 @@ import Button from '@ui-kit/components/Button';
 
 ***
 
-## 🛠 RN Config & Library Tips
+### 🛠 RN Config & Library Tips
 
 *   **Use libraries with ESM builds** when possible (`lodash-es`, `date-fns`, many modern libs).
 *   Replace **Moment → Day.js** or **date‑fns**.
@@ -1016,7 +1016,7 @@ import Button from '@ui-kit/components/Button';
 
 ***
 
-## 🧪 Verifying Bundle Size Changes
+### 🧪 Verifying Bundle Size Changes
 
 *   **Inspect bundle**:
     ```bash
@@ -1036,7 +1036,7 @@ import Button from '@ui-kit/components/Button';
 
 ***
 
-## ⚡ Interview TL;DR
+### ⚡ Interview TL;DR
 
 > Tree‑shaking eliminates unused code at build time using static analysis of ESM imports/exports.  
 > In React Native, it directly **shrinks the JS bundle**, which then becomes **smaller Hermes bytecode**, improving **startup time** and **memory**.  
@@ -1048,9 +1048,9 @@ import Button from '@ui-kit/components/Button';
 
   <details><summary>7. When to use <code>unknown</code> vs <code>any</code> vs <code>never</code> in TypeScript?</summary>
 
-## 7) When to use `unknown` vs `any` vs `never` in TypeScript
+### 7) When to use `unknown` vs `any` vs `never` in TypeScript
 
-### (Interview soundbite)
+#### (Interview soundbite)
 
 *   **`any`**: “Skip type checking.” Avoid it—unsafe, spreads bugs.
 *   **`unknown`**: “Type-safe `any`.” You **must** narrow/refine before using.
@@ -1058,7 +1058,7 @@ import Button from '@ui-kit/components/Button';
 
 ***
 
-## `any` — opt out of type safety
+### `any` — opt out of type safety
 
 *   Disables type checking for that value. You can do anything with it.
 *   Use **sparingly** (temporary migrations, 3rd-party untyped code).
@@ -1076,7 +1076,7 @@ data.foo.bar();   // Compiles, might crash at runtime
 
 ***
 
-## `unknown` — safest top type (prefer over `any`)
+### `unknown` — safest top type (prefer over `any`)
 
 *   You **cannot** use it without **narrowing** (via `typeof`, `instanceof`, user-defined type guards, schema validation).
 *   Great for **unsafe inputs**: network responses, `JSON.parse`, message events.
@@ -1112,7 +1112,7 @@ function parseAccount(payload: unknown) {
 
 ***
 
-## `never` — values that don’t exist
+### `never` — values that don’t exist
 
 *   A function returning `never` **does not return** (throws, infinite loop).
 *   Used for **exhaustiveness checks** in discriminated unions.
@@ -1146,9 +1146,9 @@ function render(s: Status) {
 
 ***
 
-## Quick RN/Banking Examples
+### Quick RN/Banking Examples
 
-### Validate external data (prefer `unknown` + schema)
+#### Validate external data (prefer `unknown` + schema)
 
 ```ts
 type Balance = { currency: 'INR' | 'USD'; amount: number };
@@ -1165,7 +1165,7 @@ function asBalance(payload: unknown): Balance {
 }
 ```
 
-### Guarding event payloads (unknown first)
+#### Guarding event payloads (unknown first)
 
 ```ts
 function onMessage(evt: unknown) {
@@ -1175,7 +1175,7 @@ function onMessage(evt: unknown) {
 }
 ```
 
-### Exhaustive state machine (use `never` to ensure all cases)
+#### Exhaustive state machine (use `never` to ensure all cases)
 
 ```ts
 type AuthState =
@@ -1199,7 +1199,7 @@ function next(state: AuthState, event: { type: string }) {
 
 ***
 
-## Rules of Thumb
+### Rules of Thumb
 
 *   **Default to precise types**.
 *   If you must defer typing, choose **`unknown` over `any`** and **validate** before use.
@@ -1214,9 +1214,9 @@ function next(state: AuthState, event: { type: string }) {
 
   <details><summary>8. Explain TypeScript utility types: Partial, Pick, Omit, Record.</summary>
 
-## 8) TypeScript Utility Types: `Partial`, `Pick`, `Omit`, `Record`
+### 8) TypeScript Utility Types: `Partial`, `Pick`, `Omit`, `Record`
 
-### 1) `Partial<T>`
+#### 1) `Partial<T>`
 
 **Makes all properties of `T` optional.**  
 Great for **patch updates**, **form drafts**, or **builder** patterns.
@@ -1249,7 +1249,7 @@ const [draft, setDraft] = useState<Partial<Profile>>({});
 
 ***
 
-### 2) `Pick<T, K>`
+#### 2) `Pick<T, K>`
 
 **Selects a subset of properties** from `T`.  
 Use to **restrict props**, **shape DTOs**, or **limit API payloads**.
@@ -1283,7 +1283,7 @@ function MinimalButton(props: MinimalButtonProps) { /* ... */ }
 
 ***
 
-### 3) `Omit<T, K>`
+#### 3) `Omit<T, K>`
 
 **Removes** a set of properties from `T`.  
 Use for **deriving safer types** (e.g., **strip sensitive data**, **prohibit client-supplied fields**).
@@ -1315,7 +1315,7 @@ type UserCreateInput = Omit<User, 'id' | 'createdAt' | 'passwordHash'>;
 
 ***
 
-### 4) `Record<K, T>`
+#### 4) `Record<K, T>`
 
 Constructs an object type with keys of type `K` and values of type `T`.  
 Great for **maps/dictionaries**, **lookup tables**, **feature flags**, **theme tokens**.
@@ -1353,9 +1353,9 @@ const flags: FeatureFlags = {
 
 ***
 
-## Putting Them Together (Practical Patterns)
+### Putting Them Together (Practical Patterns)
 
-### A) Safe API payloads
+#### A) Safe API payloads
 
 ```ts
 type Account = {
@@ -1369,7 +1369,7 @@ type UpdateAccountPayload = Partial<Pick<Account, 'holder' | 'balance'>>;
 // { holder?: string; balance?: number }
 ```
 
-### B) Component props transformations
+#### B) Component props transformations
 
 ```ts
 type TextInputBaseProps = {
@@ -1387,7 +1387,7 @@ function SecureInput({ secure, ...rest }: SecureInputProps) {
 }
 ```
 
-### C) Normalized entities
+#### C) Normalized entities
 
 ```ts
 type Txn = { id: string; amount: number };
@@ -1401,7 +1401,7 @@ const txns: TxnMap = {
 
 ***
 
-## Common Pitfalls & Tips
+### Common Pitfalls & Tips
 
 *   `Partial` is **shallow**—nested objects stay required unless you apply `Partial` at deeper levels.
 *   Prefer `Pick` for **public contracts**—it’s explicit and safer during refactors.
@@ -1415,7 +1415,7 @@ const txns: TxnMap = {
 
 ***
 
-## Interview TL;DR
+### Interview TL;DR
 
 *   **`Partial<T>`**: Make fields optional (patch updates, form drafts).
 *   **`Pick<T, K>`**: Include only specific fields (public DTOs, minimal props).
@@ -1428,7 +1428,7 @@ const txns: TxnMap = {
 
   <details><summary>9. How do you type custom React hooks?</summary>
 
-## ✅ Core Principles
+### ✅ Core Principles
 
 *   **Type the params** (including optional config) and **return type** explicitly.
 *   Prefer **object return** for extensibility; use **tuples** when the meaning is obvious (e.g., `[value, setValue]`).
@@ -1442,7 +1442,7 @@ import { useRef, useState, useEffect, Dispatch, SetStateAction, MutableRefObject
 
 ***
 
-## 1) Simple State Hook (Tuple) — `useToggle`
+### 1) Simple State Hook (Tuple) — `useToggle`
 
 ```ts
 import { useState } from 'react';
@@ -1471,7 +1471,7 @@ export function useToggle(initial = false): UseToggleResult {
 
 ***
 
-## 2) Generic Hook (Value Agnostic) — `usePrevious<T>`
+### 2) Generic Hook (Value Agnostic) — `usePrevious<T>`
 
 ```ts
 import { useEffect, useRef } from 'react';
@@ -1487,7 +1487,7 @@ export function usePrevious<T>(value: T): T | undefined {
 
 ***
 
-## 3) Generic Async Hook with Discriminated Union — `useAsync<T>`
+### 3) Generic Async Hook with Discriminated Union — `useAsync<T>`
 
 ```ts
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -1526,7 +1526,7 @@ export function useAsync<T>(fn: () => Promise<T>, deps: React.DependencyList = [
 
 ***
 
-## 4) Debounced Value Hook (RN‑friendly) — `useDebouncedValue<T>`
+### 4) Debounced Value Hook (RN‑friendly) — `useDebouncedValue<T>`
 
 ```ts
 import { useEffect, useState } from 'react';
@@ -1547,7 +1547,7 @@ export function useDebouncedValue<T>(value: T, delay = 300): T {
 
 ***
 
-## 5) Controlled State with External/Inner Control — `useControllableState<T>`
+### 5) Controlled State with External/Inner Control — `useControllableState<T>`
 
 ```ts
 import { useCallback, useState } from 'react';
@@ -1581,7 +1581,7 @@ export function useControllableState<T>({
 
 ***
 
-## 6) Hook Returning a Stable Callback — `useEvent`-style
+### 6) Hook Returning a Stable Callback — `useEvent`-style
 
 When you need a handler that **always sees the latest props/state** without changing identity:
 
@@ -1604,7 +1604,7 @@ export function useEvent<T extends (...args: any[]) => any>(handler: T): T {
 
 ***
 
-## 7) API Hook with Generics and Runtime Validation
+### 7) API Hook with Generics and Runtime Validation
 
 If you’re consuming unknown data, **type the hook generically** and validate:
 
@@ -1644,7 +1644,7 @@ export function useFetch<T>(url: string, parse: (raw: unknown) => T) {
 
 ***
 
-## 8) Typing Refs in Hooks
+### 8) Typing Refs in Hooks
 
 ```ts
 import { useRef, MutableRefObject } from 'react';
@@ -1660,7 +1660,7 @@ export function useLatest<T>(value: T): MutableRefObject<T> {
 
 ***
 
-## 9) Returning Tuples with Literal Types (keep positions typed)
+### 9) Returning Tuples with Literal Types (keep positions typed)
 
 When returning tuples with mixed types, use `as const` or an explicit tuple type:
 
@@ -1676,7 +1676,7 @@ export function useCounter(initial = 0) {
 
 ***
 
-## 10) Error-First Result Pattern
+### 10) Error-First Result Pattern
 
 ```ts
 type Ok<T> = { ok: true;  data: T };
@@ -1701,7 +1701,7 @@ export function useSafeAsync<T>(fn: () => Promise<T>) {
 
 ***
 
-## Pitfalls & Tips
+### Pitfalls & Tips
 
 *   **Don’t export `any`** from hooks—propagates unsafe types across the app.
 *   Prefer **`unknown` at the boundary** (API, storage), then **narrow** or **validate**.
@@ -1713,7 +1713,7 @@ export function useSafeAsync<T>(fn: () => Promise<T>) {
 
 ***
 
-## Short Interview Answer (Soundbite)
+### Short Interview Answer (Soundbite)
 
 > Type custom hooks by typing **params and return explicitly**, use **generics `<T>`** for reusable data‑agnostic hooks, return **tuples** for conventional state + actions and **objects** for extensibility, use React types like `Dispatch`, `SetStateAction`, `MutableRefObject`, and prefer **discriminated unions** for async state. Validate unknown data at the boundary and avoid `any`.
 
@@ -1727,7 +1727,7 @@ export function useSafeAsync<T>(fn: () => Promise<T>) {
 
 ***
 
-## 🔷 High‑Level Principles
+### 🔷 High‑Level Principles
 
 *   **Feature‑first** structure (group files by feature, not type).
 *   **Layered architecture**: `app` (UI), `features` (screens + hooks), `entities` (domain), `shared` (cross‑cutting), `processes` (auth/session), `widgets` (reusable UI).
@@ -1738,7 +1738,7 @@ export function useSafeAsync<T>(fn: () => Promise<T>) {
 
 ***
 
-## 📁 Suggested Folder Layout (App)
+### 📁 Suggested Folder Layout (App)
 
     apps/mobile/
       app/                       # App shell (entry, navigation, providers)
@@ -1802,7 +1802,7 @@ export function useSafeAsync<T>(fn: () => Promise<T>) {
 
 ***
 
-## 🧱 Monorepo Variant (optional but recommended at scale)
+### 🧱 Monorepo Variant (optional but recommended at scale)
 
     .
     ├─ apps/
@@ -1818,7 +1818,7 @@ export function useSafeAsync<T>(fn: () => Promise<T>) {
 
 ***
 
-## ⚙️ TypeScript Configuration
+### ⚙️ TypeScript Configuration
 
 **`tsconfig.json` (app level)**
 
@@ -1869,7 +1869,7 @@ module.exports = {
 
 ***
 
-## 🔐 API Layer (safe by default)
+### 🔐 API Layer (safe by default)
 
 **`shared/api/http.ts`**
 
@@ -1912,7 +1912,7 @@ export async function getAccount(id: string) {
 
 ***
 
-## 🧠 State Management Strategy
+### 🧠 State Management Strategy
 
 *   **React Query** for server state (cache, retries, mutations).
 *   **Redux Toolkit** (or Zustand) for **client state**: feature flags, session, UI state.
@@ -1941,7 +1941,7 @@ export type RootState = ReturnType<typeof store.getState>;
 
 ***
 
-## 🧭 Navigation
+### 🧭 Navigation
 
 *   Keep **navigation routes** per feature (`features/transfer/routes.ts`).
 *   Centralize **linking config** and **guards** (auth) in `app/navigation/`.
@@ -1949,7 +1949,7 @@ export type RootState = ReturnType<typeof store.getState>;
 
 ***
 
-## 🎨 Theming & UI
+### 🎨 Theming & UI
 
 *   **Design tokens** in `shared/styles/` (spacing, colors, typography).
 *   A **UI kit** in `shared/ui/` with stable API (Button, Text, Input).
@@ -1957,14 +1957,14 @@ export type RootState = ReturnType<typeof store.getState>;
 
 ***
 
-## 🌍 i18n
+### 🌍 i18n
 
 *   `shared/i18n/` with message keys; do **not** embed user‑visible strings in code.
 *   Keep **formatting utilities** (numbers, currency, dates) centralized (important for finance).
 
 ***
 
-## 🧪 Testing Stack
+### 🧪 Testing Stack
 
 *   **Unit**: Jest + React Native Testing Library.
 *   **Integration/UI**: React Native Testing Library (screen interactions).
@@ -1985,7 +1985,7 @@ module.exports = {
 
 ***
 
-## 🧹 Quality Gates
+### 🧹 Quality Gates
 
 *   **ESLint** (eslint-config), **Prettier**, **TypeScript strict**, **lint-staged** + **husky**.
 *   **Import boundaries**: prevent cross‑layer leaks.
@@ -2008,7 +2008,7 @@ module.exports = {
 
 ***
 
-## 🔒 Security & Config
+### 🔒 Security & Config
 
 *   **Environment config** in `shared/config/` (per flavor/scheme).
 *   **Secrets** via CI (never in repo).
@@ -2018,7 +2018,7 @@ module.exports = {
 
 ***
 
-## 📦 Build Flavors & Schemes (multi‑env)
+### 📦 Build Flavors & Schemes (multi‑env)
 
 *   **Android**: `debug`, `uat`, `release` (productFlavors).
 *   **iOS**: Schemes + configurations (Debug/UAT/Release).
@@ -2026,7 +2026,7 @@ module.exports = {
 
 ***
 
-## 🧰 Codegen (highly recommended)
+### 🧰 Codegen (highly recommended)
 
 *   **API typings** from OpenAPI/GraphQL → generate **SDK** (in `packages/api-sdk`).
 *   **Assets** (SVG → `react-native-svg` components).
@@ -2034,7 +2034,7 @@ module.exports = {
 
 ***
 
-## 🚀 CI/CD Essentials
+### 🚀 CI/CD Essentials
 
 *   **Cache** Gradle/CocoaPods.
 *   Upload **dSYMs/ProGuard mappings**.
@@ -2044,7 +2044,7 @@ module.exports = {
 
 ***
 
-## 📉 Performance Discipline
+### 📉 Performance Discipline
 
 *   Hermes on by default; measure TTI.
 *   Avoid mega “barrel” imports; **tree‑shake friendly** libs (ESM).
@@ -2053,7 +2053,7 @@ module.exports = {
 
 ***
 
-## 🧭 Example: Feature Public API
+### 🧭 Example: Feature Public API
 
 **`features/transfer/index.ts`**
 
@@ -2071,7 +2071,7 @@ import { TransferScreen } from '@features/transfer';
 
 ***
 
-## ✅ Checklist (copy for your repo’s README)
+### ✅ Checklist (copy for your repo’s README)
 
 *   [ ] TS strict + absolute imports
 *   [ ] Feature‑first modules with public API index
@@ -2090,7 +2090,7 @@ import { TransferScreen } from '@features/transfer';
 
   <details><summary>11. How to manage typings for native modules without @types?</summary>
 
-## ✅ Goals
+### ✅ Goals
 
 *   Get **type-safe** usage today (even if the lib has no `@types`).
 *   Keep types **local and maintainable**.
@@ -2098,7 +2098,7 @@ import { TransferScreen } from '@features/transfer';
 
 ***
 
-## 1) Create a Local **Ambient Declaration** (`.d.ts`) Shim
+### 1) Create a Local **Ambient Declaration** (`.d.ts`) Shim
 
 When a package has no types, add a **module declaration** file in your app:
 
@@ -2155,7 +2155,7 @@ declare module 'react-native-awesome-camera' {
 
 ***
 
-## 2) Start Safe: Prefer `unknown` Over `any` at the Boundary
+### 2) Start Safe: Prefer `unknown` Over `any` at the Boundary
 
 If you don’t fully know shapes yet, **type the minimal surface** and narrow inside app code:
 
@@ -2181,7 +2181,7 @@ function trackPurchase(p: unknown) {
 
 ***
 
-## 3) Typing **React Native NativeModules** (Bridge API)
+### 3) Typing **React Native NativeModules** (Bridge API)
 
 When a library exposes methods via `NativeModules`, define an interface and assert:
 
@@ -2213,7 +2213,7 @@ async function sample() {
 
 ***
 
-## 4) Typing **TurboModules** (JSI / TurboModuleRegistry)
+### 4) Typing **TurboModules** (JSI / TurboModuleRegistry)
 
 If the package exports a TurboModule via `TurboModuleRegistry.get`, define the `Spec` and get typed access:
 
@@ -2248,7 +2248,7 @@ Foo.add(2, 3); // typed number
 
 ***
 
-## 5) Typing **JSI Modules** (global functions/objects)
+### 5) Typing **JSI Modules** (global functions/objects)
 
 If module registers globals (e.g., `global.__foo`), declare them:
 
@@ -2271,7 +2271,7 @@ const digest = FooJSI.hash('hello'); // fully typed
 
 ***
 
-## 6) Add Types inside the **Library** (if you control it)
+### 6) Add Types inside the **Library** (if you control it)
 
 If you’re the module author or use a fork:
 
@@ -2295,7 +2295,7 @@ TypeScript users get types from JSDoc without a `.d.ts`.
 
 ***
 
-## 7) Organize & Maintain Shims
+### 7) Organize & Maintain Shims
 
 *   Keep all shims in `types/shims/`.
 *   Add **README comments** with the **library version** the types match:
@@ -2306,7 +2306,7 @@ TypeScript users get types from JSDoc without a `.d.ts`.
 
 ***
 
-## 8) Contribute Upstream (or to DefinitelyTyped)
+### 8) Contribute Upstream (or to DefinitelyTyped)
 
 Once stable, **upstream your declarations**:
 
@@ -2318,7 +2318,7 @@ Once stable, **upstream your declarations**:
 
 ***
 
-## 9) Fallback Strategy (temporary)
+### 9) Fallback Strategy (temporary)
 
 If you must ship quickly:
 
@@ -2335,7 +2335,7 @@ Then wrap usage with **narrowers** at the edges to avoid `any` pollution.
 
 ***
 
-## 10) Example: Pulling Signatures from Native Code
+### 10) Example: Pulling Signatures from Native Code
 
 When crafting the `.d.ts`, skim native signatures:
 
@@ -2370,7 +2370,7 @@ Match Promise vs sync **accurately** to avoid runtime surprises.
 
 ***
 
-## 11) Guard Against Future Breaks
+### 11) Guard Against Future Breaks
 
 *   **Wrap module access** behind a tiny typed facade you control:
     ```ts
@@ -2390,7 +2390,7 @@ Match Promise vs sync **accurately** to avoid runtime surprises.
 
 ***
 
-## 12) Quick Checklist
+### 12) Quick Checklist
 
 *   [ ] Create `.d.ts` in `types/shims` with `declare module 'pkg'`.
 *   [ ] Prefer `unknown` for untrusted data; **narrow or validate** with zod.
@@ -2402,7 +2402,7 @@ Match Promise vs sync **accurately** to avoid runtime surprises.
 
 ***
 
-## Copy‑Paste Template (`declare module`)
+### Copy‑Paste Template (`declare module`)
 
 ```ts
 // types/shims/some-lib.d.ts
@@ -2426,7 +2426,7 @@ declare module 'some-lib' {
 
   <details><summary>12. How do you avoid floating-point issues when dealing with currency?</summary>
 
-# ✅ 12. How do you avoid floating‑point issues when dealing with currency?
+### ✅ 12. How do you avoid floating‑point issues when dealing with currency?
 
 JavaScript numbers use **IEEE‑754 floating‑point**, which cannot represent many decimal values exactly.
 
@@ -2443,7 +2443,7 @@ Below are the **correct** techniques.
 
 ***
 
-# ✅ **1) Store currency in *integers* (smallest unit)**
+### ✅ **1) Store currency in *integers* (smallest unit)**
 
 **Gold standard** in fintech.
 
@@ -2451,7 +2451,7 @@ Below are the **correct** techniques.
 *   Do ALL math using integers.
 *   Convert to decimal **only at display time**.
 
-### Example
+#### Example
 
 ```ts
 // ₹199.75 represented as 19975 paise
@@ -2461,7 +2461,7 @@ const amountPaisa = 19975;
 const total = amountPaisa + 2025; // 22000 paise = ₹220.00
 ```
 
-### Formatting back
+#### Formatting back
 
 ```ts
 function formatINR(paise: number) {
@@ -2471,7 +2471,7 @@ function formatINR(paise: number) {
 formatINR(22000); // "220.00"
 ```
 
-### Why best?
+#### Why best?
 
 *   100% precise
 *   Easy math
@@ -2480,7 +2480,7 @@ formatINR(22000); // "220.00"
 
 ***
 
-# ✅ **2) Use a decimal library (when integer strategy is not enough)**
+### ✅ **2) Use a decimal library (when integer strategy is not enough)**
 
 Recommended libraries:
 
@@ -2503,17 +2503,17 @@ For React Native, these libs are lightweight and safe.
 
 ***
 
-# ✅ **3) Avoid floating-point APIs & always convert string → decimal → string**
+### ✅ **3) Avoid floating-point APIs & always convert string → decimal → string**
 
 When receiving values from APIs:
 
-### ❌ Don’t do this:
+#### ❌ Don’t do this:
 
 ```ts
 const total = amountFromApi + fee;      // risky if amounts are floats
 ```
 
-### ✅ Do this:
+#### ✅ Do this:
 
 ```ts
 const total = new Decimal(amountFromApi).plus(fee);
@@ -2527,7 +2527,7 @@ const total = Number(amountFromApi) * 100 + Number(fee) * 100;
 
 ***
 
-# ✅ **4) Use ` Intl.NumberFormat` for display only**
+### ✅ **4) Use ` Intl.NumberFormat` for display only**
 
 Do NOT use formats for calculations.
 
@@ -2543,7 +2543,7 @@ fmt.format(123456 / 100);  // ₹1,234.56
 
 ***
 
-# ✅ **5) Always round explicitly**
+### ✅ **5) Always round explicitly**
 
 Banking requires deterministic rounding:
 
@@ -2560,7 +2560,7 @@ new Decimal("1.005").toDecimalPlaces(2);  // "1.01"
 
 ***
 
-# ✅ **6) Never trust floating numbers from APIs**
+### ✅ **6) Never trust floating numbers from APIs**
 
 Example server response:
 
@@ -2570,7 +2570,7 @@ Example server response:
 
 Do NOT store that float directly.
 
-### Convert safely:
+#### Convert safely:
 
 ```ts
 const paise = Math.round(199.75 * 100);  // 19975
@@ -2584,7 +2584,7 @@ Or, better, have backend **send integers**:
 
 ***
 
-# ✅ **7) Use TypeScript types to enforce safety**
+### ✅ **7) Use TypeScript types to enforce safety**
 
 Define strong types:
 
@@ -2608,16 +2608,16 @@ function addMoney(a: Money, b: Money): Money {
 
 ***
 
-# 🔥 **8) Real RN examples — Search, Checkout, Offers**
+### 🔥 **8) Real RN examples — Search, Checkout, Offers**
 
-## Example: cart total
+#### Example: cart total
 
 ```ts
 const totalPaise = cartItems
   .reduce((sum, item) => sum + (item.pricePaise * item.qty), 0);
 ```
 
-## Example: EMI calculation (library)
+#### Example: EMI calculation (library)
 
 ```ts
 import Decimal from "decimal.js";
@@ -2631,21 +2631,21 @@ const emi = principal.times(rate).times((1 + rate) ** n)
 
 ***
 
-# 🚫 What NOT to do (common interview pitfalls)
+### 🚫 What NOT to do (common interview pitfalls)
 
-### ❌ Do NOT store currency as floating numbers
+#### ❌ Do NOT store currency as floating numbers
 
-### ❌ Do NOT multiply floats without converting
+#### ❌ Do NOT multiply floats without converting
 
-### ❌ Do NOT rely on JS `.toFixed()` for calculations
+#### ❌ Do NOT rely on JS `.toFixed()` for calculations
 
-### ❌ Do NOT calculate interest with floats
+#### ❌ Do NOT calculate interest with floats
 
-### ❌ Do NOT use floating values in Redux state
+#### ❌ Do NOT use floating values in Redux state
 
 ***
 
-# 🎤 Short Interview Answer (Ideal)
+### 🎤 Short Interview Answer (Ideal)
 
 > JS floats cause precision errors (0.1 + 0.2 ≠ 0.3).  
 > In fintech, we avoid this by:
@@ -2662,7 +2662,7 @@ const emi = principal.times(rate).times((1 + rate) ** n)
 
 ***
 
-### **2) React Native Core Concepts (12 questions)**
+### 2) React Native Core Concepts (12 questions)
 
 <details>
   <summary>React Native Core Concepts (12)</summary>
@@ -2671,7 +2671,7 @@ const emi = principal.times(rate).times((1 + rate) ** n)
 
   <details><summary>13. Explain RN Architecture (Bridge, JSI, TurboModules, Fabric).</summary>
 
-## 🧱 The Big Picture
+### 🧱 The Big Picture
 
 React Native historically had **three realms**:
 
@@ -2700,7 +2700,7 @@ Over time, RN moved from the **legacy Bridge** to **JSI**, enabling **TurboModul
 
 ***
 
-## 1) Legacy **Bridge** (old architecture)
+### 1) Legacy **Bridge** (old architecture)
 
 *   **How it works:** JS and Native talk via an **asynchronous, batched bridge** using **JSON serialization**. Messages queue up and are processed in order.
 *   **Limitations:**
@@ -2713,7 +2713,7 @@ Over time, RN moved from the **legacy Bridge** to **JSI**, enabling **TurboModul
 
 ***
 
-## 2) **JSI** (JavaScript Interface) — the modern foundation
+### 2) **JSI** (JavaScript Interface) — the modern foundation
 
 *   **What it is:** A **C++ API** that embeds the JS engine (Hermes/JSC) and lets native code **expose functions/objects directly** to JS **without the Bridge**.
 *   **Why it matters:**
@@ -2728,7 +2728,7 @@ Over time, RN moved from the **legacy Bridge** to **JSI**, enabling **TurboModul
 
 ***
 
-## 3) **TurboModules** — next‑gen Native Modules
+### 3) **TurboModules** — next‑gen Native Modules
 
 *   **What they are:** Native modules rewritten to use the **JSI** pipeline rather than the Bridge.
 *   **Benefits:**
@@ -2740,7 +2740,7 @@ Over time, RN moved from the **legacy Bridge** to **JSI**, enabling **TurboModul
 
 ***
 
-## 4) **Fabric** — the new concurrent UI renderer
+### 4) **Fabric** — the new concurrent UI renderer
 
 *   **What it is:** The next‑gen renderer for React Native views (replacing the old UI manager).
 *   **Key improvements:**
@@ -2754,7 +2754,7 @@ Over time, RN moved from the **legacy Bridge** to **JSI**, enabling **TurboModul
 
 ***
 
-## How they fit together in modern RN
+### How they fit together in modern RN
 
 *   **JSI** is the base layer.
 *   **TurboModules** use JSI for fast native module calls.
@@ -2763,7 +2763,7 @@ Over time, RN moved from the **legacy Bridge** to **JSI**, enabling **TurboModul
 
 ***
 
-## RN Version & Enablement (practical notes)
+### RN Version & Enablement (practical notes)
 
 *   Recent RN versions (0.70+) have **Hermes on by default** and ship the **New Architecture** tooling (Fabric + TurboModules).
 *   In a new app, you typically **opt into the New Architecture** with config flags; many popular libraries are already compatible.
@@ -2776,7 +2776,7 @@ Over time, RN moved from the **legacy Bridge** to **JSI**, enabling **TurboModul
 
 ***
 
-## Real‑world impact (what interviewers expect)
+### Real‑world impact (what interviewers expect)
 
 *   **Performance:** Less overhead between JS and native; better **startup**, **memory**, and **animation smoothness**.
 *   **Reliability:** Fewer flaky async hops; sync APIs possible when appropriate.
@@ -2785,13 +2785,13 @@ Over time, RN moved from the **legacy Bridge** to **JSI**, enabling **TurboModul
 
 ***
 
-## Example: Why Reanimated 2/3 feels smooth
+### Example: Why Reanimated 2/3 feels smooth
 
 Reanimated uses **worklets** and **JSI** to run animations on the UI thread, avoiding the Bridge—so gestures and animations don’t lag even if the JS thread is busy. This is exactly the kind of win JSI enables.
 
 ***
 
-## What to say in the interview (short version)
+### What to say in the interview (short version)
 
 > The **legacy Bridge** batched JSON messages between JS and native, which added latency and copies.  
 > The **JSI** replaces this with a direct C++ interface to the JS engine, allowing **synchronous** and **zero‑copy** calls.  
@@ -2804,7 +2804,7 @@ Reanimated uses **worklets** and **JSI** to run animations on the UI thread, avo
 
   <details><summary>14. How does Hermes improve startup performance?</summary>
 
-## ✅ How Hermes Improves Startup Performance
+### ✅ How Hermes Improves Startup Performance
 
 Hermes is a JS engine optimized for React Native. It reduces startup time by:
 
@@ -2833,7 +2833,7 @@ Hermes is a JS engine optimized for React Native. It reduces startup time by:
 
 ***
 
-## 🔬 What “startup” improvements typically look like
+### 🔬 What “startup” improvements typically look like
 
 (Varies by app & device; these are common patterns teams observe)
 
@@ -2845,7 +2845,7 @@ Hermes is a JS engine optimized for React Native. It reduces startup time by:
 
 ***
 
-## 🛠 How to Enable Hermes (React Native ≥ 0.70 is Hermes‑first)
+### 🛠 How to Enable Hermes (React Native ≥ 0.70 is Hermes‑first)
 
 **Android — `android/gradle.properties`**
 
@@ -2878,7 +2878,7 @@ npx react-native run-ios
 
 ***
 
-## 📏 How to Measure the Impact
+### 📏 How to Measure the Impact
 
 **JS Metrics**
 
@@ -2905,7 +2905,7 @@ console.log('TTI(ms)=', Date.now() - start);
 
 ***
 
-## ⚠️ Common Gotchas (and fixes)
+### ⚠️ Common Gotchas (and fixes)
 
 *   **App size**: Engine adds footprint; but overall performance improves. Use **ABI splits** (Android App Bundles) to keep download size in check.
 *   **Non‑Hermes‑friendly libs**: Rare now, but ensure native/JSI libs support Hermes; update to latest versions.
@@ -2913,7 +2913,7 @@ console.log('TTI(ms)=', Date.now() - start);
 
 ***
 
-## 🎤 Short Interview Answer
+### 🎤 Short Interview Answer
 
 > Hermes speeds up React Native startup by **precompiling JS to bytecode**, so the app **skips parsing/JIT at launch**. It also has a **smaller, mobile‑optimized GC and runtime**, which reduces memory and CPU spikes during cold start. With **JSI**, Hermes integrates tightly with **TurboModules/Fabric**, improving module load and early render phases. In practice, you’ll often see **hundreds of ms** improvement in cold start TTI, especially on lower‑end Android devices.
 
@@ -2923,9 +2923,9 @@ console.log('TTI(ms)=', Date.now() - start);
 
   <details><summary>15. JS thread vs UI thread — what runs where?</summary>
 
-## 15) JS thread vs UI thread — what runs where?
+### 15) JS thread vs UI thread — what runs where?
 
-### Threads at a glance (modern RN with Hermes, JSI, Fabric)
+#### Threads at a glance (modern RN with Hermes, JSI, Fabric)
 
 *   **JS thread**: Runs your **JavaScript/TypeScript** (React app logic, setState, effects, business code). Also runs most **timers**, **promises**, and typical **gesture handlers** (unless offloaded).
 *   **UI thread (Main thread)**: Handles **touch input**, **view updates**, **layout & drawing**, and **native animations**. It must stay **butter-smooth** (60/120 FPS).
@@ -2935,7 +2935,7 @@ console.log('TTI(ms)=', Date.now() - start);
 
 ***
 
-## What runs on the **JS thread?**
+### What runs on the **JS thread?**
 
 *   React rendering & reconciliation (diffing virtual tree, scheduling updates).
 *   Your **component code**, **hooks/effects**, business logic.
@@ -2953,7 +2953,7 @@ console.log('TTI(ms)=', Date.now() - start);
 
 ***
 
-## What runs on the **UI thread?**
+### What runs on the **UI thread?**
 
 *   Touch input dispatch, hit testing.
 *   View hierarchy updates, layout resolve, drawing.
@@ -2970,9 +2970,9 @@ console.log('TTI(ms)=', Date.now() - start);
 
 ***
 
-## Modern optimizations you can use
+### Modern optimizations you can use
 
-### 1) **Reanimated 2/3 worklets (run on UI thread)**
+#### 1) **Reanimated 2/3 worklets (run on UI thread)**
 
 Animations and some gesture calculations can run on the **UI thread**, independent of JS thread.
 
@@ -2993,7 +2993,7 @@ const style = useAnimatedStyle(() => ({
 
 **Benefit:** Smooth gestures/animations even if JS thread is busy.
 
-### 2) **TurboModules / JSI for heavy compute**
+#### 2) **TurboModules / JSI for heavy compute**
 
 Move CPU-heavy or crypto/image ops to a native module exposed via **JSI** (sync or async) to avoid blocking JS.
 
@@ -3003,7 +3003,7 @@ import { hashSync } from 'react-native-jsi-crypto';
 const digest = hashSync(largeBuffer); // native speed, non-Bridge
 ```
 
-### 3) **InteractionManager** (defer non-critical JS work)
+#### 3) **InteractionManager** (defer non-critical JS work)
 
 Schedule JS work **after** animations/interactions finish.
 
@@ -3015,15 +3015,15 @@ InteractionManager.runAfterInteractions(() => {
 });
 ```
 
-### 4) **Background/Headless tasks**
+#### 4) **Background/Headless tasks**
 
 For periodic background work (sync, notifications), use **Headless JS** / background fetch so heavy work isn’t done during critical UI time.
 
 ***
 
-## Typical pitfalls & fixes
+### Typical pitfalls & fixes
 
-### Pitfall A: Heavy loops on JS thread
+#### Pitfall A: Heavy loops on JS thread
 
 ```ts
 // ❌ Will freeze taps/scroll for hundreds of ms
@@ -3035,19 +3035,19 @@ const sum = bigArray.reduce((a, b) => a + b, 0);
 *   Chunk work with timers/microtasks (cooperative scheduling).
 *   Move to native/JSI or a web worker–like approach (community libs), or let the backend do it.
 
-### Pitfall B: Doing layout/measure in a tight render loop
+#### Pitfall B: Doing layout/measure in a tight render loop
 
 *   Measuring in **every** render/frame causes layout thrash.
 *   Prefer **onLayout**, memoized layout, or **Fabric** measurement APIs; batch changes.
 
-### Pitfall C: JS-driven animations
+#### Pitfall C: JS-driven animations
 
 *   `Animated` (old, JS-driven) stutters if JS is busy.
 *   **Use Reanimated** (UI-thread worklets) or **native driver** where applicable.
 
 ***
 
-## What updates the screen?
+### What updates the screen?
 
 1.  **JS thread** computes new React tree (setState/useState → reconciliation).
 2.  The framework **commits updates** to native (via Fabric).
@@ -3058,7 +3058,7 @@ If step 3 is slow → **frames drop** even if JS is fast.
 
 ***
 
-## How to keep both threads healthy
+### How to keep both threads healthy
 
 *   **JS thread**
     *   Minimize sync CPU work (JSON, transforms, crypto → native/JSI).
@@ -3074,7 +3074,7 @@ If step 3 is slow → **frames drop** even if JS is fast.
 
 ***
 
-## Quick RN examples
+### Quick RN examples
 
 **Avoid blocking JS on navigation**
 
@@ -3106,7 +3106,7 @@ setInterval(() => setX(x => x + 1), 16);
 
 ***
 
-## Short interview soundbite
+### Short interview soundbite
 
 > The **JS thread** runs your React app logic—state updates, effects, timers, and most business code.  
 > The **UI (main) thread** handles input, layout, and drawing.  
@@ -3119,9 +3119,9 @@ setInterval(() => setX(x => x + 1), 16);
 
   <details><summary>16. How to optimize re-renders using memo, useMemo, useCallback?</summary>
 
-## 16) How to optimize re‑renders using `React.memo`, `useMemo`, `useCallback`
+### 16) How to optimize re‑renders using `React.memo`, `useMemo`, `useCallback`
 
-### 🔑 Core idea
+#### 🔑 Core idea
 
 React re-renders a component when its **parent re-renders** and **any of its props** have a **new reference** or **new primitive value**.  
 We optimize by:
@@ -3133,7 +3133,7 @@ We optimize by:
 
 ***
 
-## 1) `React.memo` — prevent child re-render when props are “equal”
+### 1) `React.memo` — prevent child re-render when props are “equal”
 
 ```tsx
 import React from 'react';
@@ -3163,7 +3163,7 @@ const Row = React.memo(RowImpl, (prev, next) =>
 
 ***
 
-## 2) `useCallback` — keep function props stable
+### 2) `useCallback` — keep function props stable
 
 Parents often pass handlers like `onPress={() => doSomething(item)}`—this creates **new functions** each render → child re-renders.
 
@@ -3198,7 +3198,7 @@ const keyExtractor = useCallback((item) => item.id, []);
 
 ***
 
-## 3) `useMemo` — keep object/array props stable + cache expensive computations
+### 3) `useMemo` — keep object/array props stable + cache expensive computations
 
 *   **For referential stability** of props:
 
@@ -3221,7 +3221,7 @@ const sorted = useMemo(() => heavySort(transactions), [transactions]);
 
 ***
 
-## 4) Split components to reduce blast radius
+### 4) Split components to reduce blast radius
 
 ```tsx
 // Parent re-renders often due to unrelated state
@@ -3247,7 +3247,7 @@ const AccountList = React.memo(({ filter }: { filter: string }) => {
 
 ***
 
-## 5) RN list essentials (big wins)
+### 5) RN list essentials (big wins)
 
 *   **Use `React.memo` for row items**.
 *   **Pass stable `renderItem`, `keyExtractor`, and handlers** (useCallback).
@@ -3271,7 +3271,7 @@ const renderItem = useCallback(({ item }) => (
 
 ***
 
-## 6) Avoid creating new references in JSX
+### 6) Avoid creating new references in JSX
 
 **Bad:**
 
@@ -3295,7 +3295,7 @@ const handle = useCallback(() => doSomething(id), [doSomething, id]);
 
 ***
 
-## 7) Common pitfalls (and fixes)
+### 7) Common pitfalls (and fixes)
 
 *   **Stale closure** in callbacks:
     *   Use functional updates or include dependencies correctly.
@@ -3323,7 +3323,7 @@ const handler = useCallback(() => {
 
 ***
 
-## 8) Practical checklist (copy for code reviews)
+### 8) Practical checklist (copy for code reviews)
 
 *   [ ] Split large components—only the subtree that changes should re-render.
 *   [ ] Wrap heavy/leaf components with `React.memo`.
@@ -3335,7 +3335,7 @@ const handler = useCallback(() => {
 
 ***
 
-## 9) Micro examples
+### 9) Micro examples
 
 **A) Prevent child re-render when parent state changes unrelatedly**
 
@@ -3375,7 +3375,7 @@ const onPressUser = useCallback((id: string) => {
 
 ***
 
-## 10) When NOT to optimize
+### 10) When NOT to optimize
 
 *   Small screens/forms where re-renders are cheap.
 *   If child already re-renders due to state changes inside itself.
@@ -3385,7 +3385,7 @@ Start with a clear **perf issue** (e.g., list stutter) → profile → apply tar
 
 ***
 
-## (Interview answer)
+### (Interview answer)
 
 *   Use **`React.memo`** to skip re-renders when props don’t change.
 *   Use **`useCallback`** to keep **function props stable**.
@@ -3399,9 +3399,9 @@ Start with a clear **perf issue** (e.g., list stutter) → profile → apply tar
 
   <details><summary>17. Best practices for FlatList performance (windowing, keys, memoization).</summary>
 
-## 17) Best practices for **FlatList** performance (windowing, keys, memoization)
+### 17) Best practices for **FlatList** performance (windowing, keys, memoization)
 
-### 1) Use **stable keys** (never array index)
+#### 1) Use **stable keys** (never array index)
 
 *   Stable keys let RN recycle cells correctly and avoid re‑mounts.
 
@@ -3414,7 +3414,7 @@ const keyExtractor = React.useCallback((item: Item) => item.id, []);
 
 ***
 
-### 2) Memoize **renderItem** and the **row component**
+#### 2) Memoize **renderItem** and the **row component**
 
 *   Prevents row re-renders unless **relevant props** actually change.
 
@@ -3437,7 +3437,7 @@ const renderItem = React.useCallback(
 
 ***
 
-### 3) Windowing & batch render settings (tune per screen)
+#### 3) Windowing & batch render settings (tune per screen)
 
 These control how many items mount initially and per batch—avoid rendering “the whole world”.
 
@@ -3459,7 +3459,7 @@ These control how many items mount initially and per batch—avoid rendering “
 
 ***
 
-### 4) Provide **`getItemLayout`** (when item height is known or computable)
+#### 4) Provide **`getItemLayout`** (when item height is known or computable)
 
 Prevents measurement passes and allows **constant-time** scroll jumps → big perf win.
 
@@ -3483,7 +3483,7 @@ const getItemLayout = React.useCallback(
 
 ***
 
-### 5) Avoid creating new references in JSX (hot path)
+#### 5) Avoid creating new references in JSX (hot path)
 
 ```tsx
 // ❌ causes unnecessary re-renders
@@ -3499,7 +3499,7 @@ const handlePress = React.useCallback(() => onPress(id), [onPress, id]);
 
 ***
 
-### 6) Use **`extraData`** carefully
+#### 6) Use **`extraData`** carefully
 
 Only pass `extraData` when necessary. It forces FlatList to re-check rows when the value changes.
 
@@ -3511,7 +3511,7 @@ Only pass `extraData` when necessary. It forces FlatList to re-check rows when t
 
 ***
 
-### 7) Split UI to reduce re-render blast radius
+#### 7) Split UI to reduce re-render blast radius
 
 Keep parent lightweight; memoize heavy children (filters, headers, footers).
 
@@ -3525,7 +3525,7 @@ Also memoize `ItemSeparatorComponent`, `ListEmptyComponent` if they are not triv
 
 ***
 
-### 8) Control infinite scroll (end reached noise)
+#### 8) Control infinite scroll (end reached noise)
 
 Tune `onEndReachedThreshold` and debounce `onEndReached` to avoid duplicate loads.
 
@@ -3540,7 +3540,7 @@ const onEndReached = React.useCallback(() => {
 
 ***
 
-### 9) Images: pre-size & cache
+#### 9) Images: pre-size & cache
 
 *   Provide **width/height** to avoid layout thrash.
 *   Use `react-native-fast-image` (or modern caching) for heavy feeds.
@@ -3556,7 +3556,7 @@ const onEndReached = React.useCallback(() => {
 
 ***
 
-### 10) Avoid expensive inline conditions in rows
+#### 10) Avoid expensive inline conditions in rows
 
 Compute heavy values outside render or **useMemo** inside row:
 
@@ -3566,7 +3566,7 @@ const computed = React.useMemo(() => heavyCompute(item), [item.id]);
 
 ***
 
-### 11) Use **FlashList** for very large lists (drop-in, better defaults)
+#### 11) Use **FlashList** for very large lists (drop-in, better defaults)
 
 If your list is huge or stutters, **FlashList** (Shopify) often performs better with minimal changes:
 
@@ -3586,7 +3586,7 @@ import { FlashList } from '@shopify/flash-list';
 
 ***
 
-### 12) Don’t do heavy JS work during scroll
+#### 12) Don’t do heavy JS work during scroll
 
 Network parsing, JSON transforms, crypto, etc. will block the JS thread → scroll jank.
 
@@ -3599,20 +3599,20 @@ InteractionManager.runAfterInteractions(() => parseLargeJSON());
 
 ***
 
-### 13) Advanced: `CellRendererComponent` / `shouldRasterizeIOS`
+#### 13) Advanced: `CellRendererComponent` / `shouldRasterizeIOS`
 
 *   **`CellRendererComponent`** can help batch row wrappers (rarely needed).
 *   On iOS, for complex static cells, `style={{ transform: [], backfaceVisibility: 'hidden' }}` or layer‑backing can help, but use sparingly. Measure first.
 
 ***
 
-### 14) Avoid nested scrollable lists when possible
+#### 14) Avoid nested scrollable lists when possible
 
 Nested `FlatList`/`ScrollView` can fight for gestures and memory. Prefer a single list with **section headers** (`SectionList`) or render expanded content inline.
 
 ***
 
-### 15) Measure & verify (don’t guess)
+#### 15) Measure & verify (don’t guess)
 
 *   **React DevTools Profiler**: which components re-render and why.
 *   **Flipper Perf Monitor**: FPS and JS frame drops.
@@ -3620,7 +3620,7 @@ Nested `FlatList`/`ScrollView` can fight for gestures and memory. Prefer a singl
 
 ***
 
-## Example: Putting it together
+### Example: Putting it together
 
 ```tsx
 type Item = { id: string; title: string };
@@ -3665,7 +3665,7 @@ export function ItemsList({ data, onPressRow }: { data: Item[]; onPressRow: (id:
 
 ***
 
-## Quick checklist (for code reviews)
+### Quick checklist (for code reviews)
 
 *   [ ] Stable `keyExtractor` (no index).
 *   [ ] `Row` uses `React.memo`.
@@ -3683,7 +3683,7 @@ export function ItemsList({ data, onPressRow }: { data: Item[]; onPressRow: (id:
 
   <details><summary>18. How to handle responsive UI across multiple screen sizes?</summary>
 
-# ✅ **18. How to handle responsive UI across multiple screen sizes?**
+### ✅ 18. How to handle responsive UI across multiple screen sizes?
 
 React Native does **not** scale layouts automatically—you must design components that adapt to:
 
@@ -3698,11 +3698,11 @@ Below are the **best practices** with code snippets.
 
 ***
 
-# 1) **Use Flexbox layout (primary tool)**
+### 1) **Use Flexbox layout (primary tool)**
 
 Flexbox handles most responsiveness with **no pixel math**.
 
-### Example
+#### Example
 
 ```tsx
 <View style={{ flexDirection: 'row', flex: 1 }}>
@@ -3716,7 +3716,7 @@ Flexbox handles most responsiveness with **no pixel math**.
 
 ***
 
-# 2) **Use % widths instead of absolute pixels**
+### 2) **Use % widths instead of absolute pixels**
 
 ```tsx
 <View style={{ width: '90%', alignSelf: 'center' }}>
@@ -3728,7 +3728,7 @@ Useful for cards, containers, images, grids, modals.
 
 ***
 
-# 3) **Use `Dimensions` or `useWindowDimensions()`**
+### 3) **Use `Dimensions` or `useWindowDimensions()`**
 
 Automatically adapt on screen rotation or resizing.
 
@@ -3738,7 +3738,7 @@ import { useWindowDimensions } from 'react-native';
 const { width, height } = useWindowDimensions();
 ```
 
-### Example: Responsive columns
+#### Example: Responsive columns
 
 ```tsx
 const numColumns = width > 600 ? 3 : 2;  // tablet vs phone
@@ -3746,7 +3746,7 @@ const numColumns = width > 600 ? 3 : 2;  // tablet vs phone
 
 ***
 
-# 4) **Use breakpoints (like web responsive design)**
+### 4) **Use breakpoints (like web responsive design)**
 
 Define breakpoints once:
 
@@ -3766,7 +3766,7 @@ const layout = width > BREAKPOINTS.tablet ? 'tablet' : 'phone';
 
 ***
 
-# 5) **Safe Area for notches, status bar, home bar**
+### 5) **Safe Area for notches, status bar, home bar**
 
 Use `react-native-safe-area-context`
 
@@ -3787,12 +3787,12 @@ Ensures UI does not overlap:
 
 ***
 
-# 6) **Use scalable units (moderate scale)**
+### 6) **Use scalable units (moderate scale)**
 
 Pixel-perfect UI breaks on different DPIs.  
 Use libraries for consistent scaling:
 
-### Option A: `react-native-size-matters`
+#### Option A: `react-native-size-matters`
 
 ```tsx
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
@@ -3803,7 +3803,7 @@ const styles = StyleSheet.create({
 });
 ```
 
-### Option B: `react-native-responsive-screen`
+#### Option B: `react-native-responsive-screen`
 
 ```tsx
 import { widthPercentageToDP, heightPercentageToDP } from 'react-native-responsive-screen';
@@ -3820,7 +3820,7 @@ const styles = {
 
 ***
 
-# 7) **Support Dynamic Type / Font scaling**
+### 7) **Support Dynamic Type / Font scaling**
 
 Text needs to respond to Accessibility font size settings.
 
@@ -3842,7 +3842,7 @@ To **prevent breaking layouts**:
 
 ***
 
-# 8) **Use platform-specific styles when needed**
+### 8) **Use platform-specific styles when needed**
 
 ```tsx
 import { Platform } from 'react-native';
@@ -3862,7 +3862,7 @@ Styling differences help on:
 
 ***
 
-# 9) **Use responsive images**
+### 9) **Use responsive images**
 
 Always specify image **width/height**, even when responsive.
 
@@ -3880,7 +3880,7 @@ For device‑scale bitmap variants:
 
 ***
 
-# 10) **Grids & Lists — responsive columns**
+### 10) **Grids & Lists — responsive columns**
 
 ```tsx
 const numColumns = width > 600 ? 3 : 2;
@@ -3902,7 +3902,7 @@ Good for:
 
 ***
 
-# 11) **Use `react-native-responsive-fontsize` (optional)**
+### 11) **Use `react-native-responsive-fontsize` (optional)**
 
 ```tsx
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -3911,7 +3911,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 
 ***
 
-# 12) **Tablet‑specific UI patterns**
+### 12) **Tablet‑specific UI patterns**
 
 For tablets, use **side-by-side layouts**:
 
@@ -3935,9 +3935,9 @@ Makes banking apps look professional:
 
 ***
 
-# Real-world RN examples (banking apps)
+### Real-world RN examples (banking apps)
 
-### **A) Transaction list spacing**
+#### **A) Transaction list spacing**
 
 ```tsx
 const isLargeScreen = width > 420;
@@ -3959,7 +3959,7 @@ const SHEET_HEIGHT = height * 0.5;   // half screen
 
 ***
 
-# Pitfalls (what interviewers want to hear)
+### Pitfalls (what interviewers want to hear)
 
 *   ❌ Hardcoded widths/heights break on tablets
 *   ❌ Absolute positioning everywhere
@@ -3969,7 +3969,7 @@ const SHEET_HEIGHT = height * 0.5;   // half screen
 
 ***
 
-# Best Practices Summary (Interview answer)
+### Best Practices Summary (Interview answer)
 
 > Use **Flexbox** as the foundation, responsive **percent widths**, breakpoints, `useWindowDimensions()`, and safe area views.  
 > For scaling, use tools like `size-matters` or `responsive-screen`.  
@@ -3982,7 +3982,7 @@ const SHEET_HEIGHT = height * 0.5;   // half screen
 
   <details><summary>19. Explain RN navigation stacks & how you prevent memory leaks.</summary>
 
-## ✅ 19) React Native navigation stacks & preventing memory leaks
+### ✅ 19) React Native navigation stacks & preventing memory leaks
 
 ### 1) What is a **navigation stack**?
 
@@ -4049,7 +4049,7 @@ export function AppNavigator() {
 
 ***
 
-## Preventing Memory Leaks
+### Preventing Memory Leaks
 
 Leaks in RN typically come from **un‑cleared references** (timers, subscriptions, listeners, inflight async), **overgrown stacks**, or **long‑lived closures** capturing old state. Use the patterns below.
 
@@ -4204,7 +4204,7 @@ useEffect(() => {
 
 ***
 
-## Mini checklists
+### Mini checklists
 
 **When adding a new screen**
 
@@ -4222,7 +4222,7 @@ useEffect(() => {
 
 ***
 
-## Code snippets you can copy
+### Code snippets you can copy
 
 **Auth handoff without back to login**
 
@@ -4282,7 +4282,7 @@ useEffect(() => {
 
 ***
 
-## Short interview answer (soundbite)
+### Short interview answer (soundbite)
 
 > A **navigation stack** is a LIFO history of screens. In React Navigation, you compose stacks with tabs/drawers and use `navigate`, `push`, `replace`, and `reset` to control history.  
 > To **prevent memory leaks**, always **clean up timers, listeners, and async work** (use `AbortController` or React Query), use **`useFocusEffect`** to start/stop work on focus/blur, prefer **`replace/reset`** to avoid overgrowing stacks, keep **route params small**, and enable **`detachInactiveScreens`** when needed. This keeps both memory and responsiveness healthy.
@@ -4293,7 +4293,7 @@ useEffect(() => {
 
   <details><summary>20. What are Error Boundaries and how to implement one?</summary>
 
-## 20) What are Error Boundaries and how to implement one?
+### 20) What are Error Boundaries and how to implement one?
 
 ### What is an Error Boundary?
 
@@ -4312,7 +4312,7 @@ An **Error Boundary** is a React component that **catches JavaScript errors** in
 
 ***
 
-## Minimal Error Boundary (class component)
+### Minimal Error Boundary (class component)
 
 ```tsx
 import React from 'react';
@@ -4373,7 +4373,7 @@ export function TransferScreenWithBoundary() {
 
 ***
 
-## Resetting the boundary when navigating
+### Resetting the boundary when navigating
 
 When you navigate, you often want a **fresh** boundary so previous errors don’t persist. Key the boundary by the **route key**:
 
@@ -4394,7 +4394,7 @@ Wrap each screen’s content with `ScreenWrapper` to ensure it **resets on navig
 
 ***
 
-## Functional alternative with `react-error-boundary`
+### Functional alternative with `react-error-boundary`
 
 If you prefer hooks/functional style, use the community package:
 
@@ -4433,7 +4433,7 @@ export function WrappedScreen() {
 
 ***
 
-## What Error Boundaries **don’t** catch (and what to do)
+### What Error Boundaries **don’t** catch (and what to do)
 
 ### 1) Event handlers (use `try/catch`)
 
@@ -4482,7 +4482,7 @@ const defaultHandler = (ErrorUtils as any).getGlobalHandler?.();
 
 ***
 
-## Where to place Error Boundaries (practical guidance)
+### Where to place Error Boundaries (practical guidance)
 
 *   **Root boundary**: Around your entire app to avoid full white screens.
 *   **Feature boundaries**: Around risky areas (heavy lists, webviews, complex forms, experimental modules).
@@ -4491,7 +4491,7 @@ const defaultHandler = (ErrorUtils as any).getGlobalHandler?.();
 
 ***
 
-## UX & Observability best practices
+### UX & Observability best practices
 
 *   Show a **friendly message** with a **Retry** and “Report issue” (optional).
 *   **Log** with user/session context and breadcrumbs (Sentry/Crashlytics).
@@ -4504,7 +4504,7 @@ const defaultHandler = (ErrorUtils as any).getGlobalHandler?.();
 
 ***
 
-## Interview soundbite
+### Interview soundbite
 
 > Error Boundaries are **class (or library) components** that catch errors during **rendering and lifecycle** of their children and display a **fallback UI** instead of crashing the app. They don’t catch **event handler** or **async** errors, so those need **try/catch** (or request‑level error handling). In RN, place boundaries at the **root** and around **screens/features**, **log** with Sentry/Crashlytics, and **reset** the boundary on navigation by keying it to the **route key**.
 
@@ -4514,7 +4514,7 @@ const defaultHandler = (ErrorUtils as any).getGlobalHandler?.();
 
   <details><summary>21. Explain deep linking & universal links.</summary>
 
-## ✅ What are Deep Links, Universal Links, and App Links?
+### ✅ What are Deep Links, Universal Links, and App Links?
 
 *   **Deep Link (generic)**: A link (e.g., `mybank://transfer/123`) that **opens your app** and navigates to a specific screen/route. Uses a **custom URL scheme**.
     *   Pros: Easy to set up.
@@ -4528,7 +4528,7 @@ const defaultHandler = (ErrorUtils as any).getGlobalHandler?.();
 
 ***
 
-## 🧭 RN App-Level Linking: Single source of truth
+### 🧭 RN App-Level Linking: Single source of truth
 
 With **React Navigation**, define a **linking configuration** to map URLs → screens.
 
@@ -4577,7 +4577,7 @@ Then pass it to the NavigationContainer:
 
 ***
 
-## 📱 iOS — Universal Links
+### 📱 iOS — Universal Links
 
 ### 1) Enable Associated Domains
 
@@ -4639,7 +4639,7 @@ useEffect(() => {
 
 ***
 
-## 🤖 Android — App Links
+### 🤖 Android — App Links
 
 ### 1) Intent filter for HTTPS routes (AndroidManifest.xml)
 
@@ -4705,7 +4705,7 @@ If it shows a chooser or opens the browser:
 
 ***
 
-## 🧰 Custom URL Scheme (fallback / internal)
+### 🧰 Custom URL Scheme (fallback / internal)
 
 **iOS (Info.plist):**
 
@@ -4736,7 +4736,7 @@ If it shows a chooser or opens the browser:
 
 ***
 
-## 🔐 Security & Compliance (Banking)
+### 🔐 Security & Compliance (Banking)
 
 *   **Do not** encode sensitive data (tokens, PAN, PII) directly in URLs—they can appear in logs, notifications, referrers.
 *   For **login/OTP** deep links, use **short‑lived codes**; exchange server‑side for tokens.
@@ -4746,14 +4746,14 @@ If it shows a chooser or opens the browser:
 
 ***
 
-## 🧭 Handling “open app if installed, else go to store/web”
+### 🧭 Handling “open app if installed, else go to store/web”
 
 *   **Universal/App Links** already do app‑if‑installed, else web fallback.
 *   If you need **App Store / Play Store fallback**, use a **redirector** service or JS on the fallback page to detect app presence and route accordingly.
 
 ***
 
-## 🔄 Deferred Deep Links (after install)
+### 🔄 Deferred Deep Links (after install)
 
 If a user taps a link without the app installed, you may want to open the **intended screen after install**. This typically uses a provider (e.g., **Firebase Dynamic Links**, **Branch.io**, **AppsFlyer**):
 
@@ -4764,7 +4764,7 @@ If a user taps a link without the app installed, you may want to open the **inte
 
 ***
 
-## 🧪 Testing matrix (copy for your QA plan)
+### 🧪 Testing matrix (copy for your QA plan)
 
 *   iOS: iPhone with app installed vs not installed; iOS 14–17; tap from **Notes**, **Mail**, **Safari**.
 *   Android: Multiple OEMs; Chrome vs in‑app browsers; installed vs not installed; first open behavior.
@@ -4774,7 +4774,7 @@ If a user taps a link without the app installed, you may want to open the **inte
 
 ***
 
-## Common Pitfalls (and fixes)
+### Common Pitfalls (and fixes)
 
 *   **AASA/assetlinks served with wrong content‑type** or behind **redirects** → OS cannot verify.
 *   **Wrong TeamID/BundleID** in AASA or **wrong certificate fingerprint** in assetlinks → verification fails.
@@ -4784,7 +4784,7 @@ If a user taps a link without the app installed, you may want to open the **inte
 
 ***
 
-## Short interview soundbite
+### Short interview soundbite
 
 > Deep links open a specific route in your app. For production, we use **iOS Universal Links** and **Android App Links**, which are verified HTTPS links that open the app directly if installed, falling back to the website otherwise. They’re enabled by entitlements/intent filters and verified via **AASA** (iOS) and **assetlinks.json** (Android). In React Navigation, we define a **linking config** mapping paths to screens. We avoid putting sensitive data in URLs, validate inputs, and use a provider like **Dynamic Links/Branch** for **deferred deep linking**.
 
@@ -4794,7 +4794,7 @@ If a user taps a link without the app installed, you may want to open the **inte
 
   <details><summary>22. How do push notifications work (APNs, FCM)?</summary>
 
-## ✅ What are Push Notifications—High Level
+### ✅ What are Push Notifications—High Level
 
 A push notification involves four parties:
 
@@ -4807,7 +4807,7 @@ In **React Native**, most teams use **Firebase Cloud Messaging (FCM)** to unify 
 
 ***
 
-## 🛠️ Basic Flows
+### 🛠️ Basic Flows
 
 ### iOS (APNs)
 
@@ -4831,14 +4831,14 @@ In **React Native**, most teams use **Firebase Cloud Messaging (FCM)** to unify 
 
 ***
 
-## 🔐 Permissions & Tokens
+### 🔐 Permissions & Tokens
 
 *   **iOS**: Must request **UNUserNotificationCenter** permissions; user can deny, limit alerts, or allow provisional (quiet) notifications. Token can change—**refresh and update your backend** on every app start.
 *   **Android**: Android 13+ requires **`POST_NOTIFICATIONS`** runtime permission. Tokens also rotate—update backend appropriately.
 
 ***
 
-## 🔔 Message Types (Important for behavior)
+### 🔔 Message Types (Important for behavior)
 
 *   **Notification message**: OS displays it automatically; app callback may not run if the app is killed (varies).
 *   **Data message**: Delivered to the app’s handler; you’re responsible for showing a local notification if needed.
@@ -4850,7 +4850,7 @@ In **React Native**, most teams use **Firebase Cloud Messaging (FCM)** to unify 
 
 ***
 
-## 📦 Payload Examples
+### 📦 Payload Examples
 
 ### APNs (HTTP/2 over TLS, direct to Apple)
 
@@ -4942,7 +4942,7 @@ curl -v \
 
 ***
 
-## 🧩 React Native Handling (using `@react-native-firebase/messaging`)
+### 🧩 React Native Handling (using `@react-native-firebase/messaging`)
 
 **Request permissions (iOS & Android 13+):**
 
@@ -4994,7 +4994,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 
 ***
 
-## 📣 iOS Extensions & Rich Notifications
+### 📣 iOS Extensions & Rich Notifications
 
 *   **Notification Service Extension (NSE)**: Download media, decrypt payloads, or modify content **before display** (e.g., mask account digits).
 *   **Mutable content**: Set `mutable-content: 1` (APNs) to trigger NSE.
@@ -5002,7 +5002,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 
 ***
 
-## 📊 Delivery, Priority & Throttling
+### 📊 Delivery, Priority & Throttling
 
 *   **APNs**: `apns-priority: 10` for alert, `5` for background. `content-available` pushes are throttled and not guaranteed if the app is force-quit.
 *   **FCM**: `priority: HIGH` for time-sensitive messages. Use **collapse keys** / **notification keys** to avoid spam and save battery.
@@ -5010,7 +5010,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 
 ***
 
-## 🔐 Security & Privacy (Banking-grade)
+### 🔐 Security & Privacy (Banking-grade)
 
 *   **Never put PII or secrets in notification payloads**—they can appear on lock screens and logs. Prefer IDs/tokens and fetch details in-app.
 *   **Use short-lived IDs** and server fetch on open.
@@ -5021,14 +5021,14 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 
 ***
 
-## 🧱 Channels (Android) & Interruption Levels (iOS)
+### 🧱 Channels (Android) & Interruption Levels (iOS)
 
 *   **Android**: Create **Notification Channels** (e.g., `payments`, `security`) with proper importance. Users control per-channel settings.
 *   **iOS**: Set **interruption level** (iOS 15+) responsibly; most banking notifications should be **active** or **time-sensitive** only if justified. Use **relevance score** sparingly.
 
 ***
 
-## 🧪 Testing
+### 🧪 Testing
 
 *   **iOS**: Xcode device logs, `apns-topic` & `apns-push-type` correctness, A/B silent vs alert.
 *   **Android**: `adb shell cmd notification` tools; test background/Doze modes; OEM differences.
@@ -5036,7 +5036,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 
 ***
 
-## 🧭 Design Choices (What to say in interviews)
+### 🧭 Design Choices (What to say in interviews)
 
 *   Use **FCM HTTP v1** for unified send (Android+iOS), but be aware of **APNs semantics** (e.g., `content-available`, `mutable-content`).
 *   Prefer **data-only** messages + **local notifications** for precise control and **privacy**.
@@ -5046,7 +5046,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 
 ***
 
-## Quick RN Checklist
+### Quick RN Checklist
 
 *   [ ] Request permissions (iOS & Android 13+).
 *   [ ] Obtain and sync **FCM token** to backend; handle refresh.
@@ -5366,7 +5366,7 @@ Custom swipe/drag gestures (like carousels or sliders) must have:
 
 # ✅ **24. When to use CodePush, and why banking apps may restrict it?**
 
-## **What is CodePush (Microsoft App Center CodePush)?**
+### **What is CodePush (Microsoft App Center CodePush)?**
 
 CodePush allows you to **push JavaScript and asset updates over‑the‑air (OTA)** to deployed RN apps **without going through App Store / Play Store review**.
 
@@ -5590,7 +5590,7 @@ But **keep all logic inside the shipped binary**.
 
   <details><summary>25. When to choose Expo Managed vs Bare workflows?</summary>
 
-## ✅ **25. When to choose Expo Managed vs Bare Workflows?**
+### ✅ **25. When to choose Expo Managed vs Bare Workflows?**
 
 ### **Expo Managed Workflow — When to Choose**
 
@@ -5632,14 +5632,14 @@ Choose **Bare Workflow** when:
 
 ***
 
-## 🔍 Interview-Friendly Summary
+### 🔍 Interview-Friendly Summary
 
 > **Choose Expo Managed** for speed and simplicity when native capabilities are enough.  
 > **Choose Expo Bare** when your project needs custom native code, special SDKs, or deeper platform control — common in enterprise banking apps.
 
 ***
 
-## 📌 Example Scenario
+### 📌 Example Scenario
 
 ### **Expo Managed (Ideal)**
 
@@ -5695,13 +5695,13 @@ NativeModules.FraudDetection.startDetection();
 
   <details><summary>26. Limitations of Expo for banking apps (background tasks, pinning).</summary>
 
-## ✅ **26. Limitations of Expo for Banking Apps (Background Tasks, Pinning)**
+### ✅ **26. Limitations of Expo for Banking Apps (Background Tasks, Pinning)**
 
 ### **1️⃣ Background Tasks — Limited / Not Full Native Control**
 
 Expo Managed Workflow has major restrictions:
 
-#### **Limitations**
+##### **Limitations**
 
 *   ❌ Cannot run **continuous background services** (e.g., fraud monitoring, session heartbeat).
 *   ❌ No support for **true background execution** like long‑running tasks.
@@ -5718,7 +5718,7 @@ Expo Managed Workflow has major restrictions:
 
 Expo Managed can’t support these.
 
-#### **Expo Background Fetch Example (Limited)**
+##### **Expo Background Fetch Example (Limited)**
 
 ```js
 import * as BackgroundFetch from 'expo-background-fetch';
@@ -5755,7 +5755,7 @@ Banking apps must prevent:
 
 This requires deep native networking control → **Bare Workflow only**.
 
-#### **What it looks like (Bare Workflow Example using react-native-pinch)**
+##### **What it looks like (Bare Workflow Example using react-native-pinch)**
 
 ```js
 import { usePinned } from "@react-native-pinch/pinch";
@@ -5772,7 +5772,7 @@ This **cannot** be done in Expo Managed because it requires custom native instal
 
 ***
 
-## 🧩 Other Expo Limitations Important for Banking Clients
+### 🧩 Other Expo Limitations Important for Banking Clients
 
 Below are quick bullets useful in interviews:
 
@@ -5800,7 +5800,7 @@ Below are quick bullets useful in interviews:
 
 ***
 
-## 🟦 **Quick Interview Summary**
+### 🟦 **Quick Interview Summary**
 
 > **Expo Managed** is not ideal for banking apps due to limitations in background tasks, certificate pinning, security SDKs, and custom native code.  
 > **Bare Workflow** is required for enterprise security and compliance.
@@ -6249,7 +6249,7 @@ codePush.sync({
 
 # ✅ **30. EAS Build vs Fastlane — When to Prefer Each?**
 
-## 🟦 **What is EAS Build?**
+### 🟦 **What is EAS Build?**
 
 EAS Build (Expo Application Services) is a **cloud-based build system** built by Expo.
 
@@ -6263,7 +6263,7 @@ Best when you want:
 
 ***
 
-## 🟥 **What is Fastlane?**
+### 🟥 **What is Fastlane?**
 
 Fastlane is a **local/CI automation toolkit** for iOS/Android that gives **full control** over:
 
@@ -6395,7 +6395,7 @@ end
 
 ***
 
-### **4) Native Modules & Platform APIs (8 questions)**
+### 4) Native Modules & Platform APIs (8 questions)
 
 <details>
   <summary>Native Modules & Platform APIs (8)</summary>
@@ -6406,7 +6406,7 @@ end
 
 # ✅ **31. When do you create a Native Module? Explain Bridging.**
 
-## 🟦 **When do you create a Native Module?**
+### 🟦 **When do you create a Native Module?**
 
 You create a **native module** in React Native when:
 
@@ -6455,7 +6455,7 @@ React Native uses a **JS ↔ Native bridge** to communicate between the JavaScri
 
 # 🟩 **Simple Example — Creating a Native Module**
 
-## **Android (Kotlin)**
+### **Android (Kotlin)**
 
 ### **1. Create Native Module**
 
@@ -6487,7 +6487,7 @@ class SecurityPackage : ReactPackage {
 
 ***
 
-## **JavaScript Side**
+### **JavaScript Side**
 
 ```js
 import { NativeModules } from "react-native";
@@ -6531,7 +6531,7 @@ JS calls it the same way.
 
   <details><summary>32. How does certificate pinning work in RN?</summary>
 
-## ✅ 32. How does certificate pinning work in React Native?
+### ✅ 32. How does certificate pinning work in React Native?
 
 ### What is certificate pinning?
 
@@ -6548,14 +6548,14 @@ This blocks **MITM attacks** even if a device’s trust store is compromised or 
 
 ***
 
-## RN Workflows: What’s supported?
+### RN Workflows: What’s supported?
 
 *   **Expo Managed:** ❌ No direct pinning (you can’t patch `NSURLSession`/`OkHttp`). You must eject to **Bare** or use a custom dev client.
 *   **React Native CLI / Expo Bare:** ✅ Full support via native code or libraries (e.g., `@react-native-pinch/pinch`).
 
 ***
 
-## Option A — Use a library (simplest)
+### Option A — Use a library (simplest)
 
 ### Using `@react-native-pinch/pinch` (iOS + Android)
 
@@ -6592,7 +6592,7 @@ async function getSecured() {
 
 ***
 
-## Option B — Native pinning (maximum control)
+### Option B — Native pinning (maximum control)
 
 ### Android (OkHttp with CertificatePinner)
 
@@ -6672,7 +6672,7 @@ Create a `URLSession` with this delegate and use it for sensitive calls, exposed
 
 ***
 
-## Practical steps to implement pinning (checklist)
+### Practical steps to implement pinning (checklist)
 
 1.  **Decide pin type**: Prefer **SPKI** (public key pinning) for longevity; include **2+ pins** (active + backup).
 2.  **Extract the pin**:
@@ -6689,7 +6689,7 @@ Create a `URLSession` with this delegate and use it for sensitive calls, exposed
 
 ***
 
-## Common gotchas (banking interviews love these)
+### Common gotchas (banking interviews love these)
 
 *   **Expo Managed**: Pinning **not supported** without Bare/custom dev client.
 *   **Single pin risk**: A single pin can **brick** connectivity during renewals; always add a **backup pin**.
@@ -6700,7 +6700,7 @@ Create a `URLSession` with this delegate and use it for sensitive calls, exposed
 
 ***
 
-## Interview‑friendly one‑liner
+### Interview‑friendly one‑liner
 
 > In React Native, certificate pinning is implemented in **Bare** apps by validating the server’s cert or public key (prefer **SPKI**) in **native networking (OkHttp/NSURLSession)** or via a library like `@react-native-pinch/pinch`. Always ship **backup pins**, fail closed, and test against interception proxies.
 
@@ -6738,7 +6738,7 @@ For **banking apps**, the recommended approach is:
 
 ***
 
-## 🔐 **Implementation (Bare Workflow / Banking Ready)**
+### 🔐 **Implementation (Bare Workflow / Banking Ready)**
 
 ### **1. Install**
 
@@ -6749,7 +6749,7 @@ cd ios && pod install
 
 ***
 
-## **2. Set a Biometric-Protected Credential**
+### **2. Set a Biometric-Protected Credential**
 
 (Used after user logs in normally)
 
@@ -6766,7 +6766,7 @@ This stores the token in hardware security + locks access with biometrics.
 
 ***
 
-## **3. Authenticate using Biometrics**
+### **3. Authenticate using Biometrics**
 
 ```js
 const creds = await Keychain.getGenericPassword({
@@ -6914,7 +6914,7 @@ Using **biometric / device passcode protection** if needed.
 
 # 🟦 **Implementation Using `react-native-keychain`**
 
-## **1. Install**
+### **1. Install**
 
 ```sh
 npm install react-native-keychain
@@ -7061,7 +7061,7 @@ In React Native, you handle these links using:
 
 # 🟦 **ANDROID — App Links (Digital Asset Links)**
 
-## **Step 1: Add Intent Filter in `AndroidManifest.xml`**
+### **Step 1: Add Intent Filter in `AndroidManifest.xml`**
 
 ```xml
 <intent-filter android:autoVerify="true">
@@ -7079,7 +7079,7 @@ In React Native, you handle these links using:
 
 ***
 
-## **Step 2: Host Digital Asset Links JSON on your domain**
+### **Step 2: Host Digital Asset Links JSON on your domain**
 
 File must be here:
 
@@ -7102,7 +7102,7 @@ Example:
 
 # 🟥 **iOS — Universal Links (Associated Domains)**
 
-## **Step 1: Enable Associated Domains in Xcode**
+### **Step 1: Enable Associated Domains in Xcode**
 
 `Signing & Capabilities → + Capability → Associated Domains`
 
@@ -7116,7 +7116,7 @@ applinks:mybank.com
 
 ---
 
-## **Step 2: Host `apple-app-site-association` on domain**
+### **Step 2: Host `apple-app-site-association` on domain**
 
 Must be placed at:
 
@@ -7433,7 +7433,7 @@ Below is the **interview‑ready flow**:
 
 ***
 
-## **Step 1 — Create a C++ function (high-performance)**
+### **Step 1 — Create a C++ function (high-performance)**
 
 `native-lib.cpp`
 
@@ -7449,7 +7449,7 @@ jsi::Value addNumbers(jsi::Runtime &rt, int a, int b) {
 
 ***
 
-## **Step 2 — Expose it as a JSI Host Function**
+### **Step 2 — Expose it as a JSI Host Function**
 
 ```cpp
 void installJsiBindings(jsi::Runtime &rt) {
@@ -7475,7 +7475,7 @@ void installJsiBindings(jsi::Runtime &rt) {
 
 ***
 
-## **Step 3 — Load the JSI bindings in Android**
+### **Step 3 — Load the JSI bindings in Android**
 
 `MyModulePackage.java`
 
@@ -7499,7 +7499,7 @@ void install(long jsContext) {
 
 ***
 
-## **Step 4 — Call directly in JavaScript**
+### **Step 4 — Call directly in JavaScript**
 
 ```js
 const result = global.addNumbers(5, 7);
@@ -7689,7 +7689,7 @@ Requires a **JSI/native module** because App Attest uses:
 
 ***
 
-### **5) Architecture & State Management (12 questions)**
+### 5) Architecture & State Management (12 questions)
 
 <details>
   <summary>Architecture &amp; State Management (12)</summary>
@@ -7873,7 +7873,7 @@ Good in theory, but **not widely adopted** in highly regulated domains.
 
   <details><summary>40. When to use React Query vs Redux?</summary>
 
-## **40. When to use React Query vs Redux?**
+### **40. When to use React Query vs Redux?**
 
 ### ✅ **Answer**
 
@@ -7882,7 +7882,7 @@ Use **Redux** for **client state**.
 
 ***
 
-## **When to use React Query**
+### **When to use React Query**
 
 Use **React Query** when dealing with **remote API data** that needs:
 
@@ -7902,7 +7902,7 @@ const { data, isLoading } = useQuery(['transactions'], fetchTransactions);
 
 ***
 
-## **When to use Redux**
+### **When to use Redux**
 
 Use **Redux** when handling **local UI/client-specific state** that multiple screens depend on:
 
@@ -7924,7 +7924,7 @@ dispatch(setTheme('dark'));
 
 ***
 
-## **Easy Comparison Table**
+### **Easy Comparison Table**
 
 | Need                | React Query | Redux                             |
 | ------------------- | ----------- | --------------------------------- |
@@ -7937,7 +7937,7 @@ dispatch(setTheme('dark'));
 
 ***
 
-## **Interview One‑Liner**
+### **Interview One‑Liner**
 
 > **Use React Query for asynchronous server state and caching. Use Redux for global client state and complex UI workflows not tied to the backend.**
 
@@ -8107,7 +8107,7 @@ Each feature exports its own screens → plugged into root navigator.
 
 # **42. What is a Domain Layer? Why is it useful?**
 
-## ✅ **Short Interview Answer**
+### ✅ **Short Interview Answer**
 
 The **Domain Layer** contains the **core business logic** of the app — the rules, policies, and use‑cases that define *how* the system should behave independent of UI, API, or database.  
 It makes the app **scalable, testable, and maintainable**, especially in complex banking workflows.
@@ -8143,27 +8143,27 @@ All banking rules live here:
 
 # **Why is the Domain Layer Useful?**
 
-## ✔ 1. **Keeps business logic independent**
+### ✔ 1. **Keeps business logic independent**
 
 No UI or networking dependencies → easier changes.
 
 If API changes, domain layer remains same.
 
-## ✔ 2. **Highly testable**
+### ✔ 2. **Highly testable**
 
 You can unit‑test domain logic without UI or backend.
 
-## ✔ 3. **Perfect for banking apps**
+### ✔ 3. **Perfect for banking apps**
 
 Banking rules change often, but UI shouldn’t break.
 
 Domain isolates the complexity.
 
-## ✔ 4. **Reusability**
+### ✔ 4. **Reusability**
 
 Multiple screens can reuse the same use-case (e.g., `calculateEMI()` used in loans & calculators).
 
-## ✔ 5. **Scalable architecture**
+### ✔ 5. **Scalable architecture**
 
 Clear boundary:  
 UI → Application → Domain → Infrastructure
@@ -8218,7 +8218,7 @@ const emi = calculateEMI({ principal: 500000, interestRate: 8.5, tenure: 60 });
 
   <details><summary>43. How to handle normalized data & selectors?</summary>
 
-## **43. How to handle normalized data & selectors?**
+### **43. How to handle normalized data & selectors?**
 
 ### ✅ **Short Interview Answer**
 
@@ -8229,7 +8229,7 @@ const emi = calculateEMI({ principal: 500000, interestRate: 8.5, tenure: 60 });
 
 ***
 
-## Why normalize?
+### Why normalize?
 
 *   Prevents duplication and inconsistent updates
 *   Makes updates O(1) via `id` lookups
@@ -8237,7 +8237,7 @@ const emi = calculateEMI({ principal: 500000, interestRate: 8.5, tenure: 60 });
 
 ***
 
-## Recommended approach (Redux Toolkit)
+### Recommended approach (Redux Toolkit)
 
 ### 1) **Model normalized state with Entity Adapters**
 
@@ -8346,7 +8346,7 @@ export const makeSelectEnrichedTransactionsForAccount = () => {
 
 ***
 
-## With **React Query** (server state)
+### With **React Query** (server state)
 
 *   You generally **don’t need to normalize** React Query caches; it caches per‑query‑key.
 *   If the UI needs **cross-entity joins**, pull data via multiple queries and **derive** with `useMemo` or a small **client store** (Redux) for relationships.
@@ -8364,7 +8364,7 @@ const enriched = useMemo(() => {
 
 ***
 
-## Pagination & infinite lists
+### Pagination & infinite lists
 
 *   Store **page metadata** separately from entities:
 
@@ -8381,7 +8381,7 @@ pages: {
 
 ***
 
-## Optimistic updates (banking-safe pattern)
+### Optimistic updates (banking-safe pattern)
 
 1.  Update entity adapter (optimistic)
 2.  Rollback on error
@@ -8390,7 +8390,7 @@ pages: {
 
 ***
 
-## Performance tips
+### Performance tips
 
 *   Prefer **`selectById`** in item rows (stable memoization per `id`).
 *   Use **`useSelector` with shallowEqual** for small object selections.
@@ -8399,7 +8399,7 @@ pages: {
 
 ***
 
-## Anti‑patterns to avoid
+### Anti‑patterns to avoid
 
 *   Storing **nested/duplicated** server payloads directly in state.
 *   Building **huge selectors** that recompute every render; always memoize and parameterize.
@@ -8408,7 +8408,7 @@ pages: {
 
 ***
 
-## Tiny end‑to‑end example (screen)
+### Tiny end‑to‑end example (screen)
 
 ```tsx
 // features/transactions/screens/TransactionsList.tsx
@@ -8443,7 +8443,7 @@ export const TransactionRow = React.memo(({ id }: { id: string }) => {
 
 ***
 
-## One‑liner for the interview
+### One‑liner for the interview
 
 > “Normalize entities (flat by id), manage them with `createEntityAdapter`, and expose memoized, parameterized selectors (`createSelector`). Denormalize only at the edge in selectors or `useMemo`. Use React Query for server caching and Redux for normalized client graph and UI state.”
 
@@ -8463,7 +8463,7 @@ export const TransactionRow = React.memo(({ id }: { id: string }) => {
 
 # **Key Principles**
 
-## **1. Use Context‑aware Loading States**
+### **1. Use Context‑aware Loading States**
 
 Use different loaders depending on the UI:
 
@@ -8487,7 +8487,7 @@ Use different loaders depending on the UI:
 
 ***
 
-## **2. Use Skeletons for Data-heavy UI**
+### **2. Use Skeletons for Data-heavy UI**
 
 Ideal for banking transaction lists, accounts, dashboards.
 
@@ -8504,7 +8504,7 @@ Skeletons reduce layout shift → feels fast.
 
 ***
 
-## **3. Provide Meaningful Error States**
+### **3. Provide Meaningful Error States**
 
 Error should explain *what failed* + a *retry* option.
 
@@ -8521,7 +8521,7 @@ const ErrorView = ({ message, onRetry }) => (
 
 ***
 
-## **4. Use React Query’s Built‑in States**
+### **4. Use React Query’s Built‑in States**
 
 React Query simplifies loading/error logic:
 
@@ -8537,7 +8537,7 @@ return <TxnList data={data} />;
 
 ***
 
-## **5. Do Not Block the Entire UI (unless critical)**
+### **5. Do Not Block the Entire UI (unless critical)**
 
 Examples of non-blocking loaders:
 
@@ -8551,7 +8551,7 @@ Banking UX rule:
 
 ***
 
-## **6. Show Toasts for Non-Critical Errors**
+### **6. Show Toasts for Non-Critical Errors**
 
 Network drop, timeout, etc.:
 
@@ -8566,7 +8566,7 @@ For critical errors (KYC fail, payment fail) → dedicated screen.
 
 ***
 
-## **7. Use a Consistent State Machine**
+### **7. Use a Consistent State Machine**
 
 Every async flow follows:
 
@@ -8585,7 +8585,7 @@ Easy to test + predictable.
 
 ***
 
-## **8. Provide Optimistic Feedback**
+### **8. Provide Optimistic Feedback**
 
 For smooth UX:
 
@@ -8632,7 +8632,7 @@ mutate(paymentData, {
 
   <details><summary>45. Persisting state securely using redux-persist + MMKV.</summary>
 
-## **45. Persisting state securely using `redux-persist` + `MMKV`**
+### **45. Persisting state securely using `redux-persist` + `MMKV`**
 
 ### ✅ **Short Interview Answer**
 
@@ -8640,7 +8640,7 @@ Use **MMKV** (fast, C++ storage) as the Redux Persist storage engine, **encrypt*
 
 ***
 
-## Why MMKV?
+### Why MMKV?
 
 *   **Very fast** (native, O(1) reads/writes), ideal for large Redux trees.
 *   Small footprint; no JS bridge bottlenecks.
@@ -8859,7 +8859,7 @@ export default function App() {
 
 ***
 
-## 🔐 Token Handling Pattern (Recommended)
+### 🔐 Token Handling Pattern (Recommended)
 
 ```ts
 // src/services/secureTokens.ts
@@ -8900,7 +8900,7 @@ export async function clearTokens() {
 
 ***
 
-## 🧠 What to persist vs not
+### 🧠 What to persist vs not
 
 **Persist (usually safe)**
 
@@ -8917,7 +8917,7 @@ export async function clearTokens() {
 
 ***
 
-## 🧪 Testing & Troubleshooting
+### 🧪 Testing & Troubleshooting
 
 *   **Cold start test**: kill app, relaunch, assert rehydration guards the UI.
 *   **Migration test**: bump `version`, simulate old state, verify transform.
@@ -8936,7 +8936,7 @@ export async function logout() {
 
 ***
 
-## ⚡ Performance Tips
+### ⚡ Performance Tips
 
 *   Keep persisted state **small**; large trees slow rehydration.
 *   Use **entity adapters** to normalize lists; persist **ids + entities**.
@@ -8946,7 +8946,7 @@ export async function logout() {
 
 ***
 
-## 🗣️ Interview One‑liner
+### 🗣️ Interview One‑liner
 
 > “I use redux‑persist with an MMKV storage adapter for fast, reliable persistence. I whitelist only safe slices, encrypt at-rest data via a Keychain/Keystore-managed key, keep tokens in a separate secure service (not Redux), and add migrations, transforms, and a PersistGate to ensure smooth rehydration.”
 
@@ -9564,7 +9564,7 @@ Domain layer should run without mocking navigation, UI, or network.
 
 ***
 
-## 🔥 Real Banking Example (Interviewer loves this)
+### 🔥 Real Banking Example (Interviewer loves this)
 
 ### *Withdraw money flow:*
 
@@ -9997,7 +9997,7 @@ This sequence ensures **safe**, **non‑breaking**, **incremental** migration.
 
 ***
 
-### **6) API Integration, Networking, Security (12 questions)**
+### 6) API Integration, Networking, Security (12 questions)
 
 <details>
   <summary>API Integration &amp; Networking (12)</summary>
@@ -10006,7 +10006,7 @@ This sequence ensures **safe**, **non‑breaking**, **incremental** migration.
 
   <details><summary>51. How to design an API layer using Axios/Fetch wrappers?</summary>
 
-## **51. How to design an API layer using Axios/Fetch wrappers?**
+### **51. How to design an API layer using Axios/Fetch wrappers?**
 
 ### ✅ **Short Interview Answer**
 
@@ -10014,7 +10014,7 @@ This sequence ensures **safe**, **non‑breaking**, **incremental** migration.
 
 ***
 
-## **Goals of a good API layer**
+### **Goals of a good API layer**
 
 *   **Single source** of HTTP truth (baseURL, timeouts, headers)
 *   **Security**: auth token injection, idempotency keys, PII scrubbing
@@ -10025,7 +10025,7 @@ This sequence ensures **safe**, **non‑breaking**, **incremental** migration.
 
 ***
 
-## **Recommended Structure**
+### **Recommended Structure**
 
     src/
       services/
@@ -10041,7 +10041,7 @@ This sequence ensures **safe**, **non‑breaking**, **incremental** migration.
 
 ***
 
-## **1) Core Axios Client (Typed, Secure, Robust)**
+### **1) Core Axios Client (Typed, Secure, Robust)**
 
 ```ts
 // services/http/httpClient.ts
@@ -10142,7 +10142,7 @@ function isIdempotentEndpoint(url?: string) {
 
 ***
 
-## **2) Error Normalization**
+### **2) Error Normalization**
 
 ```ts
 // services/http/errors.ts
@@ -10190,7 +10190,7 @@ function mask(v: string) {
 
 ***
 
-## **3) Retry / Backoff Utility**
+### **3) Retry / Backoff Utility**
 
 ```ts
 // services/http/backoff.ts
@@ -10218,7 +10218,7 @@ export async function withExponentialBackoff<T>(
 
 ***
 
-## **4) Feature Service Modules (Domain‑friendly APIs)**
+### **4) Feature Service Modules (Domain‑friendly APIs)**
 
 ```ts
 // services/api/transactions.api.ts
@@ -10251,7 +10251,7 @@ export const TransactionsApi = {
 
 ***
 
-## **5) Cancellation (important for fast navigation / list searches)**
+### **5) Cancellation (important for fast navigation / list searches)**
 
 ```ts
 // Usage example with AbortController
@@ -10265,7 +10265,7 @@ controller.abort();
 
 ***
 
-## **6) Using with React Query (recommended for server cache)**
+### **6) Using with React Query (recommended for server cache)**
 
 ```ts
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -10291,7 +10291,7 @@ export function useCreatePayment() {
 
 ***
 
-## **7) Production Security Checklist (Banking)**
+### **7) Production Security Checklist (Banking)**
 
 *   **Auth tokens** from **secure storage** (Keychain/Keystore via MMKV), not Redux.
 *   **Idempotency keys** for POST transfers/payments (prevent double-charging).
@@ -10305,7 +10305,7 @@ export function useCreatePayment() {
 
 ***
 
-## **8) Nice-to-haves**
+### **8) Nice-to-haves**
 
 *   **Auto-refresh token** queue (serialize requests while refreshing).
 *   **Global offline awareness** (NetInfo) to soft-fail quickly.
@@ -10315,7 +10315,7 @@ export function useCreatePayment() {
 
 ***
 
-## **Interview One‑liner**
+### **Interview One‑liner**
 
 > “I wrap Axios in a typed client with interceptors for auth, request IDs, idempotency keys, timeouts and backoff. Errors are normalized centrally. Feature modules expose small typed functions. React Query handles caching, while the client enforces security, reliability, and observability.”
 
@@ -10327,7 +10327,7 @@ export function useCreatePayment() {
 
 # **52. Explain OAuth2/OIDC PKCE flow for mobile apps.**
 
-## ✅ **Short Interview Answer**
+### ✅ **Short Interview Answer**
 
 “PKCE is an extension to OAuth2/OIDC that makes the Authorization Code flow secure for mobile apps. The mobile app generates a random `code_verifier` and a hashed `code_challenge`. It sends the challenge during login. After the user authenticates in the browser, the authorization server returns an authorization code. The app exchanges that code along with the original `code_verifier`. If the two match, it gets tokens (ID token, access token, refresh token). This prevents attackers from stealing the authorization code and using it.”
 
@@ -10348,7 +10348,7 @@ So even if someone steals the authorization code, they **cannot** exchange it wi
 
 # 🔐 **OAuth2 + OIDC PKCE Flow (Step-by-Step)**
 
-## **1️⃣ App creates:**
+### **1️⃣ App creates:**
 
 *   `code_verifier` → long random string
 *   `code_challenge = SHA256(code_verifier)` (Base64URL-encoded)
@@ -10360,7 +10360,7 @@ const codeChallenge = base64UrlEncode(sha256(codeVerifier));
 
 ***
 
-## **2️⃣ App opens system browser (AppAuth Chrome Custom Tab / SafariViewController)**
+### **2️⃣ App opens system browser (AppAuth Chrome Custom Tab / SafariViewController)**
 
 Redirect user to:
 
@@ -10378,7 +10378,7 @@ Redirect user to:
 
 ***
 
-## **3️⃣ User logs in on the Authorization Server**
+### **3️⃣ User logs in on the Authorization Server**
 
 May involve:
 
@@ -10391,7 +10391,7 @@ OIDC adds **ID Token** (JWT with user identity).
 
 ***
 
-## **4️⃣ Authorization Server redirects back to the app**
+### **4️⃣ Authorization Server redirects back to the app**
 
 Example:
 
@@ -10401,7 +10401,7 @@ Your deep-link / AppAuth callback receives this.
 
 ***
 
-## **5️⃣ App exchanges code + verifier for tokens**
+### **5️⃣ App exchanges code + verifier for tokens**
 
 POST:
 
@@ -10427,7 +10427,7 @@ If valid → returns:
 
 ***
 
-## **6️⃣ App stores tokens securely**
+### **6️⃣ App stores tokens securely**
 
 ❌ Not Redux  
 ❌ Not AsyncStorage  
@@ -10435,7 +10435,7 @@ If valid → returns:
 
 ***
 
-## **7️⃣ App uses access token in API calls**
+### **7️⃣ App uses access token in API calls**
 
 ```ts
 Authorization: Bearer ACCESS_TOKEN
@@ -10443,7 +10443,7 @@ Authorization: Bearer ACCESS_TOKEN
 
 ***
 
-## **8️⃣ Refresh token flow**
+### **8️⃣ Refresh token flow**
 
 The app silently refreshes tokens:
 
@@ -11260,7 +11260,7 @@ Validation ensures:
 
 # 🧩 **Using Zod (Recommended)**
 
-## **1. Define a schema**
+### **1. Define a schema**
 
 ```ts
 import { z } from "zod";
@@ -11277,7 +11277,7 @@ export const TransactionSchema = z.object({
 
 ***
 
-## **2. Validate API response**
+### **2. Validate API response**
 
 ```ts
 const res = await api.get("/transactions/123");
@@ -11297,7 +11297,7 @@ if (!result.success) {
 
 ***
 
-## **3. Infer TS types automatically**
+### **3. Infer TS types automatically**
 
 ```ts
 export type Transaction = z.infer<typeof TransactionSchema>;
@@ -11976,7 +11976,7 @@ So retries don’t duplicate items.
 
   <details><summary>61. WebSockets vs polling vs SSE in RN.</summary>
 
-## **61. WebSockets vs Polling vs SSE (Server‑Sent Events) in React Native**
+### **61. WebSockets vs Polling vs SSE (Server‑Sent Events) in React Native**
 
 ### ✅ **Quick TL;DR**
 
@@ -11986,7 +11986,7 @@ So retries don’t duplicate items.
 
 ***
 
-## **When to use what (banking examples)**
+### **When to use what (banking examples)**
 
 | Use case                                                                | Best choice                     | Why                                                  |
 | ----------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------- |
@@ -11999,7 +11999,7 @@ So retries don’t duplicate items.
 
 ***
 
-## **React Native support & libraries**
+### **React Native support & libraries**
 
 *   **WebSockets**: Built‑in (`new WebSocket(url)`), widely used; GraphQL subscriptions use WS via `subscriptions-transport-ws` or `graphql-ws`.
 *   **SSE**: No native `EventSource` in RN—use **polyfills** like `react-native-event-source` or implement **Fetch‑based SSE** reader.
@@ -12009,7 +12009,7 @@ So retries don’t duplicate items.
 
 ***
 
-## **Pros & cons (what to mention in interviews)**
+### **Pros & cons (what to mention in interviews)**
 
 ### **WebSockets**
 
@@ -12055,7 +12055,7 @@ So retries don’t duplicate items.
 
 ***
 
-## **Security & reliability checklist (banking-grade)**
+### **Security & reliability checklist (banking-grade)**
 
 *   **TLS**: Always `wss://` for WebSockets; HTTPS for SSE/polling.
 *   **Auth**: Short‑lived access token; refresh safely. For WS, send token in query/header and **re‑authenticate on reconnect**.
@@ -12067,7 +12067,7 @@ So retries don’t duplicate items.
 
 ***
 
-## **Code snippets (RN)**
+### **Code snippets (RN)**
 
 ### 1) **WebSocket with reconnect + heartbeat**
 
@@ -12199,7 +12199,7 @@ export function usePolling(fetchFn: (signal: AbortSignal) => Promise<void>, base
 
 ***
 
-## **Practical selection guide**
+### **Practical selection guide**
 
 *   **Need two‑way, sub‑second updates?** → **WebSockets**
 *   **Need server‑only push (lightweight) & HTTP infra reuse?** → **SSE**
@@ -12208,7 +12208,7 @@ export function usePolling(fetchFn: (signal: AbortSignal) => Promise<void>, base
 
 ***
 
-## **Banking‑specific tips**
+### **Banking‑specific tips**
 
 *   Coalesce frequent updates (e.g., emit only the **latest** price to UI)
 *   Use **topic/room** subscriptions (symbol, accountId) to limit data volume
@@ -12275,21 +12275,21 @@ This breaks payments, UPI mandates, investments, trading, etc.
 
 # 🛠 **Recommended Strategy (Banking Standard)**
 
-## **1) Fetch server time at app startup**
+### **1) Fetch server time at app startup**
 
 API:
 
     GET /time
     → { serverTime: 1738823100000 } // UNIX ms
 
-## **2) Compute offset**
+### **2) Compute offset**
 
 ```ts
 const deviceTime = Date.now();
 const delta = serverTime - deviceTime; // can be + or -
 ```
 
-## **3) Store delta in memory (NOT persistent)**
+### **3) Store delta in memory (NOT persistent)**
 
 ```ts
 let TIME_OFFSET = delta;
@@ -12421,7 +12421,7 @@ Mask or sanitize logs.
 
 ***
 
-### **7) Data Storage & Offline Strategy (6 questions)**
+### 7) Data Storage & Offline Strategy (6 questions)
 
 <details>
   <summary>Data Storage & Offline Strategy (6)</summary>
@@ -12430,7 +12430,7 @@ Mask or sanitize logs.
 
   <details><summary>63. Compare AsyncStorage, MMKV, SQLite, Realm.</summary>
 
-## Decision Guide
+### Decision Guide
 
 *   **Feature flags, tokens, small JSON, preferences:** **MMKV** (fastest, robust) → fallback **AsyncStorage** for simplest setups.
 *   **Relational data, complex queries, reports, pagination:** **SQLite** (deterministic, ACID, SQL you know).
@@ -12439,7 +12439,7 @@ Mask or sanitize logs.
 
 ***
 
-## One-liner summaries
+### One-liner summaries
 
 *   **AsyncStorage**: Simple key–value **JS bridge** storage (community module). OK for **small, non-sensitive** config/state. Not fast for heavy reads/writes.
 *   **MMKV**: **Native, memory-mapped** key–value store (via JSI). **Ultra-fast**, type-safe primitives, optional encryption. Great default for app state.
@@ -12448,7 +12448,7 @@ Mask or sanitize logs.
 
 ***
 
-## What to use when (banking/servicing context)
+### What to use when (banking/servicing context)
 
 | Scenario                                                       | Best Pick                       | Why                                                             |
 | -------------------------------------------------------------- | ------------------------------- | --------------------------------------------------------------- |
@@ -12460,7 +12460,7 @@ Mask or sanitize logs.
 
 ***
 
-## Performance & Architecture
+### Performance & Architecture
 
 *   **AsyncStorage**: JS ↔ native bridge JSON serialization → **slower**, especially under frequent reads/writes. Good for < a few hundred keys.
 *   **MMKV**: Native C++ storage + **JSI** (no bridge). **Near-constant time** reads, great for frequently accessed state.
@@ -12469,7 +12469,7 @@ Mask or sanitize logs.
 
 ***
 
-## Encryption & Security (important for banking)
+### Encryption & Security (important for banking)
 
 *   **AsyncStorage**: No built-in encryption. Wrap with app-layer encryption if used beyond trivial prefs.
 *   **MMKV**: Supports encryption (single key). Still treat as **sensitive**; key management matters.
@@ -12480,7 +12480,7 @@ Mask or sanitize logs.
 
 ***
 
-## Migrations & Tooling
+### Migrations & Tooling
 
 *   **AsyncStorage/MMKV**: Manual key migrations (version namespacing).
 *   **SQLite**: Migration scripts (DDL), robust versioning; easy to diff/schema evolve.
@@ -12488,7 +12488,7 @@ Mask or sanitize logs.
 
 ***
 
-## Bundle Size & Complexity
+### Bundle Size & Complexity
 
 *   **AsyncStorage**: Tiny, simplest.
 *   **MMKV**: Small native dep; minimal cognitive load.
@@ -12497,7 +12497,7 @@ Mask or sanitize logs.
 
 ***
 
-## Quick code snippets
+### Quick code snippets
 
 > *Note: Don’t put secrets directly here. Use Keychain/Keystore for tokens/passwords.*
 
@@ -12626,7 +12626,7 @@ txns.addListener((collection, changes) => {
 
 ***
 
-## Common pitfalls & banking-grade recommendations
+### Common pitfalls & banking-grade recommendations
 
 1.  **Don’t store secrets in AsyncStorage/MMKV/SQLite/Realm unencrypted.** Use **Keychain/Keystore** (with biometrics if needed).
 2.  **Enable at-rest encryption** for any DB that may cache PII (Realm encryption or SQLCipher for SQLite).
@@ -12638,7 +12638,7 @@ txns.addListener((collection, changes) => {
 
 ***
 
-## Quick “Which one should I say in interview?”
+### Quick “Which one should I say in interview?”
 
 *   “For **config and fast app state** I use **MMKV**; for **structured transactional data** I pick **SQLite** with indexes and migrations; for **offline-first with complex domain models** and **encrypted at rest** I like **Realm**. **AsyncStorage** is fine for small non-sensitive flags but I avoid it for heavy lifting.”
 
@@ -12713,7 +12713,7 @@ await Keychain.setGenericPassword('db_key', '<<64-byte-random-key>>', {
 
 # **3. Encrypt-at-Rest per Storage Type**
 
-## **a) MMKV Encryption**
+### **a) MMKV Encryption**
 
 MMKV supports AES encryption natively.
 
@@ -12732,7 +12732,7 @@ export const storage = new MMKV({
 
 ***
 
-## **b) SQLite Encryption (SQLCipher)**
+### **b) SQLite Encryption (SQLCipher)**
 
 SQLite itself is NOT encrypted.  
 To use encrypted DB:
@@ -12751,7 +12751,7 @@ const db = SQLite.openDatabase({
 
 ***
 
-## **c) Realm Encryption**
+### **c) Realm Encryption**
 
 Realm supports built-in AES‑256 encryption.
 
@@ -12767,7 +12767,7 @@ const realm = await Realm.open({
 
 ***
 
-## **d) File Encryption**
+### **d) File Encryption**
 
 For files (PDF statements, receipts, downloaded documents):
 
@@ -12794,7 +12794,7 @@ cipher.init(Cipher.ENCRYPT_MODE, secretKeyFromKeystore);
 
 # **4. Encryption Strategies (Best Practices)**
 
-## **A. App-Level Encryption (AES‑256‑GCM)**
+### **A. App-Level Encryption (AES‑256‑GCM)**
 
 Encrypt sensitive blobs manually:
 
@@ -12807,7 +12807,7 @@ BUT → appKey **must** come from Keychain/Keystore.
 
 ***
 
-## **B. Envelope Encryption**
+### **B. Envelope Encryption**
 
 Industry standard for banking.
 
@@ -12822,7 +12822,7 @@ Reduces exposure and allows key rotation.
 
 ***
 
-## **C. Key Rotation Strategy**
+### **C. Key Rotation Strategy**
 
 *   Maintain **key\_version** in storage.
 *   On new app version:
@@ -12948,7 +12948,7 @@ In banking apps:
 
 # **4. Conflict Resolution Strategies**
 
-## **Strategy A: Timestamp Versioning (LWW)**
+### **Strategy A: Timestamp Versioning (LWW)**
 
 Each record has:
 
@@ -12976,7 +12976,7 @@ Used for:
 
 ***
 
-## **Strategy B: Operational Queue Replay (Event Sourcing)**
+### **Strategy B: Operational Queue Replay (Event Sourcing)**
 
 Each offline action is a **command**.
 
@@ -12992,7 +12992,7 @@ If server fails any operation—stop and show conflict UI.
 
 ***
 
-## **Strategy C: Server Authoritative Overwrite**
+### **Strategy C: Server Authoritative Overwrite**
 
 For sensitive financial objects:
 
@@ -13005,7 +13005,7 @@ No merge.
 
 ***
 
-## **Strategy D: Manual User Resolution**
+### **Strategy D: Manual User Resolution**
 
 Used rarely (e.g., standing instruction edit conflict).
 
@@ -13047,7 +13047,7 @@ Executes commands in order.
 
 # **6. Code Examples**
 
-## **A. Storing Offline Operation**
+### **A. Storing Offline Operation**
 
 ```ts
 realm.write(() => {
@@ -13063,7 +13063,7 @@ realm.write(() => {
 
 ***
 
-## **B. Sync Engine Logic**
+### **B. Sync Engine Logic**
 
 ```ts
 async function processQueue() {
@@ -13092,7 +13092,7 @@ async function processQueue() {
 
 ***
 
-## **C. Version-Based Conflict Handling**
+### **C. Version-Based Conflict Handling**
 
 ```ts
 if (local.updatedAt > server.updatedAt) {
@@ -13771,7 +13771,7 @@ export async function isDeviceCompromised() {
 
 ***
 
-### **8) Security, Compliance & Privacy (Financial Apps) (14 questions)**
+### 8) Security, Compliance & Privacy (Financial Apps) (14 questions)
 
 <details>
   <summary>Security, Compliance &amp; Privacy (14)</summary>
@@ -13801,7 +13801,7 @@ Below is the **developer-friendly summary**:
 
 ***
 
-## **1. MASVS-STORAGE**
+### **1. MASVS-STORAGE**
 
 ### *Secure Data Storage*
 
@@ -13818,7 +13818,7 @@ Includes:
 
 ***
 
-## **2. MASVS-CRYPTO**
+### **2. MASVS-CRYPTO**
 
 ### *Secure Cryptography*
 
@@ -13835,7 +13835,7 @@ Includes:
 
 ***
 
-## **3. MASVS-AUTH**
+### **3. MASVS-AUTH**
 
 ### *Authentication & Session Management*
 
@@ -13852,7 +13852,7 @@ Includes:
 
 ***
 
-## **4. MASVS-NETWORK**
+### **4. MASVS-NETWORK**
 
 ### *Secure Network Communication*
 
@@ -13869,7 +13869,7 @@ Includes:
 
 ***
 
-## **5. MASVS-PLATFORM**
+### **5. MASVS-PLATFORM**
 
 ### *Interaction with OS & Platform Security Features*
 
@@ -13886,7 +13886,7 @@ Includes:
 
 ***
 
-## **6. MASVS-CODE**
+### **6. MASVS-CODE**
 
 ### *Secure Coding & Hardening*
 
@@ -13903,7 +13903,7 @@ Includes:
 
 ***
 
-## **7. MASVS-RESILIENCE**
+### **7. MASVS-RESILIENCE**
 
 ### *Anti-Tampering & Runtime Protection*
 
@@ -13920,7 +13920,7 @@ Includes:
 
 ***
 
-## **8. MASVS-ARCHITECTURE**
+### **8. MASVS-ARCHITECTURE**
 
 ### *Secure Application Architecture*
 
@@ -14612,7 +14612,7 @@ Most critical for banking apps because attackers use **Frida**, **Xposed**, **Ma
 
 ### **1. Detect Hooking Frameworks**
 
-#### **Detect Frida**
+##### **Detect Frida**
 
 *   Scan for Frida server ports: `27042`, `27043`
 *   Look for processes:
@@ -14622,7 +14622,7 @@ Most critical for banking apps because attackers use **Frida**, **Xposed**, **Ma
     *   `frida-gadget`
     *   `libfrida.so`
 
-#### **Detect Xposed / LSPosed**
+##### **Detect Xposed / LSPosed**
 
 Check for classes in memory:
 
@@ -14630,7 +14630,7 @@ Check for classes in memory:
 Class.forName("de.robv.android.xposed.XposedBridge");
 ```
 
-#### **Detect Magisk**
+##### **Detect Magisk**
 
 Check for files:
 
@@ -15713,7 +15713,7 @@ Below is the precise, banking‑grade explanation expected in interviews.
 
 # ✅ **A. Key Risks of Using WebViews in Banking Apps**
 
-## **1. JavaScript Injection / XSS inside WebView**
+### **1. JavaScript Injection / XSS inside WebView**
 
 If the WebView loads dynamic HTML or remote content:
 
@@ -15725,7 +15725,7 @@ If the WebView loads dynamic HTML or remote content:
 
 ***
 
-## **2. Unsafe `window.postMessage` / JS bridge**
+### **2. Unsafe `window.postMessage` / JS bridge**
 
 React Native WebView exposes:
 
@@ -15744,7 +15744,7 @@ Attackers can:
 
 ***
 
-## **3. Loading arbitrary URLs → Phishing**
+### **3. Loading arbitrary URLs → Phishing**
 
 If WebView can load any URL:
 
@@ -15755,7 +15755,7 @@ If WebView can load any URL:
 
 ***
 
-## **4. Mixed content (HTTP + HTTPS)**
+### **4. Mixed content (HTTP + HTTPS)**
 
 If WebView allows HTTP:
 
@@ -15764,7 +15764,7 @@ If WebView allows HTTP:
 
 ***
 
-## **5. File system access**
+### **5. File system access**
 
 Android WebViews can access:
 
@@ -15774,7 +15774,7 @@ Android WebViews can access:
 
 ***
 
-## **6. Cookie theft**
+### **6. Cookie theft**
 
 If using WebView sessions:
 
@@ -15783,7 +15783,7 @@ If using WebView sessions:
 
 ***
 
-## **7. Debugging enabled in production**
+### **7. Debugging enabled in production**
 
 WebViews can expose:
 
@@ -16038,7 +16038,7 @@ Shown via:
 
 # ✅ **2. User Rights (You Must Implement in Banking Apps)**
 
-## **GDPR Rights**
+### **GDPR Rights**
 
 *   **Right to Access** → Users can request all data you hold
 *   **Right to Rectification** → Fix incorrect data
@@ -16048,7 +16048,7 @@ Shown via:
 *   **Right to Object (opt‑out)**
 *   **Right Not to Be Profiled / Automated Decisions**
 
-## **CPRA Rights**
+### **CPRA Rights**
 
 *   **Right to Know** what is collected
 *   **Right to Delete**
@@ -16579,7 +16579,7 @@ Classify data:
 
 ***
 
-### **9) Performance & Build Optimization (10 questions)**
+### 9) Performance & Build Optimization (10 questions)
 
 <details>
   <summary>Performance &amp; Optimization (10)</summary>
@@ -16588,7 +16588,7 @@ Classify data:
 
   <details><summary>83. How to measure app startup time & TTI?</summary>
 
-## **83. How to measure app startup time & TTI (Time‑to‑Interactive) in React Native?**
+### **83. How to measure app startup time & TTI (Time‑to‑Interactive) in React Native?**
 
 In React Native, startup performance is mainly about:
 
@@ -16599,7 +16599,7 @@ In React Native, startup performance is mainly about:
 
 # ✅ **1. Measure Startup Time (Native + JS)**
 
-## **A) Using JavaScript timestamps (simple & effective)**
+### **A) Using JavaScript timestamps (simple & effective)**
 
 ```js
 // index.js
@@ -16742,7 +16742,7 @@ Here are the **most effective strategies** with short explanations + examples.
 
 ***
 
-## **1️⃣ Use Hermes (BIGGEST reduction)**
+### **1️⃣ Use Hermes (BIGGEST reduction)**
 
 Hermes produces **smaller bytecode bundles** compared to JS bundles.
 
@@ -16764,7 +16764,7 @@ config[:hermes_enabled] = true
 
 ***
 
-## **2️⃣ Remove Unused / Heavy Dependencies**
+### **2️⃣ Remove Unused / Heavy Dependencies**
 
 Run:
 
@@ -16783,7 +16783,7 @@ Examples of **heavy libraries to replace**:
 
 ***
 
-## **3️⃣ Use Named Imports (Tree-Shaking Friendly)**
+### **3️⃣ Use Named Imports (Tree-Shaking Friendly)**
 
 Bad:
 
@@ -16801,7 +16801,7 @@ Same for date-fns, lodash-es, ramda.
 
 ***
 
-## **4️⃣ Minify & Shrink Code (Metro + ProGuard)**
+### **4️⃣ Minify & Shrink Code (Metro + ProGuard)**
 
 ### **Android ProGuard**
 
@@ -16823,7 +16823,7 @@ shrinkResources true
 
 ***
 
-## **5️⃣ Enable Hermes Bytecode Pre-Compilation**
+### **5️⃣ Enable Hermes Bytecode Pre-Compilation**
 
 RN 0.71+ supports **precompiled bytecode**, dramatically shrinking JS bundle.
 
@@ -16837,7 +16837,7 @@ enableHermesBytecodePrecompilation true
 
 ***
 
-## **6️⃣ Split Bundles by Environment**
+### **6️⃣ Split Bundles by Environment**
 
 Use env-based dynamic bundling:
 
@@ -16851,7 +16851,7 @@ Production bundle excludes dev‑only modules.
 
 ***
 
-## **7️⃣ Lazy Load Heavy Modules (Code Splitting)**
+### **7️⃣ Lazy Load Heavy Modules (Code Splitting)**
 
 Example: Load charts/screens only when needed.
 
@@ -16863,7 +16863,7 @@ This keeps your **initial bundle very small**.
 
 ***
 
-## **8️⃣ Compress Images & Use WebP**
+### **8️⃣ Compress Images & Use WebP**
 
 Optimize static assets:
 
@@ -16885,7 +16885,7 @@ module.exports = {
 
 ***
 
-## **9️⃣ Use react-native-mmkv Instead of AsyncStorage**
+### **9️⃣ Use react-native-mmkv Instead of AsyncStorage**
 
 AsyncStorage adds overhead; MMKV is **smaller and faster**.
 
@@ -16895,7 +16895,7 @@ import MMKVStorage from "react-native-mmkv-storage";
 
 ***
 
-## **🔟 Remove Inline JSON / Move to Remote Config**
+### **🔟 Remove Inline JSON / Move to Remote Config**
 
 Avoid large inline config files:
 
@@ -16923,7 +16923,7 @@ Good ✔️
 
   <details><summary>85. Preventing heavy operations on JS thread.</summary>
 
-## **85. Preventing heavy operations on the JS thread**
+### **85. Preventing heavy operations on the JS thread**
 
 ### 🎯 Goal
 
@@ -16931,7 +16931,7 @@ Keep the **JS event loop** free for: rendering, handling gestures, and schedulin
 
 ***
 
-## ✅ Core Strategies (what to say in interview)
+### ✅ Core Strategies (what to say in interview)
 
 1.  **Move CPU‑intensive work off JS**
 
@@ -16964,7 +16964,7 @@ Keep the **JS event loop** free for: rendering, handling gestures, and schedulin
 
 ***
 
-## 📦 Library Choices that keep JS thread light
+### 📦 Library Choices that keep JS thread light
 
 *   **Reanimated 2/3**: UI thread animations via **worklets**
 *   **react-native-gesture-handler**: low-latency gestures off JS
@@ -16975,7 +16975,7 @@ Keep the **JS event loop** free for: rendering, handling gestures, and schedulin
 
 ***
 
-## 🧩 Code Patterns
+### 🧩 Code Patterns
 
 ### 1) **Defer non‑critical work**
 
@@ -17126,7 +17126,7 @@ useEffect(() => {
 
 ***
 
-## 🚦 What to watch in profiling
+### 🚦 What to watch in profiling
 
 *   **Flipper**: JS CPU usage, UI thread stalls, React DevTools “Commit” times
 *   **Hermes Profiling**: sampling profiler to find long JS frames
@@ -17134,7 +17134,7 @@ useEffect(() => {
 
 ***
 
-## 🧠 Banking‑app specifics
+### 🧠 Banking‑app specifics
 
 *   OTP/login screens must feel instant → keep JS “cold path” minimal
 *   Masking/formatting on inputs (PAN, account numbers) must be **cheap** → memoize & defer heavy validation
@@ -17143,7 +17143,7 @@ useEffect(() => {
 
 ***
 
-## 📌 Short summary (to say in interview)
+### 📌 Short summary (to say in interview)
 
 > **Keep the JS thread free** by running animations/gestures on the **UI thread** (Reanimated), offloading CPU work to **native/JSI or worker threads**, deferring non‑critical tasks with **InteractionManager**/**rAF**, chunking large loops, batching storage/bridge calls, and tuning virtualized lists. Profile with **Flipper** and **Hermes** to catch long JS frames and move those operations off the hot path.
 
@@ -17360,7 +17360,7 @@ const resized = await ImageResizer.createResizedImage(uri, 1024, 1024, 'JPEG', 8
 
   <details><summary>87. Jank-free animations using Reanimated.</summary>
 
-## 🎯 Core Principle
+### 🎯 Core Principle
 
 Reanimated runs animations on the **UI thread** via **worklets**, keeping them independent of the JS thread. That’s how you avoid dropped frames during heavy JS work.
 
@@ -17368,7 +17368,7 @@ Reanimated runs animations on the **UI thread** via **worklets**, keeping them i
 
 ***
 
-## ✅ Key Building Blocks
+### ✅ Key Building Blocks
 
 ### 1) **Shared Values** (mutable state on UI thread)
 
@@ -17420,7 +17420,7 @@ const pan = Gesture.Pan()
 
 ***
 
-## 🛠️ Patterns for Smoothness (60 FPS)
+### 🛠️ Patterns for Smoothness (60 FPS)
 
 ### A) Avoid JS work during animations
 
@@ -17486,7 +17486,7 @@ Great for list insertions/removals **without JS**.
 
 ***
 
-## 📦 Gesture + Physics Example (Bottom Sheet)
+### 📦 Gesture + Physics Example (Bottom Sheet)
 
 ```tsx
 const translateY = useSharedValue(HEIGHT);
@@ -17529,7 +17529,7 @@ return (
 
 ***
 
-## 🧩 React State ↔ Worklets (Use `runOnJS` sparingly)
+### 🧩 React State ↔ Worklets (Use `runOnJS` sparingly)
 
 Only jump back to JS if absolutely needed (e.g., analytics, React state).
 
@@ -17549,7 +17549,7 @@ function onSnapEndJS(state: 'open' | 'closed') {
 
 ***
 
-## 🧠 Performance Tips
+### 🧠 Performance Tips
 
 *   **Keep worklets pure**: no closures over big objects; pass primitives or use **`useSharedValue`**.
 *   **Avoid creating new objects in worklets every frame** (e.g., new arrays). Compute scalars, reuse objects in UI styles cautiously.
@@ -17558,7 +17558,7 @@ function onSnapEndJS(state: 'open' | 'closed') {
 
 ***
 
-## 📈 Profiling & Debugging
+### 📈 Profiling & Debugging
 
 *   **Reanimated DevTools**: inspect shared values and animations (enable in Babel plugin if needed).
 *   **Flipper**:
@@ -17568,7 +17568,7 @@ function onSnapEndJS(state: 'open' | 'closed') {
 
 ***
 
-## 🛡️ Banking App Specifics
+### 🛡️ Banking App Specifics
 
 *   Use **snappy, predictable physics** (low overshoot) for money‑related interactions (card carousel, sheet, OTP keypad).
 *   Keep animations subtle and fast (120–200ms timings, or spring damping).
@@ -17577,7 +17577,7 @@ function onSnapEndJS(state: 'open' | 'closed') {
 
 ***
 
-## 🔎 Minimal Template (Card Flip)
+### 🔎 Minimal Template (Card Flip)
 
 ```tsx
 const rotate = useSharedValue(0);
@@ -17606,7 +17606,7 @@ const flip = () => {
 
 ***
 
-## 📝 Quick Interview Sound‑Bite
+### 📝 Quick Interview Sound‑Bite
 
 > “I use **Reanimated worklets + shared values** with **RNGH** so gestures and animations run on the **UI thread**. I keep React re-renders minimal, use **derived values**, cancel/sequence animations properly, and rely on **Layout Animations** for list transitions. I avoid `runOnJS` except for side effects and profile with **Flipper/Hermes** to ensure 60 FPS.”
 
@@ -17626,7 +17626,7 @@ These are the **two most commonly used** tools to detect and fix memory leaks in
 
 Flipper gives a **JS + RN + Native** view of memory usage.
 
-## **1. Flipper Debugging Tools for Memory Leaks**
+### **1. Flipper Debugging Tools for Memory Leaks**
 
 ### **1) React DevTools → Profiler**
 
@@ -17661,7 +17661,7 @@ Shows:
 
 ***
 
-## **2. Flipper Workflow (Step-by-Step)**
+### **2. Flipper Workflow (Step-by-Step)**
 
 ### **Step 1: Enable Hermes (required for JS heap snapshot)**
 
@@ -17725,7 +17725,7 @@ Most accurate tool for iOS native memory leaks.
 
 ***
 
-## **1. Useful Instruments Tools**
+### **1. Useful Instruments Tools**
 
 ### **1) Allocations Profiler**
 
@@ -17753,7 +17753,7 @@ Helps detect:
 
 ***
 
-## **2. Instruments Workflow**
+### **2. Instruments Workflow**
 
 ### **Step 1: Open Xcode → Product → Profile**
 
@@ -17873,7 +17873,7 @@ Common budgets in React Native apps:
 
 ***
 
-## **1) Enforce JS Bundle Size Limit (CI script)**
+### **1) Enforce JS Bundle Size Limit (CI script)**
 
 Example: detect if bundle size grew >10% or crosses threshold.
 
@@ -17902,7 +17902,7 @@ Add this step into your CI pipeline.
 
 ***
 
-## **2) Enforce Startup Time / TTI Budget**
+### **2) Enforce Startup Time / TTI Budget**
 
 Use **E2E test automation** + performance markers.
 
@@ -17933,7 +17933,7 @@ Used in **BrowserStack / Firebase Test Lab** devices.
 
 ***
 
-## **3) Enforce Memory Budgets**
+### **3) Enforce Memory Budgets**
 
 Use `adb shell dumpsys meminfo` in CI:
 
@@ -17948,7 +17948,7 @@ fi
 
 ***
 
-## **4) Enforce FPS / No Jank (UI Thread Budget)**
+### **4) Enforce FPS / No Jank (UI Thread Budget)**
 
 Use **Flipper Performance Plugin** programmatically:
 
@@ -17963,7 +17963,7 @@ Automation tools:
 
 ***
 
-## **5) Enforce Network Payload Size**
+### **5) Enforce Network Payload Size**
 
 Add API response size checks:
 
@@ -17981,7 +17981,7 @@ Used in **pre-prod builds** only.
 
 ***
 
-## **6) Integrate With GitHub Actions (Example)**
+### **6) Integrate With GitHub Actions (Example)**
 
 ```yaml
 name: Performance Budget Check
@@ -18462,7 +18462,7 @@ With **bytecode preloading**, Hermes compiles the JS bundle into **.hbc (Hermes 
 
 # 🚀 **Advantages**
 
-## **1️⃣ Huge Reduction in Startup Time (TTI / Cold Start)**
+### **1️⃣ Huge Reduction in Startup Time (TTI / Cold Start)**
 
 When you preload bytecode:
 
@@ -18480,7 +18480,7 @@ For banking apps:
 
 ***
 
-## **2️⃣ Smaller JS Bundle Size**
+### **2️⃣ Smaller JS Bundle Size**
 
 Hermes bytecode (`.hbc`) is:
 
@@ -18494,7 +18494,7 @@ Smaller bundle → faster OTA delivery via CodePush or custom OTA.
 
 ***
 
-## **3️⃣ Lower Memory Usage**
+### **3️⃣ Lower Memory Usage**
 
 Hermes bytecode:
 
@@ -18510,7 +18510,7 @@ Particularly useful for:
 
 ***
 
-## **4️⃣ Faster Execution (Less JIT Overhead)**
+### **4️⃣ Faster Execution (Less JIT Overhead)**
 
 Hermes bytecode uses an **ahead-of-time compilation model**, resulting in:
 
@@ -18522,7 +18522,7 @@ This removes a major performance spike during early screen navigation.
 
 ***
 
-## **5️⃣ Reduces "JS Parsing Overload" Spikes**
+### **5️⃣ Reduces "JS Parsing Overload" Spikes**
 
 Without preloading, JS parsing can cause:
 
@@ -18534,7 +18534,7 @@ With preloading → **zero parsing** → smoother startup.
 
 ***
 
-## **6️⃣ Improves CI / Release Reliability**
+### **6️⃣ Improves CI / Release Reliability**
 
 Precompiled bytecode means:
 
@@ -18550,7 +18550,7 @@ enableHermesBytecodePrecompilation true
 
 ***
 
-## **7️⃣ Perfect for CodePush / OTA Updates**
+### **7️⃣ Perfect for CodePush / OTA Updates**
 
 When delivering OTA updates:
 
@@ -18596,7 +18596,7 @@ hermes_bytecode_precompile => true
 
 ***
 
-### **10) Build, Release & CI/CD (8 questions)**
+### 10) Build, Release & CI/CD (8 questions)
 
 <details>
   <summary>Build, Release &amp; CI/CD (8)</summary>
@@ -18611,7 +18611,7 @@ Goal: Ship the **same codebase** to multiple environments (e.g., **dev**, **stag
 
 ***
 
-## ✅ ANDROID — **Product Flavors** (+ Build Types)
+### ✅ ANDROID — **Product Flavors** (+ Build Types)
 
 ### 1) **Define flavors** (app/build.gradle)
 
@@ -18741,7 +18741,7 @@ fetch(`${Config.API_URL}/v1/balance`);
 
 ***
 
-## ✅ iOS — **Schemes + Configurations + xcconfig**
+### ✅ iOS — **Schemes + Configurations + xcconfig**
 
 ### 1) **Create Configurations**
 
@@ -18849,21 +18849,21 @@ xcodebuild -scheme "MyBank Dev" -configuration Dev -workspace MyBank.xcworkspace
 
 ***
 
-## 🔐 Provisioning, Signing, and Bundle IDs
+### 🔐 Provisioning, Signing, and Bundle IDs
 
 *   **Android**: Each flavor can use a different **signingConfig** (dev/staging debug keys; prod release key).
 *   **iOS**: Each configuration uses its own **Bundle ID**, **Provisioning Profile**, and **Signing Certificate** (often managed via **Fastlane match**).
 
 ***
 
-## 🌐 Deep Links & App Links per env
+### 🌐 Deep Links & App Links per env
 
 *   **Android**: Use flavor‑specific `manifestPlaceholders` and **assetlinks.json** per env.
 *   **iOS**: Use `CFBundleURLSchemes` and **apple-app-site-association** per bundle ID/domain.
 
 ***
 
-## 🔥 CI/CD Matrix (GitHub Actions example)
+### 🔥 CI/CD Matrix (GitHub Actions example)
 
 ```yaml
 name: Build Matrix
@@ -18904,14 +18904,14 @@ jobs:
 
 ***
 
-## 🧩 CodePush/AppCenter keys per env
+### 🧩 CodePush/AppCenter keys per env
 
 *   **Android**: put **CodePushDeploymentKey** in each flavor’s `strings.xml` or `react-native-config`.
 *   **iOS**: inject via `xcconfig` → Info.plist and pass to CodePush on init.
 
 ***
 
-## 🎯 Interview Sound‑Bite
+### 🎯 Interview Sound‑Bite
 
 > “I configure **Android product flavors** and **iOS schemes/configurations** to support dev/staging/prod with unique bundle IDs, icons, API endpoints, deep link schemes, Firebase configs, and signing. On Android I use **flavorDimensions**, `applicationIdSuffix`, `manifestPlaceholders`, and per‑flavor resources. On iOS I use **schemes + xcconfig + Info.plist variables** and per‑configuration provisioning. CI runs a **matrix build** across envs, and we wire env vars via **react-native-config** and CodePush keys per environment. This lets us ship and test safely without cross‑contamination.”
 
@@ -18925,7 +18925,7 @@ jobs:
 
 ***
 
-## 🎯 Goals
+### 🎯 Goals
 
 *   **Enable minification + resource shrinking** for small APK/AAB.
 *   **Keep only what reflection needs** (RN bridge, JSON mappers, DI, annotations).
@@ -18934,7 +18934,7 @@ jobs:
 
 ***
 
-## ✅ Gradle Setup (Release)
+### ✅ Gradle Setup (Release)
 
 ```gradle
 // android/app/build.gradle
@@ -18955,7 +18955,7 @@ android {
 
 ***
 
-## ✅ Core R8/ProGuard Rules (React Native + Common Libs)
+### ✅ Core R8/ProGuard Rules (React Native + Common Libs)
 
 Paste into `android/app/proguard-rules.pro` and keep only what you use.
 
@@ -19140,7 +19140,7 @@ Paste into `android/app/proguard-rules.pro` and keep only what you use.
 
 ***
 
-## 📦 React Native specifics (why these rules?)
+### 📦 React Native specifics (why these rules?)
 
 *   RN uses **reflection** to register modules/views, load Hermes, and hook JSI/TurboModules. Over‑aggressive obfuscation can break initialization or module lookup.
 *   Networking/JSON libraries rely on **annotations and generated adapters**—you must keep annotations and relevant class members.
@@ -19148,7 +19148,7 @@ Paste into `android/app/proguard-rules.pro` and keep only what you use.
 
 ***
 
-## 🧪 Troubleshooting checklist
+### 🧪 Troubleshooting checklist
 
 *   **Crashes only in Release** → likely R8 removed or obfuscated something needed by reflection.
 *   Look for:
@@ -19163,7 +19163,7 @@ Paste into `android/app/proguard-rules.pro` and keep only what you use.
 
 ***
 
-## 🔐 Security + Size best practices
+### 🔐 Security + Size best practices
 
 *   Use **R8 (default)**; it performs shrinking + obfuscation + optimization in one step.
 *   Enable `shrinkResources true` to strip unused resources.
@@ -19182,7 +19182,7 @@ Paste into `android/app/proguard-rules.pro` and keep only what you use.
 
 ***
 
-## 🧪 Minimal rule set to start (safe default)
+### 🧪 Minimal rule set to start (safe default)
 
 If you want the fewest lines that work for most RN apps:
 
@@ -19211,7 +19211,7 @@ Add other blocks as you integrate more libs.
 
 ***
 
-## 🎯 Short interview sound‑bite
+### 🎯 Short interview sound‑bite
 
 > “I enable `minifyEnabled` + `shrinkResources` and keep reflection‑dependent bits only: RN core (bridge/JSI), networking/JSON annotations, DI, WorkManager constructors, JNI, and `@Keep` models. I upload `mapping.txt` to Play/Crashlytics. This preserves functionality while maximizing obfuscation and size reduction.”
 
@@ -19893,7 +19893,7 @@ end
 
 # ⭐ **What Fastlane Automates in Practical Terms**
 
-## **iOS**
+### **iOS**
 
 ✔ Certificate creation  
 ✔ Provisioning profiles  
@@ -19902,7 +19902,7 @@ end
 ✔ TestFlight upload  
 ✔ App Store metadata / screenshots (optional)
 
-## **Android**
+### **Android**
 
 ✔ Gradle builds  
 ✔ Signing  
@@ -20189,7 +20189,7 @@ So we use:
 
 # ✅ **1. Phased Rollout Strategy (App Store & Play Store)**
 
-## **A) Google Play (Android)**
+### **A) Google Play (Android)**
 
 Google Play supports **staged rollouts** natively.
 
@@ -20215,7 +20215,7 @@ Select: 1%, 5%, 10%, 25%, 50%, 100%
 
 ***
 
-## **B) App Store (iOS)**
+### **B) App Store (iOS)**
 
 Apple supports **Phased Release** for App Store builds.
 
@@ -20282,7 +20282,7 @@ A **kill switch** remotely disables a broken feature or build **without shipping
 
 ***
 
-## **A) Global Kill Switch (block entire app version)**
+### **A) Global Kill Switch (block entire app version)**
 
 Backend returns:
 
@@ -20310,7 +20310,7 @@ This allows:
 
 ***
 
-## **B) Feature‑specific Kill Switch**
+### **B) Feature‑specific Kill Switch**
 
 Backend returns:
 
@@ -20450,7 +20450,7 @@ Below is a **real-world pipeline** structure:
 
 ***
 
-## **A) Lint + Unit Tests Pipeline**
+### **A) Lint + Unit Tests Pipeline**
 
 `.github/workflows/ci.yml`:
 
@@ -20486,7 +20486,7 @@ Ensures all PRs follow coding standards and don’t break business logic.
 
 ***
 
-## **B) E2E Testing (Detox/Maestro)**
+### **B) E2E Testing (Detox/Maestro)**
 
 ```yaml
 - uses: actions/setup-java@v3
@@ -20509,7 +20509,7 @@ OR Maestro (lighter):
 
 ***
 
-## **C) Android Release Build + Play Store Upload**
+### **C) Android Release Build + Play Store Upload**
 
 ```yaml
 jobs:
@@ -20547,7 +20547,7 @@ jobs:
 
 ***
 
-## **D) iOS Archive + TestFlight Upload (Fastlane)**
+### **D) iOS Archive + TestFlight Upload (Fastlane)**
 
 ```yaml
 jobs:
@@ -20585,7 +20585,7 @@ Bitrise provides **mobile-focused pipelines** and is incredibly good for RN.
 
 ***
 
-## **A) Typical Bitrise Workflow**
+### **A) Typical Bitrise Workflow**
 
 1.  **Git Clone**
 2.  **Install Node & Yarn**
@@ -20610,7 +20610,7 @@ Bitrise provides **mobile-focused pipelines** and is incredibly good for RN.
 
 ***
 
-## **B) Bitrise + RN E2E tests**
+### **B) Bitrise + RN E2E tests**
 
 Detox is heavy; Bitrise provides device testing add‑ons:
 
