@@ -7761,29 +7761,2318 @@ Requires a **JSI/native module** because App Attest uses:
 <details>
   <summary>Architecture &amp; State Management (12)</summary>
 
-  <details><summary>39. Compare Redux Toolkit, Zustand, Recoil, MobX for large apps.</summary></details>
+  <details><summary>39. Compare Redux Toolkit, Zustand, Recoil, MobX for large apps.</summary>
 
-  <details><summary>40. When to use React Query vs Redux?</summary></details>
+Here’s a **clean, interview‑ready comparison** of **Redux Toolkit, Zustand, Recoil, MobX** with a focus on **large‑scale enterprise/banking apps**, scalability, performance, DX, and architecture.
 
-  <details><summary>41. How to structure a scalable feature-first RN architecture?</summary></details>
+***
 
-  <details><summary>42. What is a domain layer? Why is it useful?</summary></details>
+# ✅ **39. Compare Redux Toolkit, Zustand, Recoil, MobX for large apps**
 
-  <details><summary>43. How to handle normalized data & selectors?</summary></details>
+Below is a structured comparison you can give in interviews.
 
-  <details><summary>44. How do you design loading/error states elegantly?</summary></details>
+***
 
-  <details><summary>45. Persisting state securely using redux-persist + MMKV.</summary></details>
+# 🟦 **1. Redux Toolkit (RTK)** — *Best for large, enterprise-scale apps*
 
-  <details><summary>46. Handling global authentication state across navigation.</summary></details>
+### ✔ Pros
 
-  <details><summary>47. Implementing feature flags safely.</summary></details>
+*   **Predictable state management** (immutable, pure reducers)
+*   **Enterprise‑friendly** architecture (actions, slices, middleware)
+*   Excellent **tooling** → Redux DevTools, RTK Query
+*   Strong **community & maintenance**
+*   Great for **team workflows** (clear patterns)
+*   Built‑in async handling (`createAsyncThunk`)
+*   RTK Query for data fetching, caching, invalidations
 
-  <details><summary>48. How to enforce separation of concerns for clean architecture?</summary></details>
+### ❌ Cons
 
-  <details><summary>49. Approaches for multi-brand / white-label apps.</summary></details>
+*   More boilerplate than others
+*   Verbose for small apps
+*   Immutability can be slow for very large states (though Immer optimizes)
 
-  <details><summary>50. Strategy for refactoring legacy Redux to RTK.</summary></details>
+### 🎯 Suitable for:
+
+*   **Large banking apps**
+*   Multi-team projects
+*   Strict architecture, auditability, reproducibility
+*   Heavy API usage → RTK Query shines
+
+***
+
+# 🟩 **2. Zustand** — *Simple, fast, minimal state management*
+
+### ✔ Pros
+
+*   Extremely **lightweight** (1KB+)
+*   **No boilerplate** → pure hooks
+*   Uses **mutability with Immer** (optional)
+*   Very **fast** due to shallow state listening
+*   Perfect for **local/global mixed state**
+*   Zero learning curve
+
+### ❌ Cons
+
+*   Not ideal when you need:
+    *   strict architecture
+    *   audit trails
+    *   middleware-heavy flows
+    *   time-travel debugging
+*   State spreads easily → risk of implicit coupling
+
+### 🎯 Suitable for:
+
+*   Medium apps
+*   Localized global state (filters, themes, UI data)
+*   Performance-critical modules
+
+### ❌ Not ideal for:
+
+*   **Very large enterprise apps needing strict patterns**
+
+***
+
+# 🟧 **3. Recoil** — *Best for dependency-based state graphs*
+
+### ✔ Pros
+
+*   **Atom/Selector architecture** (reactive graph)
+*   Automatic state derivation and memoization
+*   Great for complex UI state relationships (e.g., forms, dashboards)
+*   Minimal code, great DX
+
+### ❌ Cons
+
+*   Not as widely adopted in industry
+*   Less community ecosystem
+*   Not ideal for large backend-driven data apps
+*   No strong middleware story
+
+### 🎯 Suitable for:
+
+*   Dashboard apps
+*   UI-heavy interactions
+*   Form-based workflows
+
+### ❌ Not ideal for:
+
+*   **Banking apps with large API integrations**
+*   Strict architecture requirements
+
+***
+
+# 🟥 **4. MobX** — *Reactive, powerful, but risky for huge teams*
+
+### ✔ Pros
+
+*   Very **reactive**, minimal code
+*   Mutations feel natural (OOP-friendly)
+*   Very fast for **complex, nested state**
+*   Ideal for computed values and observers
+
+### ❌ Cons
+
+*   Harder to enforce patterns in big teams
+*   Debugging is harder (state changes can originate anywhere)
+*   Can become “magic” and unpredictable if not controlled
+*   Not strongly recommended for long-term maintenance in BFSI
+
+### 🎯 Suitable for:
+
+*   Apps needing reactive programming
+*   Smaller teams
+*   Heavy observable logic (forms, dashboards)
+
+### ❌ Not ideal for:
+
+*   **Enterprise apps requiring strict state governance**
+
+***
+
+# 🟦 **Comparison Table (Interview Friendly)**
+
+| Feature                 | **Redux Toolkit** | **Zustand** | **Recoil**        | **MobX**               |
+| ----------------------- | ----------------- | ----------- | ----------------- | ---------------------- |
+| Boilerplate             | Medium            | Low         | Low               | Low                    |
+| Performance             | Good              | ⭐ Excellent | Good              | ⭐ Excellent            |
+| Scalability             | ⭐⭐⭐⭐⭐             | ⭐⭐⭐         | ⭐⭐⭐               | ⭐⭐                     |
+| Team collaboration      | ⭐⭐⭐⭐⭐             | ⭐⭐          | ⭐⭐                | ⭐                      |
+| Debugging tools         | ⭐⭐⭐⭐⭐             | ⭐⭐          | ⭐                 | ⭐                      |
+| Architecture strictness | High              | Low         | Medium            | Low                    |
+| Learning curve          | Medium            | Very Easy   | Easy              | Medium                 |
+| Ecosystem               | Huge              | Medium      | Small             | Medium                 |
+| Best For                | Enterprise apps   | Medium apps | Complex UI graphs | Reactive UI-heavy apps |
+
+***
+
+# 🟦 **Which one should banks use?**
+
+### ✔ **Redux Toolkit (with RTK Query)** → Best for large-scale banking apps
+
+*   Predictable
+*   Auditable
+*   Great for multi-team collaboration
+*   Strong ecosystem
+*   Easy integration with analytics, logs, error boundaries
+*   Works perfectly with offline caching, pagination, normalized data
+
+### Zustand may be used for:
+
+*   Local states
+*   Feature-level isolated state
+
+But **not** as the main global state engine in enterprise.
+
+### Recoil + MobX:
+
+Good in theory, but **not widely adopted** in highly regulated domains.
+
+***
+
+# ⭐ Interview‑Ready Summary
+
+> For large apps, **Redux Toolkit** is the most scalable, predictable, and enterprise‑ready solution with excellent tooling and RTK Query.  
+> **Zustand** is great for lightweight, fast global state but not ideal for strict enterprise patterns.  
+> **Recoil** excels at UI-driven dependency graphs, but lacks ecosystem maturity.  
+> **MobX** is powerful and reactive, but less predictable and risky for large teams.
+
+  </details>
+
+  <details><summary>40. When to use React Query vs Redux?</summary>
+
+Here’s a **short, interview‑friendly**, and **developer‑clear** answer for:
+
+## **40. When to use React Query vs Redux?**
+
+### ✅ **TL;DR Answer**
+
+Use **React Query** for **server state**.  
+Use **Redux** for **client state**.
+
+***
+
+## **When to use React Query**
+
+Use **React Query** when dealing with **remote API data** that needs:
+
+*   Fetching, caching, retrying
+*   Background refreshing
+*   Pagination / infinite scroll
+*   Sync with server
+*   Avoiding boilerplate (Redux actions/reducers/thunks)
+
+**Good for:** Banking dashboards, account summaries, transactions list, loan statements — anything coming from server.
+
+### Example (React Query)
+
+```js
+const { data, isLoading } = useQuery(['transactions'], fetchTransactions);
+```
+
+***
+
+## **When to use Redux**
+
+Use **Redux** when handling **local UI/client-specific state** that multiple screens depend on:
+
+*   Authentication tokens (if not handled by secure storage)
+*   Global app configuration
+*   Feature flags
+*   Complex UI states
+*   Workflow states (multi-step forms)
+*   State not coming from server
+
+**Good for:** User preferences, app session data, multi-step KYC flow, internal business logic.
+
+### Example (Redux)
+
+```js
+const user = useSelector(state => state.user);
+dispatch(setTheme('dark'));
+```
+
+***
+
+## **Easy Comparison Table**
+
+| Need                | React Query | Redux                             |
+| ------------------- | ----------- | --------------------------------- |
+| Server data caching | ✅ Best      | ❌ Not built‑in                    |
+| Background refresh  | ✅ Yes       | ❌ Manual                          |
+| Automatic retries   | ✅ Yes       | ❌ Manual                          |
+| Complex UI state    | ❌ Not ideal | ✅ Best                            |
+| Global client state | ⚠️ Limited  | ✅ Great                           |
+| Boilerplate         | Low         | High (unless using Redux Toolkit) |
+
+***
+
+## **Interview One‑Liner**
+
+> **Use React Query for asynchronous server state and caching. Use Redux for global client state and complex UI workflows not tied to the backend.**
+
+  </details>
+
+  <details><summary>41. How to structure a scalable feature-first RN architecture?</summary>
+
+Below is a **short, clean, interview‑friendly** answer with a practical folder structure and explanation tailored for **React Native + Banking apps + scalability**.
+
+***
+
+# **41. How to structure a scalable feature-first React Native architecture?**
+
+### ✅ **Short Interview Answer**
+
+A **feature‑first architecture** groups files by *feature*, not by file type.  
+Each feature (e.g., *Login*, *Profile*, *Transactions*) is self‑contained with its own screens, components, hooks, API, and state.  
+This makes the app **scalable, modular, testable, and maintainable**—ideal for large financial apps.
+
+***
+
+# **Recommended Folder Structure**
+
+    src/
+      features/
+        auth/
+          screens/
+            LoginScreen.tsx
+            RegisterScreen.tsx
+          components/
+            LoginForm.tsx
+          api/
+            auth.api.ts
+          hooks/
+            useLogin.ts
+          state/
+            authSlice.ts or auth.query.ts (Redux/React Query)
+          types/
+            auth.types.ts
+          index.ts
+
+        transactions/
+          screens/
+            TransactionsList.tsx
+            TransactionDetail.tsx
+          components/
+            TransactionItem.tsx
+          api/
+            transactions.api.ts
+          hooks/
+            useTransactions.ts
+          state/
+            transactionsSlice.ts / transactions.query.ts
+          types/
+            transactions.types.ts
+          index.ts
+
+      shared/
+        components/
+        utils/
+        hooks/
+        constants/
+        theme/
+
+      navigation/
+      services/
+        http/
+        storage/
+      app.tsx
+
+***
+
+# **Why Feature‑First Works (Interview Points)**
+
+### ✔ **1. Scales easily**
+
+Each feature is isolated, so onboarding new devs is easy.
+
+### ✔ **2. Loose coupling**
+
+Features don’t depend on each other → low risk of regression.
+
+### ✔ **3. High cohesion**
+
+All logic related to a feature is stored together.
+
+### ✔ **4. Perfect for modular banking apps**
+
+Login, KYC, Payments, Transactions, Offers — all in separate modules.
+
+***
+
+# **How a Feature Looks (Example)**
+
+### 🔹 `auth/api/auth.api.ts`
+
+```ts
+import { apiClient } from "../../services/http";
+
+export const login = (payload) =>
+  apiClient.post("/login", payload);
+```
+
+### 🔹 `auth/hooks/useLogin.ts`
+
+```ts
+import { useMutation } from "@tanstack/react-query";
+import { login } from "../api/auth.api";
+
+export const useLogin = () => {
+  return useMutation(login);
+};
+```
+
+### 🔹 `auth/screens/LoginScreen.tsx`
+
+```tsx
+import { useLogin } from "../hooks/useLogin";
+
+export default function LoginScreen() {
+  const { mutate, isLoading } = useLogin();
+
+  return (
+    <Button
+      title="Login"
+      onPress={() => mutate({ username: "a", password: "b" })}
+      disabled={isLoading}
+    />
+  );
+}
+```
+
+***
+
+# **Key Principles (Mention in Interview)**
+
+### 1️⃣ **Feature Isolation**
+
+> Each feature has its own API, state, hooks, components.
+
+### 2️⃣ **Shared Layer for Reusable Logic**
+
+UI components, storage utils, fonts, themes go to `shared/`.
+
+### 3️⃣ **Service Layer for Networking**
+
+No direct API calls inside components.
+
+### 4️⃣ **Scalable State Options**
+
+*   Client state → Redux Toolkit
+*   Server state → React Query
+
+### 5️⃣ **Clean Navigation**
+
+Each feature exports its own screens → plugged into root navigator.
+
+***
+
+# **Interview One‑liner**
+
+> “In a scalable feature‑first React Native architecture, every feature is a self‑contained module including screens, API, state, hooks, and UI components. This leads to high cohesion, low coupling, and easy scalability for complex banking apps.”
+
+  </details>
+
+  <details><summary>42. What is a domain layer? Why is it useful?</summary>
+
+Here’s a **short, interview‑friendly**, super clear explanation suited for React Native + banking domain apps.
+
+***
+
+# **42. What is a Domain Layer? Why is it useful?**
+
+## ✅ **Short Interview Answer**
+
+The **Domain Layer** contains the **core business logic** of the app — the rules, policies, and use‑cases that define *how* the system should behave independent of UI, API, or database.  
+It makes the app **scalable, testable, and maintainable**, especially in complex banking workflows.
+
+***
+
+# **What is in the Domain Layer?**
+
+Typically includes:
+
+### **1) Use‑cases (business actions)**
+
+Example:
+
+*   “Fetch user balance”
+*   “Validate PAN number”
+*   “Calculate EMI”
+*   “Verify OTP”
+
+### **2) Entities / Models**
+
+Pure business objects — not tied to API response shape.
+
+### **3) Business rules & validations**
+
+All banking rules live here:
+
+*   transaction limits,
+*   KYC conditions,
+*   interest formulas, etc.
+
+***
+
+# **Why is the Domain Layer Useful?**
+
+## ✔ 1. **Keeps business logic independent**
+
+No UI or networking dependencies → easier changes.
+
+If API changes, domain layer remains same.
+
+## ✔ 2. **Highly testable**
+
+You can unit‑test domain logic without UI or backend.
+
+## ✔ 3. **Perfect for banking apps**
+
+Banking rules change often, but UI shouldn’t break.
+
+Domain isolates the complexity.
+
+## ✔ 4. **Reusability**
+
+Multiple screens can reuse the same use-case (e.g., `calculateEMI()` used in loans & calculators).
+
+## ✔ 5. **Scalable architecture**
+
+Clear boundary:  
+UI → Application → Domain → Infrastructure
+
+***
+
+# **Example Folder Structure (Clean Architecture Style)**
+
+    src/
+      domain/
+        entities/
+          Transaction.ts
+        useCases/
+          CalculateEMI.ts
+          FetchAccountBalance.ts
+        repositories/
+          AccountRepository.ts
+
+***
+
+# **Simple Code Example**
+
+### **Domain Layer → use case**
+
+```ts
+// domain/useCases/CalculateEMI.ts
+
+export const calculateEMI = ({ principal, interestRate, tenure }) => {
+  const r = interestRate / 12 / 100;
+  return (principal * r * Math.pow(1 + r, tenure)) /
+         (Math.pow(1 + r, tenure) - 1);
+};
+```
+
+### **UI Layer → uses the domain logic**
+
+```tsx
+import { calculateEMI } from "../../domain/useCases/CalculateEMI";
+
+const emi = calculateEMI({ principal: 500000, interestRate: 8.5, tenure: 60 });
+```
+
+***
+
+# **Interview One‑liner**
+
+> “A domain layer holds the core business logic and use‑cases, independent of UI or API. It makes the app clean, testable, and scalable—especially in banking where rules and workflows are complex.”
+
+  </details>
+
+  <details><summary>43. How to handle normalized data & selectors?</summary>
+
+Here’s a **short, interview‑friendly** guide with **code you can reuse**:
+
+***
+
+## **43. How to handle normalized data & selectors?**
+
+### ✅ **Short Interview Answer**
+
+*   **Normalize** relational data (store by `id`, keep arrays of ids).
+*   Use **Redux Toolkit `createEntityAdapter`** (or `normalizr`) to manage CRUD and keep state flat.
+*   Build **memoized selectors** with **Reselect (`createSelector`)** to derive views efficiently (joins, filters, pagination), avoiding unnecessary re-renders.
+*   Keep **feature-scoped selectors**, compose them, and always key selectors by params.
+
+***
+
+## Why normalize?
+
+*   Prevents duplication and inconsistent updates
+*   Makes updates O(1) via `id` lookups
+*   Enables cheap joins across entities (e.g., transactions → accounts → users)
+
+***
+
+## Recommended approach (Redux Toolkit)
+
+### 1) **Model normalized state with Entity Adapters**
+
+```ts
+// features/transactions/state/transactions.slice.ts
+import { createSlice, createEntityAdapter } from '@reduxjs/toolkit';
+
+type Transaction = {
+  id: string;
+  accountId: string;
+  amount: number;
+  currency: 'INR' | 'USD';
+  timestamp: string;
+  status: 'PENDING' | 'POSTED' | 'FAILED';
+};
+
+const transactionsAdapter = createEntityAdapter<Transaction>({
+  selectId: (t) => t.id,
+  sortComparer: (a, b) => b.timestamp.localeCompare(a.timestamp), // newest first
+});
+
+const initialState = transactionsAdapter.getInitialState({
+  // feature-specific UI state
+  filters: { status: 'ALL' as 'ALL' | Transaction['status'] },
+});
+
+export const transactionsSlice = createSlice({
+  name: 'transactions',
+  initialState,
+  reducers: {
+    upsertMany: transactionsAdapter.upsertMany,
+    upsertOne: transactionsAdapter.upsertOne,
+    removeOne: transactionsAdapter.removeOne,
+    setStatusFilter(state, action) {
+      state.filters.status = action.payload;
+    },
+  },
+});
+
+export const { upsertMany, upsertOne, removeOne, setStatusFilter } = transactionsSlice.actions;
+export default transactionsSlice.reducer;
+
+// Export base selectors (unscoped – need to pass feature state)
+export const transactionsSelectors = transactionsAdapter.getSelectors();
+```
+
+### 2) **Scope selectors per feature and compose**
+
+```ts
+// features/transactions/state/transactions.selectors.ts
+import { createSelector } from '@reduxjs/toolkit';
+import { RootState } from '../../../store';
+import { transactionsSelectors } from './transactions.slice';
+
+// Feature scope
+const selectTransactionsState = (state: RootState) => state.transactions;
+
+// Entity adapter selectors scoped to this feature
+export const selectTransactionById = (state: RootState, id: string) =>
+  transactionsSelectors.selectById(selectTransactionsState(state), id);
+
+export const selectAllTransactions = (state: RootState) =>
+  transactionsSelectors.selectAll(selectTransactionsState(state));
+
+export const selectTransactionIds = (state: RootState) =>
+  transactionsSelectors.selectIds(selectTransactionsState(state));
+
+export const selectStatusFilter = (state: RootState) =>
+  selectTransactionsState(state).filters.status;
+
+// Derived selector (memoized)
+export const selectFilteredTransactions = createSelector(
+  [selectAllTransactions, selectStatusFilter],
+  (txns, status) => (status === 'ALL' ? txns : txns.filter(t => t.status === status))
+);
+
+// Parameterized selector (key by param)
+export const makeSelectTransactionsByAccount = () =>
+  createSelector([selectAllTransactions, (_: RootState, accountId: string) => accountId],
+    (txns, accountId) => txns.filter(t => t.accountId === accountId)
+  );
+```
+
+> **Tip:** For parameterized selectors, **create a factory** (`makeSelect...`) so each component gets its own memoized instance.
+
+### 3) **Join across entities with selectors (denormalize at the edge)**
+
+```ts
+// features/accounts/state/accounts.slice.ts (similar adapter)
+export const selectAccountById = (state: RootState, id: string) =>
+  state.accounts.entities[id];
+
+// Join: transaction + account name
+export const makeSelectEnrichedTransactionsForAccount = () => {
+  const selectTxByAccount = makeSelectTransactionsByAccount();
+  return createSelector(
+    [selectTxByAccount, (_: RootState, accountId: string) => (state: RootState) => selectAccountById(state, accountId)],
+    (txns, getAccountById) =>
+      txns.map(t => {
+        const account = getAccountById as unknown as (s: RootState) => any; // typed appropriately in real code
+        return { ...t, accountName: (account as any)?.name ?? '—' };
+      })
+  );
+};
+```
+
+***
+
+## With **React Query** (server state)
+
+*   You generally **don’t need to normalize** React Query caches; it caches per‑query‑key.
+*   If the UI needs **cross-entity joins**, pull data via multiple queries and **derive** with `useMemo` or a small **client store** (Redux) for relationships.
+*   For large relational UIs (transactions ↔ accounts ↔ payees), consider **hybrid**: React Query for fetching/caching, Redux for normalized cross-entity graph & UI state.
+
+```tsx
+const { data: txns = [] } = useQuery(['transactions', accountId], () => fetchTxns(accountId));
+const { data: accounts = [] } = useQuery(['accounts'], fetchAccounts);
+
+const enriched = useMemo(() => {
+  const byId = new Map(accounts.map(a => [a.id, a]));
+  return txns.map(t => ({ ...t, accountName: byId.get(t.accountId)?.name ?? '—' }));
+}, [txns, accounts]);
+```
+
+***
+
+## Pagination & infinite lists
+
+*   Store **page metadata** separately from entities:
+
+```ts
+// in slice
+pages: {
+  byKey: {
+    'acc:123|status:POSTED': { ids: ['t1','t2'], nextCursor: 'abc' }
+  }
+}
+```
+
+*   Selector composes: `ids -> entities` to render.
+
+***
+
+## Optimistic updates (banking-safe pattern)
+
+1.  Update entity adapter (optimistic)
+2.  Rollback on error
+3.  For React Query, use `onMutate/onError/onSettled` patterns.
+4.  Ensure **idempotency keys** server-side for transfers/payments.
+
+***
+
+## Performance tips
+
+*   Prefer **`selectById`** in item rows (stable memoization per `id`).
+*   Use **`useSelector` with shallowEqual** for small object selections.
+*   **Don’t return new arrays** from selectors unless memoized (`createSelector`).
+*   For lists, memoize **`map(id => <Row id={id} />)`** and memoize `Row`.
+
+***
+
+## Anti‑patterns to avoid
+
+*   Storing **nested/duplicated** server payloads directly in state.
+*   Building **huge selectors** that recompute every render; always memoize and parameterize.
+*   Passing **non‑stable functions/objects** into selectors (breaks memoization).
+*   Putting **server state** entirely in Redux if React Query already handles it.
+
+***
+
+## Tiny end‑to‑end example (screen)
+
+```tsx
+// features/transactions/screens/TransactionsList.tsx
+import React, { useMemo } from 'react';
+import { FlatList } from 'react-native';
+import { useSelector } from 'react-redux';
+import { selectTransactionIds } from '../state/transactions.selectors';
+import { TransactionRow } from '../components/TransactionRow';
+
+export default function TransactionsList() {
+  const ids = useSelector(selectTransactionIds); // stable from adapter
+  const renderItem = useMemo(() => ({ item }: { item: string }) => (
+    <TransactionRow id={item} />
+  ), []);
+  return <FlatList data={ids as string[]} renderItem={renderItem} keyExtractor={(id) => id} />;
+}
+
+// components/TransactionRow.tsx
+import React from 'react';
+import { Text, View } from 'react-native';
+import { useSelector, shallowEqual } from 'react-redux';
+import { selectTransactionById } from '../state/transactions.selectors';
+
+export const TransactionRow = React.memo(({ id }: { id: string }) => {
+  const txn = useSelector((s) => selectTransactionById(s, id), shallowEqual);
+  if (!txn) return null;
+  return (
+    <View><Text>{txn.amount} {txn.currency}</Text></View>
+  );
+});
+```
+
+***
+
+## One‑liner for the interview
+
+> “Normalize entities (flat by id), manage them with `createEntityAdapter`, and expose memoized, parameterized selectors (`createSelector`). Denormalize only at the edge in selectors or `useMemo`. Use React Query for server caching and Redux for normalized client graph and UI state.”
+
+  </details>
+
+  <details><summary>44. How do you design loading/error states elegantly?</summary>
+
+Here’s a **short, clean, interview‑friendly answer** with **examples** (perfect for React Native + banking apps):
+
+***
+
+# **44. How do you design loading/error states elegantly?**
+
+### ✅ **Short Interview Answer**
+
+“Design loading and error states so they are **non-blocking**, **context-aware**, **consistent**, and **accessible**. Use skeleton loaders for large lists, inline spinners for buttons, and provide retry actions for errors. Keep API, UI, and state machine flows predictable and reusable.”
+
+***
+
+# **Key Principles**
+
+## **1. Use Context‑aware Loading States**
+
+Use different loaders depending on the UI:
+
+### ✔ Page-level → Full-screen skeleton or shimmer
+
+### ✔ Component-level → Inline spinner
+
+### ✔ Button-level → Loading inside button
+
+***
+
+### **Example — Button Loading**
+
+```tsx
+<Button
+  title={isLoading ? "Processing..." : "Pay Now"}
+  disabled={isLoading}
+  onPress={mutate}
+/>
+```
+
+***
+
+## **2. Use Skeletons for Data-heavy UI**
+
+Ideal for banking transaction lists, accounts, dashboards.
+
+```tsx
+const SkeletonTxn = () => (
+  <View style={styles.row}>
+    <Skeleton width={200} height={20} />
+    <Skeleton width={100} height={20} />
+  </View>
+);
+```
+
+Skeletons reduce layout shift → feels fast.
+
+***
+
+## **3. Provide Meaningful Error States**
+
+Error should explain *what failed* + a *retry* option.
+
+### Example — Inline Error Component
+
+```tsx
+const ErrorView = ({ message, onRetry }) => (
+  <View>
+    <Text>{message}</Text>
+    <Button title="Retry" onPress={onRetry} />
+  </View>
+);
+```
+
+***
+
+## **4. Use React Query’s Built‑in States**
+
+React Query simplifies loading/error logic:
+
+```tsx
+const { data, isLoading, isError, error, refetch } =
+  useQuery(['transactions'], fetchTransactions);
+
+if (isLoading) return <SkeletonTxnList />;
+if (isError) return <ErrorView message={error.message} onRetry={refetch} />;
+
+return <TxnList data={data} />;
+```
+
+***
+
+## **5. Do Not Block the Entire UI (unless critical)**
+
+Examples of non-blocking loaders:
+
+*   Button loader instead of overlay
+*   Inline row-level placeholders
+*   "Refreshing…" instead of whole page spinner
+
+Banking UX rule:
+
+> Never block important actions like “logout”, “cancel”, “back”.
+
+***
+
+## **6. Show Toasts for Non-Critical Errors**
+
+Network drop, timeout, etc.:
+
+```tsx
+Toast.show({
+  type: "error",
+  text1: "Unable to fetch transactions",
+});
+```
+
+For critical errors (KYC fail, payment fail) → dedicated screen.
+
+***
+
+## **7. Use a Consistent State Machine**
+
+Every async flow follows:
+
+    idle → loading → success | error
+
+Easy to test + predictable.
+
+### Example (Zustand/Redux)
+
+```ts
+{
+  status: "idle" | "loading" | "success" | "error",
+  error: null
+}
+```
+
+***
+
+## **8. Provide Optimistic Feedback**
+
+For smooth UX:
+
+*   Show quick UI updates before server confirms
+*   Roll back if fails
+
+Example:
+
+```tsx
+mutate(paymentData, {
+  onMutate: () => setStatus("processing"),
+  onError: () => showErrorToast(),
+  onSuccess: () => navigate("Success"),
+});
+```
+
+***
+
+# **Recommended Patterns (Mention in Interview)**
+
+### ✔ Context-aware loaders
+
+### ✔ Skeletons for large lists
+
+### ✔ Retryable error views
+
+### ✔ Non-blocking spinners
+
+### ✔ Toasts for noncritical errors
+
+### ✔ Predictable API state machines
+
+### ✔ Graceful optimistic updates
+
+***
+
+# **Interview One-Liner**
+
+> “I design loading and error states to be graceful and consistent: skeletons for large content, inline loaders for actions, helpful error messages with retry, and React Query to simplify state. Errors never block UI unnecessarily, and all async flows follow a clean state machine.”
+
+  </details>
+
+  <details><summary>45. Persisting state securely using redux-persist + MMKV.</summary>
+
+Here’s a **short, interview‑ready** answer with **secure, production‑grade code** for React Native banking apps.
+
+***
+
+## **45. Persisting state securely using `redux-persist` + `MMKV`**
+
+### ✅ **Short Interview Answer**
+
+Use **MMKV** (fast, C++ storage) as the Redux Persist storage engine, **encrypt** at-rest data, and **whitelist only non-sensitive slices**. Keep high‑risk secrets (tokens, PIN/OTP) **outside Redux** or encrypt them with a **key from Keychain/Keystore**. Add **migrations**, **transforms**, and a **rehydration gate** for a smooth UX.
+
+***
+
+## Why MMKV?
+
+*   **Very fast** (native, O(1) reads/writes), ideal for large Redux trees.
+*   Small footprint; no JS bridge bottlenecks.
+*   Works well with background app restarts and cold launches.
+
+***
+
+# 🔧 Setup Steps
+
+### 1) Install deps
+
+```bash
+yarn add @reduxjs/toolkit redux-persist react-native-mmkv
+# If you plan to encrypt:
+yarn add react-native-keychain
+# Optional: encryption transform
+yarn add redux-persist-transform-encrypt
+```
+
+> On RN 0.71+, autolinking handles native linking. If needed, run `pod install` for iOS.
+
+***
+
+### 2) Create an MMKV instance (optionally encrypted)
+
+> **Best practice:** Store the **encryption key** in **iOS Keychain / Android Keystore** (via `react-native-keychain`). Generate once, then reuse.
+
+```ts
+// src/storage/mmkv.ts
+import { MMKV } from 'react-native-mmkv';
+import * as Keychain from 'react-native-keychain';
+
+const SECURE_KEY_NAME = 'mmkv_encryption_key_v1';
+
+async function getOrCreateEncryptionKey() {
+  // Try read
+  const creds = await Keychain.getGenericPassword({ service: SECURE_KEY_NAME });
+  if (creds) return creds.password;
+
+  // Create a random key (32 bytes base64 or hex is fine)
+  const key = [...Array(32)].map(() => Math.floor(Math.random() * 256)).join(',');
+  await Keychain.setGenericPassword('mmkv', key, { service: SECURE_KEY_NAME, accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED });
+  return key;
+}
+
+// Lazy singleton so we can await key before store config if needed
+let storageInstance: MMKV | null = null;
+
+export async function getMMKV() {
+  if (!storageInstance) {
+    const encryptionKey = await getOrCreateEncryptionKey(); // comment this line out if you prefer no encryption
+    storageInstance = new MMKV({
+      id: 'app_storage',
+      encryptionKey, // remove if not encrypting
+    });
+  }
+  return storageInstance;
+}
+```
+
+> If your organization forbids device‑managed secrets for some flows, **don’t persist** those slices at all (see whitelisting).
+
+***
+
+### 3) Create a redux‑persist storage adapter for MMKV
+
+```ts
+// src/storage/mmkvPersistStorage.ts
+import type { Storage } from 'redux-persist';
+import { getMMKV } from './mmkv';
+
+export const createMMKVStorage = (): Storage => ({
+  async getItem(key: string) {
+    const mmkv = await getMMKV();
+    const value = mmkv.getString(key);
+    return value ?? null;
+  },
+  async setItem(key: string, value: string) {
+    const mmkv = await getMMKV();
+    mmkv.set(key, value);
+  },
+  async removeItem(key: string) {
+    const mmkv = await getMMKV();
+    mmkv.delete(key);
+  },
+});
+```
+
+***
+
+### 4) Configure Redux Store with Persist, Migrations, and Transforms
+
+*   **Whitelist** only slices safe to persist.
+*   **Blacklist** volatile/sensitive data (tokens, OTP, raw PII).
+*   Add **migrations** when schema changes.
+
+```ts
+// src/store/index.ts
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { persistReducer, persistStore, createMigrate } from 'redux-persist';
+import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
+import { createMMKVStorage } from '../storage/mmkvPersistStorage';
+
+// Slices
+import authReducer from '../features/auth/state/auth.slice';
+import settingsReducer from '../features/settings/state/settings.slice';
+import transactionsReducer from '../features/transactions/state/transactions.slice';
+
+// Optional: encryption transform (if you MUST persist sensitive fields)
+import { createTransform } from 'redux-persist';
+import createEncryptor from 'redux-persist-transform-encrypt';
+import { Platform } from 'react-native';
+
+// Example: strip volatile fields before persist (client-only state)
+const stripVolatileTransform = createTransform(
+  // inbound: state being persisted
+  (inboundState: any, key) => {
+    if (key === 'auth') {
+      const { session, ...rest } = inboundState;
+      // Never persist ephemeral fields like OTP, deviceChallenge, etc.
+      const { otp, deviceChallenge, ...sessionSafe } = session ?? {};
+      return { ...rest, session: sessionSafe };
+    }
+    return inboundState;
+  },
+  // outbound: state being rehydrated
+  (outboundState) => outboundState,
+  { whitelist: ['auth'] }
+);
+
+// Optional encryptor: ONLY if policy allows persisting sensitive data
+const encryptor = createEncryptor({
+  secretKey: Platform.select({ ios: 'placeholder-ios', android: 'placeholder-android' })!, // You can inject a runtime key (e.g., from Keychain) if needed
+  onError: (e) => {
+    // Consider logging to an in-house logger; avoid console in prod
+  },
+});
+
+// Versioned migrations
+const migrations = {
+  0: (state: any) => state,
+  1: (state: any) => {
+    // Example migration: rename a field
+    if (state?.settings?.themeMode) {
+      state.settings.theme = state.settings.themeMode;
+      delete state.settings.themeMode;
+    }
+    return state;
+  },
+};
+
+const rootReducer = combineReducers({
+  auth: authReducer,
+  settings: settingsReducer,
+  transactions: transactionsReducer,
+});
+
+const persistConfig = {
+  key: 'root',
+  storage: createMMKVStorage(),
+  version: 1,
+  whitelist: ['settings', 'transactions'], // ⚠️ Avoid persisting `auth` unless encrypted or minimal
+  blacklist: ['_ui'], // any UI-only slices
+  stateReconciler: autoMergeLevel2, // shallow merge two levels deep
+  migrate: createMigrate(migrations, { debug: __DEV__ }),
+  transforms: [
+    stripVolatileTransform,
+    // encryptor, // uncomment only if you must persist sensitive data AND handle runtime secretKey sourcing securely
+  ],
+  timeout: 10000,
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefault) =>
+    getDefault({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+      },
+    }),
+});
+
+export const persistor = persistStore(store);
+
+// Types
+export type RootState = ReturnType<typeof rootReducer>;
+export type AppDispatch = typeof store.dispatch;
+```
+
+> **Security tip:** For **access tokens/refresh tokens**, prefer **MMKV (separate instance) + Keychain/Keystore** via your own small service (not Redux). If business demands Redux access, **encrypt** and minimize footprint (no refresh token if avoidable).
+
+***
+
+### 5) Gate your app until rehydration (prevent UI flash)
+
+```tsx
+// App.tsx
+import React from 'react';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './src/store';
+import { Splash } from './src/shared/components/Splash';
+
+export default function App() {
+  return (
+    <Provider store={store}>
+      <PersistGate loading={<Splash />} persistor={persistor}>
+        {/* Your Navigation root */}
+      </PersistGate>
+    </Provider>
+  );
+}
+```
+
+***
+
+## 🔐 Token Handling Pattern (Recommended)
+
+```ts
+// src/services/secureTokens.ts
+import { MMKV } from 'react-native-mmkv';
+import * as Keychain from 'react-native-keychain';
+
+const TOKEN_STORAGE_ID = 'secure_tokens';
+
+let storage: MMKV | null = null;
+async function getStorage() {
+  if (!storage) {
+    const keyEntry = await Keychain.getGenericPassword({ service: 'tokens_key' });
+    let key = keyEntry?.password;
+    if (!key) {
+      key = String(Date.now()) + Math.random().toString(36).slice(2);
+      await Keychain.setGenericPassword('mmkv', key, { service: 'tokens_key' });
+    }
+    storage = new MMKV({ id: TOKEN_STORAGE_ID, encryptionKey: key });
+  }
+  return storage!;
+}
+
+export async function setAccessToken(token: string) {
+  const s = await getStorage();
+  s.set('accessToken', token);
+}
+export async function getAccessToken() {
+  const s = await getStorage();
+  return s.getString('accessToken') ?? null;
+}
+export async function clearTokens() {
+  const s = await getStorage();
+  s.delete('accessToken');
+}
+```
+
+> Then **wire** your API client (Axios/Fetch) to read token from `secureTokens` during each request (or cache it in memory after first read).
+
+***
+
+## 🧠 What to persist vs not
+
+**Persist (usually safe)**
+
+*   Feature preferences, theme, toggles
+*   Normalized cached lists (non-sensitive), pagination cursors
+*   Dismissed banners, guides, filters
+
+**Avoid or encrypt**
+
+*   Access/refresh tokens (prefer secure storage service)
+*   Sensitive PII (full PAN/Aadhaar, DOB, addresses)
+*   OTPs, PINs, device binding secrets
+*   Any secrets useful to an attacker offline
+
+***
+
+## 🧪 Testing & Troubleshooting
+
+*   **Cold start test**: kill app, relaunch, assert rehydration guards the UI.
+*   **Migration test**: bump `version`, simulate old state, verify transform.
+*   **Tamper test**: corrupt a value, ensure app doesn’t crash (wrap selectors).
+*   **Logout flow**: `persistor.purge()` + clear secure tokens.
+
+```ts
+import { persistor } from '../store';
+import { clearTokens } from '../services/secureTokens';
+
+export async function logout() {
+  await clearTokens();
+  await persistor.purge(); // clears redux-persist storage
+}
+```
+
+***
+
+## ⚡ Performance Tips
+
+*   Keep persisted state **small**; large trees slow rehydration.
+*   Use **entity adapters** to normalize lists; persist **ids + entities**.
+*   Use **whitelists** narrowly (opt-in model).
+*   Avoid rehydrating huge blobs into initial screens (gate & lazy load).
+*   MMKV is synchronous under the hood but this adapter wraps async—still extremely fast vs AsyncStorage.
+
+***
+
+## 🗣️ Interview One‑liner
+
+> “I use redux‑persist with an MMKV storage adapter for fast, reliable persistence. I whitelist only safe slices, encrypt at-rest data via a Keychain/Keystore-managed key, keep tokens in a separate secure service (not Redux), and add migrations, transforms, and a PersistGate to ensure smooth rehydration.”
+
+  </details>
+
+  <details><summary>46. Handling global authentication state across navigation.</summary>
+
+Here’s a **short, interview‑friendly**, production‑ready explanation on:
+
+# **46. Handling global authentication state across navigation**
+
+This is one of the MOST commonly asked banking‑client RN interview questions.  
+Below is the **cleanest and safest** pattern—used in enterprise apps.
+
+***
+
+# ✅ **Short Interview Answer**
+
+“I keep authentication state in a global store (Redux/Zustand/Jotai), persist only what is safe, and expose it to navigation through a root `AuthGate`. Navigation tree switches between `AuthStack` and `AppStack` based on `isAuthenticated`. Tokens are stored securely (MMKV + Keychain). Rehydration is gated to prevent UI flash.”
+
+***
+
+# 🔥 **The Standard Architecture (Used by Banks)**
+
+    App.tsx
+     └─ AuthProvider / RootStoreProvider
+          └─ AuthGate (waits for rehydration + token check)
+               ├─ AuthStack  (Login, OTP, Register)
+               └─ AppStack   (Home, Transactions, Payments, Profile)
+
+Navigation is **derived** from global auth state — never pushed manually.
+
+***
+
+# 🧩 **Step 1: Global auth state**
+
+Using **Redux Toolkit**:
+
+```ts
+// features/auth/state/auth.slice.ts
+import { createSlice } from "@reduxjs/toolkit";
+
+const authSlice = createSlice({
+  name: "auth",
+  initialState: {
+    user: null,
+    isAuthenticated: false,
+    loading: false,
+  },
+  reducers: {
+    setUser(state, action) {
+      state.user = action.payload;
+      state.isAuthenticated = !!action.payload;
+    },
+    logout(state) {
+      state.user = null;
+      state.isAuthenticated = false;
+    },
+  },
+});
+
+export const { setUser, logout } = authSlice.actions;
+export default authSlice.reducer;
+```
+
+> **Tokens are NOT stored here** → store in **secure storage** (`MMKV + Keychain`).
+
+***
+
+# 🔐 **Step 2: Token service (secure MMKV)**
+
+```ts
+import { MMKV } from "react-native-mmkv";
+
+export const tokenStorage = new MMKV({ id: "secure", encryptionKey: "key123" });
+
+export const saveToken = (t: string) => tokenStorage.set("token", t);
+export const getToken = () => tokenStorage.getString("token");
+export const clearToken = () => tokenStorage.delete("token");
+```
+
+***
+
+# 🚪 **Step 3: AuthGate (root switcher)**
+
+This waits until:
+
+1.  redux‑persist rehydrates
+2.  secure token loaded
+3.  user is confirmed logged in or logged out
+
+```tsx
+// app/AuthGate.tsx
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { NavigationContainer } from "@react-navigation/native";
+import AuthStack from "./AuthStack";
+import AppStack from "./AppStack";
+import { getToken } from "../services/secureTokens";
+
+export default function AuthGate() {
+  const isAuthenticated = useSelector((s) => s.auth.isAuthenticated);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    const bootstrap = async () => {
+      const token = await getToken();
+      // if token exists → validate → dispatch setUser
+      setChecking(false);
+    };
+    bootstrap();
+  }, []);
+
+  if (checking) return null; // show splash or loader
+
+  return (
+    <NavigationContainer>
+      {isAuthenticated ? <AppStack /> : <AuthStack />}
+    </NavigationContainer>
+  );
+}
+```
+
+> This prevents the “flash” where app shows logged-out UI before rehydration.
+
+***
+
+# 🧭 **Step 4: Navigation flows**
+
+### **AuthStack**
+
+```tsx
+const AuthStack = createNativeStackNavigator();
+
+export function AuthStackNavigator() {
+  return (
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="Login" component={LoginScreen} />
+      <AuthStack.Screen name="OTP" component={OTPScreen} />
+    </AuthStack.Navigator>
+  );
+}
+```
+
+### **AppStack**
+
+```tsx
+const AppStack = createBottomTabNavigator();
+
+export function AppStackNavigator() {
+  return (
+    <AppStack.Navigator>
+      <AppStack.Screen name="Home" component={HomeScreen} />
+      <AppStack.Screen name="Transactions" component={TransactionsScreen} />
+    </AppStack.Navigator>
+  );
+}
+```
+
+***
+
+# 🔥 **Step 5: Login flow (global auth update)**
+
+On successful login:
+
+```tsx
+const { mutate: login } = useLoginMutation();
+
+login(values, {
+  onSuccess: async (resp) => {
+    await saveToken(resp.token);
+    dispatch(setUser(resp.user));
+  },
+});
+```
+
+***
+
+# 🧹 **Step 6: Logout flow**
+
+```ts
+await clearToken();
+dispatch(logout());
+navigation.reset({ index: 0, routes: [{ name: "Login" }] });
+```
+
+***
+
+# ⭐ Best Practices (mention in interview)
+
+### ✔ Use a global store for `isAuthenticated` + user
+
+### ✔ Switch navigation tree based on state (not manual navigate)
+
+### ✔ Store tokens in **secure storage**, not Redux
+
+### ✔ Use an **AuthGate** to prevent flashing incorrect UI
+
+### ✔ Refresh/validate tokens on app start
+
+### ✔ On logout: clear tokens + reset navigation root
+
+### ✔ Never persist sensitive auth slice unless encrypted
+
+***
+
+# 🎯 One‑liner for interviews
+
+> “I handle global auth using a secure token store + Redux auth slice and switch navigation roots using an AuthGate. Navigation always derives from auth state, ensuring no flashes and fully secure transitions.”
+
+  </details>
+
+  <details><summary>47. Implementing feature flags safely.</summary>
+
+Here’s a **short, interview‑ready**, safe, and production‑grade explanation for:
+
+# **47. Implementing Feature Flags Safely (React Native + Banking Apps)**
+
+Feature flags are widely used in financial apps to **gradually roll out risk‑sensitive features** (payments, onboarding, KYCs, offers, UPI features, etc.).  
+Below is the cleanest, safest, and most enterprise‑friendly approach.
+
+***
+
+# ✅ **Short Interview Answer**
+
+“I store feature flags on a remote config service, cache them securely (MMKV), expose them via a global feature‑flag context/store, and always design them as *non-breaking*, *server-controlled*, and *fail‑safe*. Flags determine navigation, UI exposure, and API behavior. Critical features always default to OFF if the flag service fails.”
+
+***
+
+# 🧩 **Why Feature Flags in Banking Apps**
+
+*   Risk‑controlled gradual rollout
+*   Kill‑switch for faulty features
+*   A/B testing without resubmission
+*   Instant rollback
+*   Region / customer‑segment specific features
+*   Hardening regulatory features (KYC v2, UPI flows)
+
+***
+
+# 🔐 **Security + Safety Principles**
+
+You must mention these in interviews:
+
+### ✔ Fail‑safe defaults
+
+If config fails → feature should remain **OFF**.
+
+### ✔ Server‑controlled
+
+Flags should be fetched from backend or remote config, not hardcoded.
+
+### ✔ Immutable behavior
+
+Feature flags must not break core flows like login, payments.
+
+### ✔ Secure caching
+
+Use **MMKV** with optional encryption.
+
+### ✔ Analytics‑driven gating
+
+Capture metrics for on/off performance.
+
+***
+
+# 🔧 Architecture (Simple & Enterprise-safe)
+
+    featureFlags/
+      ├── featureFlags.service.ts   (fetch from API)
+      ├── featureFlags.store.ts     (Redux/Zustand)
+      ├── featureFlags.provider.ts  (context for hooks)
+      ├── useFeatureFlag.ts         (single hook)
+      └── types.ts
+
+***
+
+# 🛠 Step 1: Fetch flags from API (remote config)
+
+```ts
+// featureFlags.service.ts
+import { apiClient } from "../services/http";
+
+export async function fetchFeatureFlags() {
+  const resp = await apiClient.get("/config/feature-flags");
+  return resp.data; // { newKYC: true, instantLoans: false }
+}
+```
+
+***
+
+# 🧠 Step 2: Store in a global store (Zustand/Redux)
+
+Using Zustand for simplicity:
+
+```ts
+// featureFlags.store.ts
+import { create } from "zustand";
+
+export const useFeatureFlagsStore = create((set) => ({
+  flags: {},
+  setFlags: (f) => set({ flags: f }),
+}));
+```
+
+***
+
+# 🔁 Step 3: Cache flags in secure MMKV
+
+```ts
+// featureFlags.cache.ts
+import { MMKV } from "react-native-mmkv";
+
+export const flagCache = new MMKV({ id: 'feature_flags' });
+
+export function saveFlags(flags) {
+  flagCache.set('flags', JSON.stringify(flags));
+}
+
+export function loadFlags() {
+  const v = flagCache.getString('flags');
+  return v ? JSON.parse(v) : null;
+}
+```
+
+***
+
+# 🚀 Step 4: Bootstrap on App Launch
+
+```ts
+// App.tsx or AppBootstrap.ts
+import { fetchFeatureFlags } from "./featureFlags/featureFlags.service";
+import { useFeatureFlagsStore } from "./featureFlags/featureFlags.store";
+import { saveFlags, loadFlags } from "./featureFlags/featureFlags.cache";
+
+async function initFeatureFlags() {
+  const cached = loadFlags();
+  if (cached) useFeatureFlagsStore.getState().setFlags(cached);
+
+  try {
+    const remote = await fetchFeatureFlags();
+    useFeatureFlagsStore.getState().setFlags(remote);
+    saveFlags(remote);
+  } catch (e) {
+    console.log("Flags fetch failed — using cached fallback.");
+  }
+}
+```
+
+***
+
+# 🔍 Step 5: A simple hook to use flags anywhere
+
+```ts
+// useFeatureFlag.ts
+import { useFeatureFlagsStore } from "./featureFlags.store";
+
+export function useFeatureFlag(key: string) {
+  return useFeatureFlagsStore((s) => s.flags[key] === true);
+}
+```
+
+***
+
+# 🎯 Step 6: Usage in UI
+
+```tsx
+const isNewKYCEnabled = useFeatureFlag("newKYC");
+
+return (
+  <>
+    {isNewKYCEnabled ? <NewKYCFlow /> : <OldKYCFlow />}
+  </>
+);
+```
+
+***
+
+# 🧭 Step 7: Gating Navigation Routes
+
+```tsx
+function HomeStack() {
+  const enableLoans = useFeatureFlag("instantLoans");
+
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Dashboard" component={Dashboard} />
+      {enableLoans && (
+        <Stack.Screen name="InstantLoan" component={InstantLoanScreen} />
+      )}
+    </Stack.Navigator>
+  );
+}
+```
+
+***
+
+# ⚠️ Safety & Compliance (important for banking interviews)
+
+### ✔ Always default to OFF on error
+
+Flags cannot break flows.
+
+### ✔ Log every flag evaluation
+
+Needed for audit trails.
+
+### ✔ Flags should be **boolean** and **immutable**
+
+No runtime extra logic.
+
+### ✔ Sensitive flags (e.g., UPI, payments) → double-check with backend
+
+Never trust only local flags for sensitive transactions.
+
+***
+
+# 🧪 Test Strategy for Feature Flags
+
+### Unit tests:
+
+*   Flags ON → new feature enabled
+*   Flags OFF → legacy behavior
+*   API fail → cached flags
+*   Misconfigured flag → fallback OFF
+
+### Integration tests:
+
+*   Navigation hiding/showing routes
+*   API-based gating
+*   Kill-switch behavior
+
+***
+
+# 🎤 Interview One‑liner
+
+> “I implement feature flags using a remote-config service, secure caching via MMKV, and a global feature-flag store. Navigation and UI derive from flags, with fail-safe defaults and strict separation for high-risk banking features.”
+
+  </details>
+
+  <details><summary>48. How to enforce separation of concerns for clean architecture?</summary>
+
+Here’s a **short, clean, interview‑friendly** explanation tailored for **React Native + banking apps**, exactly how clean‑architecture separation of concerns should be explained in interviews.
+
+***
+
+# **48. How to enforce separation of concerns for clean architecture?**
+
+### ✅ **Short Interview Answer**
+
+“I enforce separation of concerns by dividing the app into independent layers — **UI**, **State/Presentation**, **Domain (business logic)**, and **Data/Infrastructure** — and ensuring each layer depends *only* on the one below it. Business rules live in the Domain, API/storage in Data, state/logic in Presentation, and UI only renders data. No layer crosses boundaries.”
+
+***
+
+# **The Clean Architecture Layers**
+
+    UI Layer          → Screens, presentational components
+    Presentation      → State management, controllers, view models
+    Domain Layer      → Business rules, use cases, validation logic  
+    Data Layer        → API, storage, repositories  
+
+### **Dependency direction:**
+
+    UI → Presentation → Domain → Data (inverted via interfaces)
+
+***
+
+# **1) UI Layer — No business logic allowed**
+
+*   Only **renders**
+*   Uses hooks or ViewModels to *ask for data*
+*   No API calls
+*   No database/storage access
+
+```tsx
+// LoginScreen.tsx
+const { login, loading, error } = useLoginViewModel();
+```
+
+***
+
+# **2) Presentation Layer — State + workflows**
+
+This includes:
+
+*   Redux / Zustand / Jotai slices
+*   Controllers
+*   React Query hooks
+*   ViewModels
+
+**Responsibilities:**
+
+*   Connect UI ↔ Domain
+*   Manage loading/error states
+*   Manage screen workflows
+
+```ts
+// useLoginViewModel.ts
+export function useLoginViewModel() {
+  const loginUseCase = useLoginUseCase(); // from domain
+  const login = async (payload) => loginUseCase.execute(payload);
+  return { login };
+}
+```
+
+***
+
+# **3) Domain Layer — Pure business logic**
+
+**Golden rule:** Domain must not import React, Axios, Storage, Navigation, or UI.
+
+Contains:
+
+*   Use cases
+*   Business rules
+*   Calculations (interest, charges, eligibility)
+*   Entities/Models
+
+```ts
+// domain/useCases/LoginUseCase.ts
+export class LoginUseCase {
+  constructor(private repo: AuthRepository) {}
+
+  async execute(payload) {
+    if (!payload.username) throw new Error("Username required");
+    return this.repo.login(payload);
+  }
+}
+```
+
+***
+
+# **4) Data Layer — APIs, storage, encryption**
+
+Implements interfaces that domain uses.
+
+```ts
+// data/repositories/AuthRepositoryImpl.ts
+export class AuthRepositoryImpl implements AuthRepository {
+  async login(payload) {
+    return apiClient.post("/auth/login", payload);
+  }
+}
+```
+
+> UI never knows Axios exists.  
+> Domain only knows the **interface**, not the implementation.
+
+***
+
+# **How to enforce Separation of Concerns (SoC)**
+
+### **✔ 1. Strict Folder Structure**
+
+    src/
+      ui/
+      presentation/
+      domain/
+      data/
+
+Developers visually know where logic should go.
+
+***
+
+### **✔ 2. Use interfaces to invert dependencies**
+
+Domain defines *contracts*, data layer implements them.
+
+```ts
+// domain/repositories/AuthRepository.ts
+export interface AuthRepository {
+  login(payload): Promise<User>;
+}
+```
+
+This prevents domain → data coupling.
+
+***
+
+### **✔ 3. No business logic inside UI components**
+
+UI = dumb  
+Hooks/ViewModels = logic  
+Domain = rules  
+Data = IO (network, storage)
+
+If UI needs complex logic → move into ViewModel.
+
+***
+
+### **✔ 4. Enforce in PR reviews**
+
+Typical PR comments:
+
+*   “This belongs to domain layer.”
+*   “UI should not call API.”
+*   “Move business logic out of the component.”
+
+***
+
+### **✔ 5. Ensure domain layer is framework‑agnostic**
+
+Domain must run in:
+
+*   Node
+*   React Native
+*   Web
+*   Tests
+
+No framework imports.
+
+***
+
+### **✔ 6. Unit test Domain layer in isolation**
+
+Domain layer should run without mocking navigation, UI, or network.
+
+***
+
+## 🔥 Real Banking Example (Interviewer loves this)
+
+### *Withdraw money flow:*
+
+1.  **UI**: Show amount input
+2.  **Presentation**: Manage form state
+3.  **Domain**: Validate limits (e.g., RBI rules, daily limits)
+4.  **Data**: API call to withdraw endpoint
+
+If rules change (limit increased), only **Domain** updates — not UI.
+
+***
+
+# **Interview One‑liner**
+
+> “I enforce clean architecture by separating UI, state/presentation, domain business rules, and data layers. Each layer has a single responsibility and strictly controlled dependencies. Domain never depends on UI or network, ensuring maintainability, testability, and safety — crucial for banking apps.”
+
+  </details>
+
+  <details><summary>49. Approaches for multi-brand / white-label apps.</summary>
+
+Here’s a **short, interview‑ready**, and **practical** explanation of:
+
+# **49. Approaches for Multi‑Brand / White‑Label React Native Apps**
+
+White‑labeling means one codebase → multiple branded apps (UI, theme, assets, configs differ).
+
+Below are the **4 safest and most common approaches** used in banking & fintech.
+
+***
+
+# ✅ **1. Build-Time Theming (Most Popular)**
+
+Separate brand assets at **build time** using environment configs.
+
+### **Each brand gets its own:**
+
+*   Colors
+*   Fonts
+*   Icons/images
+*   API endpoints
+*   Branding config
+
+### Folder structure:
+
+    branding/
+      brandA/
+        colors.ts
+        images/
+        config.json
+      brandB/
+        colors.ts
+        images/
+        config.json
+    src/
+      app/
+      features/
+
+### Use a resolver at build time:
+
+```tsx
+import brand from "../branding/brandA/config.json";
+export default brand;
+```
+
+### How you build:
+
+```bash
+yarn ios --scheme=BrandA
+yarn ios --scheme=BrandB
+```
+
+**Good for:**  
+Banks, NBFCs, payment apps with strict branding differences.
+
+***
+
+# ✅ **2. Runtime Branding (Dynamic Loading)**
+
+Server returns the brand configuration at startup.
+
+### Example flow:
+
+1.  App boots → fetch brand config based on domain or user org.
+2.  Apply theme + images dynamically.
+3.  Cache with MMKV.
+
+```tsx
+const { theme } = useBrandConfig();  
+return <ThemeProvider theme={theme}>...</ThemeProvider>;
+```
+
+**Pros:** One binary, dynamic switching  
+**Cons:** More runtime complexity
+
+**Best for:**  
+Partners, enterprise clients, SaaS fintech dashboards.
+
+***
+
+# ✅ **3. Multi-Entry / Multi-App Setup (Monorepo)**
+
+Use **Nx / Yarn workspaces** to share modules.
+
+    apps/
+      brandA-app/
+      brandB-app/
+    packages/
+      shared-ui/
+      shared-services/
+      shared-domain/
+
+Each brand app:
+
+*   Imports shared modules
+*   Overrides branding files
+*   Has its own app entry + build scheme
+
+**Good for:**  
+Heavy customization between brands (custom screens, flows).
+
+***
+
+# ✅ **4. Plugin-Based Architecture (Modular Feature Flags)**
+
+Brands turn features ON/OFF:
+
+    isUPIEnabled: true
+    isCreditCardFlowEnabled: false
+    isInsuranceEnabled: true
+
+Use:
+
+*   Feature flags
+*   Dynamic navigation
+*   Pluggable modules
+
+```tsx
+const flags = useFeatureFlags();
+if (flags.UPI) stack.add("UPIHome", UPIHome);
+```
+
+**Benefits:**  
+Very scalable for multiple partners with unique regulatory needs.
+
+***
+
+# 🧱 **What NOT to do**
+
+❌ Copy/paste multiple codebases  
+❌ Hardcode brand switches everywhere  
+❌ Mix branding logic with business logic  
+❌ Put brand config inside Redux (use context or DI instead)
+
+***
+
+# 🔐 Banking‑Safe Considerations
+
+### 1. **Configuration isolation**
+
+Each brand must load only its allowed features.
+
+### 2. **Secure brand API endpoints**
+
+Brand configs must not expose keys or tokens.
+
+### 3. **Brand-specific navigation**
+
+Some clients may disable:
+
+*   UPI
+*   KYC v2
+*   Loans
+*   Cards
+
+### 4. **Per‑brand build signing**
+
+Different:
+
+*   package names
+*   app icons
+*   certificates
+*   deep links
+
+***
+
+# 🪄 Real Example (Enterprise-Grade Approach)
+
+**Hybrid approach:**
+
+*   Build‑time → colors, images, app icon, strings.
+*   Runtime → feature flags + partner-specific toggles.
+*   Shared → domain logic, components, business workflows.
+
+This is how **HDFC, SBI, ICICI, Paytm white‑label partners** typically do it.
+
+***
+
+# 🎤 Interview One‑Liner
+
+> “I use a feature-based multi-brand architecture where branding comes from build-time configs, runtime flags, or monorepo modularization. The business logic stays shared, branding stays isolated, and each brand gets its own theme, assets, configs, and navigation rules. This keeps the codebase maintainable across multiple white-label apps.”
+
+  </details>
+
+  <details><summary>50. Strategy for refactoring legacy Redux to RTK.</summary>
+
+Here’s a **short, interview‑friendly**, and **practical real‑world strategy** for:
+
+# **50. Strategy for Refactoring Legacy Redux → Redux Toolkit (RTK)**
+
+This is one of the *most common* migration questions.  
+Keep the answer structured, safe, and realistic.
+
+***
+
+# ✅ **Short Interview Answer**
+
+“I migrate legacy Redux to RTK incrementally. First replace reducers with `createSlice` and remove switch‑cases. Then migrate thunks to `createAsyncThunk`. After that, simplify store setup using `configureStore`. Finally, remove boilerplate actions/reducers/selectors and adopt RTK Query where appropriate. Migration happens feature‑by‑feature, not all at once.”
+
+***
+
+# 🚀 **Full Step-by-Step Strategy (Used in Real Projects)**
+
+***
+
+# **1. Start Incrementally (Slice-by-Slice)**
+
+You **do NOT rewrite everything**.
+
+Choose 1 small slice → convert → test → move on.
+
+### Legacy reducer:
+
+```js
+function authReducer(state = initialState, action) {
+  switch (action.type) {
+    case "LOGIN_SUCCESS":
+      return { ...state, user: action.payload };
+    default:
+      return state;
+  }
+}
+```
+
+### Convert to RTK slice:
+
+```ts
+const authSlice = createSlice({
+  name: "auth",
+  initialState,
+  reducers: {
+    loginSuccess: (state, action) => {
+      state.user = action.payload;
+    }
+  }
+});
+```
+
+This removes switch‑cases, action constants, and reducers → **ultra clean**.
+
+***
+
+# **2. Replace old Thunks with `createAsyncThunk`**
+
+Legacy thunk:
+
+```js
+export const login = (payload) => async (dispatch) => {
+  dispatch({ type: "LOGIN_REQUEST" });
+  try {
+    const resp = await api.login(payload);
+    dispatch({ type: "LOGIN_SUCCESS", payload: resp });
+  } catch (e) {
+    dispatch({ type: "LOGIN_FAILURE", error: e });
+  }
+};
+```
+
+RTK version:
+
+```ts
+export const login = createAsyncThunk(
+  "auth/login",
+  async (payload) => await api.login(payload)
+);
+```
+
+Handle states directly in slice:
+
+```ts
+extraReducers: (builder) => {
+  builder
+    .addCase(login.pending, (state) => { state.loading = true })
+    .addCase(login.fulfilled, (state, action) => { 
+      state.user = action.payload;
+      state.loading = false;
+    })
+    .addCase(login.rejected, (state) => { state.loading = false });
+}
+```
+
+***
+
+# **3. Replace manual store configuration**
+
+### Legacy:
+
+```js
+const store = createStore(rootReducer, applyMiddleware(thunk));
+```
+
+### RTK:
+
+```ts
+const store = configureStore({
+  reducer: rootReducer
+});
+```
+
+This gives:
+
+*   DevTools by default
+*   Built‑in thunk
+*   Good defaults
+
+***
+
+# **4. Adopt Feature‑First Folder Structure**
+
+Restructure file layout to:
+
+    features/
+      auth/
+        auth.slice.ts
+        auth.thunks.ts
+        auth.selectors.ts
+
+This supports scalability for large banking apps.
+
+***
+
+# **5. Add Types (TypeScript) Gradually**
+
+RTK works perfectly with TS.
+
+```ts
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+```
+
+Zero extra boilerplate.
+
+***
+
+# **6. Replace old selectors with memoized selectors (Optional)**
+
+Legacy:
+
+```js
+export const getUser = state => state.auth.user;
+```
+
+Modern:
+
+```ts
+export const selectUser = (state: RootState) => state.auth.user;
+```
+
+Or derived selectors with `createSelector`.
+
+***
+
+# **7. Optional Upgrade Step: Introduce RTK Query**
+
+Useful for:
+
+*   Server data
+*   API caching
+*   Pagination
+*   Automatic invalidation
+
+Not required for migration, but ideal for banking dashboards.
+
+***
+
+# **8. Clean Dead Code & Remove Old Redux Boilerplate**
+
+After all slices are migrated:
+
+*   Delete `actionTypes.js`
+*   Delete duplicated reducers
+*   Remove old middleware logic
+*   Remove manual thunk handling
+
+***
+
+# **9. Migrate Critical Features First**
+
+In financial apps:
+
+*   Auth
+*   User profile
+*   Accounts
+*   Transactions
+
+These are simplest and remove the biggest amount of boilerplate.
+
+***
+
+# ⭐ Suggested Migration Order (Interview‑Friendly)
+
+1.  **Configure store with RTK**
+2.  **Convert small reducers to slices**
+3.  **Convert thunks to `createAsyncThunk`**
+4.  **Adopt feature‑based folder structure**
+5.  **Add types & selectors**
+6.  **Optionally introduce RTK Query**
+7.  **Remove old Redux boilerplate**
+
+This sequence ensures **safe**, **non‑breaking**, **incremental** migration.
+
+***
+
+# 🎤 Interview One‑Liner
+
+> “I migrate legacy Redux to RTK gradually: start with configuring store via `configureStore`, then rewrite reducers into `createSlice`, convert thunks into `createAsyncThunk`, reorganize into feature folders, and optionally introduce RTK Query. The migration is incremental, safe, and eliminates 70–80% of boilerplate.”
+
+  </details>
 
 </details>
 
