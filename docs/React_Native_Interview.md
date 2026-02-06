@@ -12514,17 +12514,1352 @@ Mask or sanitize logs.
 <details>
   <summary>Data Storage & Offline Strategy (6)</summary>
 
-  <details><summary>63. Compare AsyncStorage, MMKV, SQLite, Realm.</summary></details>
+  <details><summary>63. Compare AsyncStorage, MMKV, SQLite, Realm.</summary>
 
-  <details><summary>64. Encrypt-at-rest strategies for mobile storage.</summary></details>
+Great topic. In banking apps we care about **speed**, **consistency**, **encryption**, **migrations**, and **debuggability**. Here’s a crisp, interview-ready comparison of **AsyncStorage vs MMKV vs SQLite vs Realm**, with when-to-use, trade‑offs, and tiny code snippets.
 
-  <details><summary>65. How to design offline-first workflows with conflict resolution?</summary></details>
+***
 
-  <details><summary>66. How to manage large lists or caches efficiently?</summary></details>
+## TL;DR Decision Guide
 
-  <details><summary>67. Securely caching user/session data.</summary></details>
+*   **Feature flags, tokens, small JSON, preferences:** **MMKV** (fastest, robust) → fallback **AsyncStorage** for simplest setups.
+*   **Relational data, complex queries, reports, pagination:** **SQLite** (deterministic, ACID, SQL you know).
+*   **Rich domain models, object graphs, live queries, sync option:** **Realm** (object DB, encrypted, reactive, great offline-first).
+*   **Avoid storing PII/secrets unencrypted** in any store. Use platform Keychain/Keystore + encrypted DB where needed.
 
-  <details><summary>68. How to detect rooted/jailbroken devices?</summary></details>
+***
+
+## One-liner summaries
+
+*   **AsyncStorage**: Simple key–value **JS bridge** storage (community module). OK for **small, non-sensitive** config/state. Not fast for heavy reads/writes.
+*   **MMKV**: **Native, memory-mapped** key–value store (via JSI). **Ultra-fast**, type-safe primitives, optional encryption. Great default for app state.
+*   **SQLite**: **Relational** ACID database. Strong for **structured data** with **queries, joins, indexes**. Mature, predictable.
+*   **Realm**: **Object database** with **live objects**, **change notifications**, **zero-copy** like reads, **built-in encryption**, and optional **sync** (MongoDB Realm). Excellent for **offline-first** and complex domain models.
+
+***
+
+## What to use when (banking/servicing context)
+
+| Scenario                                                       | Best Pick                       | Why                                                             |
+| -------------------------------------------------------------- | ------------------------------- | --------------------------------------------------------------- |
+| Session flags, feature toggles, UI prefs, last-sync timestamps | **MMKV**                        | Fast, low overhead, persistent KV.                              |
+| Secure tokens/PII                                              | **Keychain/Keystore + MMKV/DB** | Store secrets in Keychain/Keystore; reference via IDs in store. |
+| Transaction history, statements, pagination, filters           | **SQLite** or **Realm**         | Need indexes/queries (SQLite) or reactive models (Realm).       |
+| Complex object graphs, offline-first with background sync      | **Realm**                       | Live queries, notifications, good write perf, encryption.       |
+| Extremely large tables with SQL reporting                      | **SQLite**                      | Deterministic SQL, tooling, query plans.                        |
+
+***
+
+## Performance & Architecture
+
+*   **AsyncStorage**: JS ↔ native bridge JSON serialization → **slower**, especially under frequent reads/writes. Good for < a few hundred keys.
+*   **MMKV**: Native C++ storage + **JSI** (no bridge). **Near-constant time** reads, great for frequently accessed state.
+*   **SQLite**: Disk-backed, indexable. Performance depends on **schema, indexes, transactions**, and batch operations.
+*   **Realm**: MVCC storage, **zero-copy reads**, lazy loading, notifications. Excels with frequent reads and complex objects.
+
+***
+
+## Encryption & Security (important for banking)
+
+*   **AsyncStorage**: No built-in encryption. Wrap with app-layer encryption if used beyond trivial prefs.
+*   **MMKV**: Supports encryption (single key). Still treat as **sensitive**; key management matters.
+*   **SQLite**: Use **SQLCipher** build for at-rest encryption, or encrypt at the app layer.
+*   **Realm**: **Built-in at-rest encryption** (per‑DB key). Combine with platform secure enclave/Keychain/Keystore for key storage.
+
+> **Best practice:** store encryption keys/refresh tokens **only** in **iOS Keychain / Android Keystore**. Keep minimal references in app stores.
+
+***
+
+## Migrations & Tooling
+
+*   **AsyncStorage/MMKV**: Manual key migrations (version namespacing).
+*   **SQLite**: Migration scripts (DDL), robust versioning; easy to diff/schema evolve.
+*   **Realm**: Declarative migrations via schema versions; handles object model changes well.
+
+***
+
+## Bundle Size & Complexity
+
+*   **AsyncStorage**: Tiny, simplest.
+*   **MMKV**: Small native dep; minimal cognitive load.
+*   **SQLite**: Native dep; tooling required; SQL knowledge.
+*   **Realm**: Larger binary; powerful but adds modeling concepts and build steps.
+
+***
+
+## Quick code snippets
+
+> *Note: Don’t put secrets directly here. Use Keychain/Keystore for tokens/passwords.*
+
+### 1) AsyncStorage (small, non-sensitive values)
+
+```ts
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const savePrefs = async () => {
+  await AsyncStorage.setItem('theme', 'dark');
+};
+
+const loadPrefs = async () => {
+  const theme = await AsyncStorage.getItem('theme'); // 'dark'
+  return theme ?? 'light';
+};
+```
+
+### 2) MMKV (fast KV; optional encryption)
+
+```ts
+import { MMKV } from 'react-native-mmkv';
+
+export const storage = new MMKV({
+  id: 'app',
+  encryptionKey: '<<derive-from-keystore>>', // store/retrieve securely!
+});
+
+storage.set('theme', 'dark');
+storage.set('biometricEnabled', true);
+
+const theme = storage.getString('theme');
+const bio = storage.getBoolean('biometricEnabled');
+```
+
+### 3) SQLite (structured, queryable)
+
+```ts
+import SQLite from 'react-native-sqlite-storage';
+
+// open / create
+const db = SQLite.openDatabase({ name: 'bank.db', location: 'default' });
+
+// schema & insert
+db.transaction(tx => {
+  tx.executeSql(
+    `CREATE TABLE IF NOT EXISTS txns (
+      id TEXT PRIMARY KEY,
+      amount REAL NOT NULL,
+      postedAt INTEGER,
+      category TEXT
+    )`
+  );
+
+  tx.executeSql(
+    `INSERT OR REPLACE INTO txns (id, amount, postedAt, category)
+     VALUES (?, ?, ?, ?)`,
+    ['T123', 1500.25, Date.now(), 'Utilities']
+  );
+});
+
+// query with index usage
+db.readTransaction(tx => {
+  tx.executeSql(
+    `SELECT * FROM txns WHERE postedAt >= ? ORDER BY postedAt DESC LIMIT 50`,
+    [Date.now() - 30*24*60*60*1000],
+    (_, res) => console.log(res.rows.raw())
+  );
+});
+```
+
+### 4) Realm (object DB, live queries, encryption)
+
+```ts
+import Realm from 'realm';
+
+// define schema
+class Transaction extends Realm.Object {
+  _id!: string;
+  amount!: number;
+  postedAt!: Date;
+  category?: string;
+
+  static schema = {
+    name: 'Transaction',
+    primaryKey: '_id',
+    properties: {
+      _id: 'string',
+      amount: 'double',
+      postedAt: 'date',
+      category: 'string?',
+    },
+  };
+}
+
+// open with encryption key (store key in Keystore/Keychain)
+const realm = await Realm.open({
+  path: 'bank.realm',
+  schema: [Transaction],
+  encryptionKey: getKeyFromSecureStore(), // 64-byte key
+  schemaVersion: 2,
+  onMigration: (oldRealm, newRealm) => {
+    // migration logic when schema changes
+  },
+});
+
+// write
+realm.write(() => {
+  realm.create('Transaction', {
+    _id: 'T123',
+    amount: 1500.25,
+    postedAt: new Date(),
+    category: 'Utilities',
+  }, Realm.UpdateMode.Modified);
+});
+
+// reactive query
+const txns = realm.objects<Transaction>('Transaction')
+                  .filtered('postedAt >= $0', new Date(Date.now() - 30*24*60*60*1000))
+                  .sorted('postedAt', true);
+
+txns.addListener((collection, changes) => {
+  // update UI on insert/delete/modify
+});
+```
+
+***
+
+## Common pitfalls & banking-grade recommendations
+
+1.  **Don’t store secrets in AsyncStorage/MMKV/SQLite/Realm unencrypted.** Use **Keychain/Keystore** (with biometrics if needed).
+2.  **Enable at-rest encryption** for any DB that may cache PII (Realm encryption or SQLCipher for SQLite).
+3.  **Batch writes** and use **transactions** (SQLite/Realm) to avoid partial states.
+4.  **Add indexes** for frequently filtered/sorted fields (SQLite) to avoid slow queries.
+5.  **Plan migrations early** (version your schemas, keep migration tests).
+6.  **Background sync**: write to local DB first, then sync; resolve conflicts server-side where possible; keep **lastSyncAt** in MMKV.
+7.  **Size guardrails**: Avoid dumping large JSON blobs in key–value stores; prefer DB tables with normalized/denormalized shapes as appropriate.
+
+***
+
+## Quick “Which one should I say in interview?”
+
+*   “For **config and fast app state** I use **MMKV**; for **structured transactional data** I pick **SQLite** with indexes and migrations; for **offline-first with complex domain models** and **encrypted at rest** I like **Realm**. **AsyncStorage** is fine for small non-sensitive flags but I avoid it for heavy lifting.”
+
+  </details>
+
+  <details><summary>64. Encrypt-at-rest strategies for mobile storage.</summary>
+
+Here’s a clean, interview‑ready explanation of **Encrypt-at-Rest strategies for mobile storage**, tailored for **React Native in banking/financial apps**.
+
+***
+
+# **64. Encrypt‑at‑Rest Strategies for Mobile Storage (Banking‑Grade)**
+
+Encrypt‑at‑rest means **protecting all locally stored data** (files, DBs, KV stores) so that if the device is compromised (stolen, rooted, jailbroken), data cannot be read without keys.
+
+A banking app must treat **PII, tokens, financial data, cached transactions, and session info** as *sensitive* and protect them with proper encryption.
+
+***
+
+# **1. Platform-Level Encryption (Base Layer)**
+
+### **iOS**
+
+*   iOS provides **File Protection** automatically.
+*   Data is encrypted using a hardware AES engine tied to the Secure Enclave.
+*   Highest level: `NSFileProtectionComplete` (unlocked only after passcode entry).
+
+### **Android**
+
+*   Since Android 7+, **File-Based Encryption (FBE)**.
+*   Hardware-backed keymaster protects keys.
+*   However, *apps cannot rely only on OS-level encryption* → device may have weak/no passcode.
+
+👉 **OS encryption alone is not enough for banking apps.**
+
+***
+
+# **2. Secure Key Storage (Critical Step)**
+
+Never store encryption keys inside:
+
+*   AsyncStorage
+*   MMKV
+*   SQLite / Realm
+*   JS code
+*   Redux state
+*   Constants / env files
+
+Instead, store keys in:
+
+### **iOS Keychain**
+
+*   Hardware-backed secure enclave.
+*   Non-exportable keys.
+
+### **Android Keystore**
+
+*   Hardware-backed (**TEE / StrongBox**).
+*   Keys cannot be extracted from device.
+
+***
+
+### **React Native example (Keychain):**
+
+```ts
+import * as Keychain from 'react-native-keychain';
+
+await Keychain.setGenericPassword('db_key', '<<64-byte-random-key>>', {
+  accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
+});
+```
+
+***
+
+# **3. Encrypt-at-Rest per Storage Type**
+
+## **a) MMKV Encryption**
+
+MMKV supports AES encryption natively.
+
+```ts
+import { MMKV } from 'react-native-mmkv';
+
+const encryptionKey = getKeyFromKeyStore(); // 16/32 bytes
+
+export const storage = new MMKV({
+  id: 'secure-storage',
+  encryptionKey,
+});
+```
+
+> Good for flags, non-PII cached fields, fast access.
+
+***
+
+## **b) SQLite Encryption (SQLCipher)**
+
+SQLite itself is NOT encrypted.  
+To use encrypted DB:
+
+### **Use SQLCipher build** (React Native SQLite plugins support this version).
+
+```ts
+const db = SQLite.openDatabase({
+  name: 'secure.db',
+  key: dbKey,         // from keystore
+  location: 'default'
+});
+```
+
+> Best for structured transactional data, statements, caches.
+
+***
+
+## **c) Realm Encryption**
+
+Realm supports built-in AES‑256 encryption.
+
+```ts
+const realm = await Realm.open({
+  path: 'bank.realm',
+  schema: [Transaction],
+  encryptionKey: getKeyFromKeyStore(), // 64-byte key
+});
+```
+
+> Great for complex offline-first data models with live queries.
+
+***
+
+## **d) File Encryption**
+
+For files (PDF statements, receipts, downloaded documents):
+
+### **iOS:**
+
+```ts
+writeFile(path, data, {
+  NSFileProtectionKey: 'NSFileProtectionComplete'
+});
+```
+
+### **Android:**
+
+Use crypto APIs + Keystore key.
+
+```ts
+const cipher = Cipher.getInstance("AES/GCM/NoPadding");
+cipher.init(Cipher.ENCRYPT_MODE, secretKeyFromKeystore);
+```
+
+> Never store financial PDFs unencrypted.
+
+***
+
+# **4. Encryption Strategies (Best Practices)**
+
+## **A. App-Level Encryption (AES‑256‑GCM)**
+
+Encrypt sensitive blobs manually:
+
+```ts
+const encrypted = AES.encrypt(text, appKey);
+const decrypted = AES.decrypt(encrypted, appKey);
+```
+
+BUT → appKey **must** come from Keychain/Keystore.
+
+***
+
+## **B. Envelope Encryption**
+
+Industry standard for banking.
+
+1.  Generate a random **Data Encryption Key (DEK)** for DB/file.
+2.  Store DEK **encrypted** using a **Key Encryption Key (KEK)** from Keychain/Keystore.
+3.  At runtime:
+    *   Retrieve KEK
+    *   Decrypt DEK
+    *   Use DEK to read/write data.
+
+Reduces exposure and allows key rotation.
+
+***
+
+## **C. Key Rotation Strategy**
+
+*   Maintain **key\_version** in storage.
+*   On new app version:
+    *   Decrypt with old key.
+    *   Re-encrypt with new key.
+    *   Update key version.
+
+> Banking clients often ask: “How do you rotate encryption keys?”  
+> → This answer nails it.
+
+***
+
+# **5. What to Encrypt in Banking Apps**
+
+| Data                        | Should It Be Encrypted? | Where?                      |
+| --------------------------- | ----------------------- | --------------------------- |
+| Refresh tokens, auth tokens | **YES**                 | Keystore/Keychain only      |
+| PII (name, account number…) | **YES**                 | SQLCipher / Realm encrypted |
+| Transaction history         | **YES**                 | SQLCipher / Realm           |
+| Feature flags / UI settings | No                      | MMKV / AsyncStorage         |
+| PDF statements              | **YES**                 | App-level file encryption   |
+
+***
+
+# **6. Avoid These Common Mistakes**
+
+❌ Storing tokens in AsyncStorage / MMKV directly  
+❌ Hardcoding keys inside JS  
+❌ Relying only on iOS/Android system encryption  
+❌ Storing entire JSON blobs instead of structured encrypted storage  
+❌ Not rotating keys  
+❌ Leaving logs with sensitive information
+
+***
+
+# **Interview-Ready Summary (20 seconds)**
+
+> “For encrypt-at-rest, I use platform Keychain/Keystore to store encryption keys.  
+> For structured data I use SQLCipher or encrypted Realm.  
+> For fast key-value I use encrypted MMKV.  
+> For files like PDFs, I use AES‑256‑GCM with the key from Keychain.  
+> I never store tokens or PII unencrypted, and I follow envelope encryption + key rotation strategy.”
+
+  </details>
+
+  <details><summary>65. How to design offline-first workflows with conflict resolution?</summary>
+
+Here’s a **clean, interview‑ready, banking‑grade explanation** of **offline‑first workflows + conflict resolution**, with patterns, flowcharts, and code examples (Realm/SQLite).
+
+***
+
+# **65. How to Design Offline‑First Workflows with Conflict Resolution**
+
+In banking apps, offline‑first design means:
+
+✔ App works **fully without network**  
+✔ User actions are **queue‑ed & replayed** later  
+✔ Server remains the **source of truth**  
+✔ Conflicts are resolved **deterministically**
+
+Below is the exact design pattern expected in interviews.
+
+***
+
+# **1. Key Principles of Offline‑First Architecture**
+
+### **A. Local-First Reads**
+
+*   UI reads **only** from local DB (Realm/SQLite).
+*   Network sync happens in background.
+
+### **B. Command Queue for Writes**
+
+When user performs an action offline (e.g., add payee, schedule transfer):
+
+→ App creates a **pending operation** and stores it locally.
+
+```json
+{
+  "id": "op123",
+  "type": "ADD_PAYEE",
+  "payload": { "name": "John", "account": "999001122" },
+  "status": "pending"
+}
+```
+
+### **C. Sync Engine**
+
+A background service:
+
+1.  Dequeues pending operations
+2.  Calls API
+3.  Updates local DB with server response
+4.  Marks operation as resolved/failed
+
+### **D. Server as Source of Truth**
+
+Final state always matches server.
+
+***
+
+# **2. High-Level Offline Sync Flow**
+
+            UI ⟷ Local DB (Realm/SQLite)
+                     ⤊        ⤋
+               Pending Operations Queue
+                     ⤊        ⤋
+                Sync Engine → API Server
+
+***
+
+# **3. Common Conflict Types**
+
+| Conflict Type             | Example                     | Resolution                      |
+| ------------------------- | --------------------------- | ------------------------------- |
+| **Last Write Wins (LWW)** | Two devices update nickname | Use timestamp version           |
+| **Field-level merge**     | User updates contact info   | Merge changed fields            |
+| **Hard conflict**         | Transfer modified twice     | Server rejects; app shows error |
+| **Server authoritative**  | Balance, statements         | Always overwrite local          |
+
+In banking apps:  
+➡ Most conflicts are **server-overwrites-local**, except editable user preferences.
+
+***
+
+# **4. Conflict Resolution Strategies**
+
+## **Strategy A: Timestamp Versioning (LWW)**
+
+Each record has:
+
+*   `updatedAt`
+*   `version`
+
+When syncing:
+
+*   Compare versions
+*   Latest version wins
+
+```ts
+if (local.version > server.version) {
+  sendLocalUpdate();
+} else {
+  overwriteLocal(serverData);
+}
+```
+
+Used for:
+
+*   Payee nicknames
+*   User settings
+*   Drafts
+
+***
+
+## **Strategy B: Operational Queue Replay (Event Sourcing)**
+
+Each offline action is a **command**.
+
+Example:
+
+1.  Add Payee
+2.  Update Payee
+3.  Delete Payee
+
+Commands are replayed **in order** on the server.
+
+If server fails any operation—stop and show conflict UI.
+
+***
+
+## **Strategy C: Server Authoritative Overwrite**
+
+For sensitive financial objects:
+
+*   Balances
+*   Statements
+*   Transaction history
+
+→ ALWAYS overwrite local.  
+No merge.
+
+***
+
+## **Strategy D: Manual User Resolution**
+
+Used rarely (e.g., standing instruction edit conflict).
+
+Example:
+
+> “Your changes conflict with updates made elsewhere.  
+> Keep yours / Refresh with server?”
+
+***
+
+# **5. Recommended Architecture for Banking**
+
+### **1. Local Database (Realm or SQLCipher SQLite)**
+
+Stores:
+
+*   Cached statements
+*   Transaction history
+*   Payees
+*   Limits/preferences
+
+### **2. Pending Operations Table**
+
+Stores user actions waiting for sync.
+
+### **3. Sync Worker**
+
+Runs when:
+
+*   App launches
+*   Network restored
+*   Timer interval (5–10 minutes)
+
+### **4. Replay**
+
+Executes commands in order.
+
+***
+
+# **6. Code Examples**
+
+## **A. Storing Offline Operation**
+
+```ts
+realm.write(() => {
+  realm.create('PendingOperation', {
+    id: uuid.v4(),
+    type: 'ADD_PAYEE',
+    payload: JSON.stringify(payee),
+    createdAt: new Date(),
+    status: 'pending',
+  });
+});
+```
+
+***
+
+## **B. Sync Engine Logic**
+
+```ts
+async function processQueue() {
+  const ops = realm.objects('PendingOperation').filtered("status = 'pending'");
+
+  for (const op of ops) {
+    try {
+      const res = await api.execute(op.type, JSON.parse(op.payload));
+
+      realm.write(() => {
+        applyServerChanges(res.data);   // update local DB
+        op.status = 'done';
+      });
+
+    } catch (e) {
+      // Retry policy
+      if (op.retryCount > 3) {
+        op.status = 'failed';
+      } else {
+        op.retryCount++;
+      }
+    }
+  }
+}
+```
+
+***
+
+## **C. Version-Based Conflict Handling**
+
+```ts
+if (local.updatedAt > server.updatedAt) {
+  // local newer → upload
+  queueOperation('UPDATE', local);
+} else {
+  // server newer → replace local
+  realm.write(() => {
+    realm.create('Payee', server, Realm.UpdateMode.Modified);
+  });
+}
+```
+
+***
+
+# **7. UX Patterns for Great Offline Experience**
+
+✔ Show “Last synced 2 mins ago”  
+✔ Grey out features that MUST be online (KYC, token refresh)  
+✔ Indicate offline state with banner  
+✔ Queue visual feedback for pending operations (spinner next to payee)  
+✔ Retry automatically on next connection
+
+***
+
+# **8. Interview-Ready 20‑Second Summary**
+
+> “For offline-first, I use a **local encrypted database** as the primary source of truth.  
+> All user writes go into a **pending operations queue**, and a sync engine replays them when online.  
+> Conflicts are resolved using **timestamp versioning**, **server authoritative data**, or **operational replay** depending on data sensitivity.  
+> The server remains the final authority, and DB is updated after each successful sync.”
+
+  </details>
+
+  <details><summary>66. How to manage large lists or caches efficiently?</summary>
+
+Here’s a **clear, interview‑ready**, React Native + banking-focused answer for:
+
+# **66. How to Manage Large Lists or Caches Efficiently?**
+
+Handling **large transaction lists**, **statement history**, or **searchable customer datasets** is a common challenge in banking apps. The goal is to keep UI fast, memory low, and scrolling buttery smooth.
+
+Below are the exact techniques interviewers look for.
+
+***
+
+# ✅ **1. Use Virtualized Lists (FlatList / SectionList) Properly**
+
+### Key optimizations:
+
+```tsx
+<FlatList
+  data={transactions}
+  renderItem={renderItem}
+  keyExtractor={(item) => item.id}
+  initialNumToRender={12}
+  maxToRenderPerBatch={10}
+  windowSize={10}
+  removeClippedSubviews={true} // huge gain on Android
+  getItemLayout={getItemLayout} // improves scroll speed when row height fixed
+/>
+```
+
+### Why this matters:
+
+*   Only a **small window** of items is kept in memory.
+*   Critical when dealing with **5k+ records** like transaction logs.
+
+***
+
+# ✅ **2. Paginated / Infinite Scrolling Instead of Full Loads**
+
+Fetch transactions in batches (e.g., 20 or 50 at a time).
+
+### Basic infinite scroll:
+
+```tsx
+<FlatList
+  onEndReached={loadMore}
+  onEndReachedThreshold={0.5}
+/>
+```
+
+### Typical banking pattern:
+
+*   Load 30 recent transactions.
+*   When scrolling down, load older ones.
+*   Cache older pages in local DB.
+
+***
+
+# ✅ **3. Cache in Local Database (Realm or SQLite)**
+
+Never keep huge arrays in JS memory.
+
+### Store list in DB:
+
+*   SQLite/SQLCipher when using large relational sets.
+*   Realm for reactive UI + fast reads.
+
+Example query:
+
+```ts
+const txns = realm.objects('Transaction')
+  .sorted('postedAt', true)
+  .slice(offset, offset + limit);
+```
+
+Benefits:
+✔ Fast indexed queries  
+✔ Low memory  
+✔ Easy pagination  
+✔ Encrypted at rest (important for PII)
+
+***
+
+# ✅ **4. Use `getItemLayout` for Fixed Row Heights**
+
+This avoids measuring row heights during scrolling.
+
+```ts
+const getItemLayout = (_, index) => ({
+  length: 60,
+  offset: 60 * index,
+  index,
+});
+```
+
+Massive performance boost for:
+
+*   Transaction lists
+*   Statements
+*   Notifications
+
+***
+
+# ✅ **5. Memoize Row Components**
+
+Prevent re-renders when scrolling.
+
+```tsx
+const TransactionRow = React.memo(({ item }) => {
+  return <View><Text>{item.amount}</Text></View>;
+});
+```
+
+Or use:
+
+*   `useCallback` for renderItem
+*   `React.memo` for row
+*   `useMemo` for heavy formatting
+
+***
+
+# ✅ **6. Use Image/Asset Caching (FastImage etc.)**
+
+If each row has icons/avatars:
+
+*   Use **react-native-fast-image**
+*   Enable memory + disk caching
+*   Avoid base64 images completely
+
+***
+
+# ✅ **7. Normalized Data (Avoid Large JSON Blobs)**
+
+Instead of storing a giant array:
+
+❌
+
+```json
+{ "transactions": [ ...5000 items... ] }
+```
+
+✔  
+Store items individually:
+
+```ts
+realm.create('Transaction', item, Realm.UpdateMode.Modified);
+```
+
+Then query only what UI needs.
+
+***
+
+# ✅ **8. Avoid Storing Lists in AsyncStorage/MMKV**
+
+Why?
+
+*   They load in **full** on app start.
+*   They keep entire list in **JS memory**.
+*   They are NOT designed for big datasets.
+
+Use DB instead.
+
+***
+
+# ✅ **9. Implement Background Sync + Incremental Updates**
+
+Don’t refresh the entire list each time.
+
+Strategy:
+
+1.  Fetch only delta changes (`since=timestamp`).
+2.  Upsert into local DB.
+3.  UI reflects changes instantly.
+
+***
+
+# ✅ **10. Use Key‑based Rendering**
+
+Always use a **stable keyExtractor**:
+
+```tsx
+keyExtractor={(item) => item.id}
+```
+
+Never use:
+
+```tsx
+keyExtractor={(item, index) => index}
+```
+
+→ Causes re-renders & scroll jumps.
+
+***
+
+# 🚀 **Real Banking Example: Handling 20k+ Transactions**
+
+Approach:
+
+1.  Paginated fetch from server (50 per page).
+2.  Store in SQLite/Realm with index on `postedAt`.
+3.  UI uses FlatList with:
+    *   memoized row
+    *   10–12 initial render
+    *   `windowSize: 10`
+    *   fixed height + `getItemLayout`
+4.  Infinite scroll + offline caching
+5.  Delta sync on app open
+
+Result → Smooth, memory efficient, stable.
+
+***
+
+# 🔥 **30‑Second Interview Summary**
+
+> “For large lists, I never keep data in JS memory.  
+> I use an encrypted local DB (Realm or SQLite) with paginated queries.  
+> UI uses FlatList with virtualization, memoized rows, fixed heights, and windowSize tuning for smooth scrolling.  
+> For network efficiency, I use incremental sync and lazy loading.  
+> This ensures scalable caching for thousands of transactions with low memory usage.”
+
+  </details>
+
+  <details><summary>67. Securely caching user/session data.</summary>
+
+Here’s a **sharp, interview‑ready**, React Native + banking‑grade answer for:
+
+# **67. Securely Caching User / Session Data**
+
+Banking apps must cache user/session data for performance and offline-first UX—but **security is non‑negotiable**. The goal is to:
+
+✔ Protect tokens/PII  
+✔ Support fast local reads  
+✔ Prevent reverse‑engineering attacks  
+✔ Handle logout/expiry properly  
+✔ Resist rooted/jailbroken device access
+
+Below is the answer hiring managers expect.
+
+***
+
+# ✅ **1. Principle: Never store secrets in JS‑accessible storage**
+
+**Do NOT store sensitive data in:**
+
+*   AsyncStorage ❌
+*   MMKV (unencrypted) ❌
+*   Redux Persist ❌
+*   In‑memory JS variables (long‑lived) ❌
+*   File system ❌
+
+These are easy to extract on rooted/jailbroken devices.
+
+**Only acceptable locations:**
+
+*   **iOS Keychain**
+*   **Android Keystore**
+*   **Encrypted DB (SQLCipher/Realm)** (for non-token sensitive data)
+
+***
+
+# ✅ **2. What counts as sensitive?**
+
+| Data                               | Securely Cache? | Store Where?               |
+| ---------------------------------- | --------------- | -------------------------- |
+| Access Token                       | YES             | Keychain/Keystore          |
+| Refresh Token                      | YES             | Keychain/Keystore          |
+| Device Binding Keys                | YES             | Keystore (hardware-backed) |
+| User Profile                       | YES             | Encrypted DB               |
+| PII (name, account, mobile, email) | YES             | Encrypted DB               |
+| Preferences (theme, toggles)       | No              | MMKV/AsyncStorage          |
+| Financial data (transactions)      | YES             | SQLCipher / Realm          |
+
+***
+
+# ✅ **3. Secure Token Storage (Keychain/Keystore)**
+
+### React Native Secure Keychain storage:
+
+```ts
+import * as Keychain from 'react-native-keychain';
+
+await Keychain.setGenericPassword("token", accessToken, {
+  accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
+  storage: Keychain.STORAGE_TYPE.AES, // hardware backed
+});
+```
+
+Retrieving:
+
+```ts
+const creds = await Keychain.getGenericPassword();
+const accessToken = creds?.password;
+```
+
+> Tokens **must never touch** unencrypted storage.
+
+***
+
+# ✅ **3. Session Data Caching Architecture (Industry Standard)**
+
+### **A. Tokens → Keychain/Keystore**
+
+*   access token
+*   refresh token
+*   biometric keys
+*   cryptographic signing keys
+
+### **B. User profile / app data → Encrypted DB**
+
+Realm (with encryption key) OR SQLCipher.
+
+### **C. Light config → MMKV**
+
+*   feature flags
+*   app settings
+*   booleans like “isOnboarded”
+
+***
+
+# ✅ **4. Encrypted DB for Cached User Data**
+
+Banking apps typically store:
+
+*   user profile
+*   last 20–200 transactions
+*   payees
+*   limits
+*   preferences
+
+### **Realm encrypted storage example:**
+
+```ts
+const realm = await Realm.open({
+  schema: [User, Transaction],
+  encryptionKey: getKeyFromKeyStore(), // 64 bytes
+});
+```
+
+### **Why encrypted DB?**
+
+✔ Protects PII  
+✔ Supports offline mode  
+✔ Prevents local tampering  
+✔ Enforces encryption-at-rest
+
+***
+
+# ✅ **5. Session Expiry & Auto‑Logout Strategy**
+
+Secure caching includes **timely clearing**.
+
+### Clear cache on:
+
+*   logout
+*   token refresh failure
+*   app reinstall
+*   device lock threshold exceeded
+*   jailbreak/root detection
+*   user triggered “clear data”
+
+Example:
+
+```ts
+await Keychain.resetGenericPassword();
+realm.write(() => realm.deleteAll());
+storage.clearAll(); // MMKV
+```
+
+***
+
+# ✅ **6. Protect Cached Data from Reverse Engineering**
+
+### Techniques:
+
+1.  **Hardware-backed keys** (Secure Enclave / TEE)
+2.  **App Attestation** (device integrity: SafetyNet/DeviceCheck)
+3.  **Root/Jailbreak detection**
+4.  **Obfuscation / minification**
+5.  **Prevent screenshots of sensitive screens**
+6.  **Detect debuggers / instrumentation**
+
+Banking-grade apps usually incorporate all of these.
+
+***
+
+# ✅ **7. Prevent Token Leakage in Memory**
+
+Tokens can leak via logs or React state.
+
+### Best practices:
+
+*   Never log session data
+*   Keep tokens **out of Redux**
+*   Use short-lived in-memory refs
+*   Clear tokens on app background
+*   Use “Just-in-Time Retrieval” from Keychain for API calls
+
+Example:
+
+```ts
+const token = await Keychain.getGenericPassword();
+api.defaults.headers.Authorization = `Bearer ${token.password}`;
+```
+
+***
+
+# ✅ **8. Best Patterns for Secure Caching**
+
+### ✔ Envelope Encryption
+
+*   Keystore key encrypts DB key
+*   DB key encrypts data
+*   Supports rotation
+
+### ✔ Key Rotation
+
+*   Store `key_version` in DB
+*   Rotate keys on app updates
+
+### ✔ Zero-copy token usage
+
+*   Never clone tokens into multiple places
+*   Always read straight from Keychain
+
+***
+
+# ⚡ **20-Second Interview Summary**
+
+> “For secure caching, I store all tokens in Keychain/Keystore using hardware-backed encryption.  
+> User profile and financial data go into an encrypted local DB (Realm/SQLCipher).  
+> Only non-sensitive flags go into MMKV.  
+> I implement cache clearing on logout, expiry, and device‑integrity failures, and prevent leakage through logs, Redux, or unencrypted storage.  
+> This ensures fast offline access while keeping session data fully protected.”
+
+  </details>
+
+  <details><summary>68. How to detect rooted/jailbroken devices?</summary>
+
+Here’s a **clean, interview‑ready** answer for:
+
+# **68. How to Detect Rooted / Jailbroken Devices?**
+
+(Banking‑grade, React Native friendly)
+
+Detecting rooted/jailbroken devices is critical for banking apps because such devices can bypass OS security, intercept traffic, extract keys, or tamper with app storage.
+
+Below are **the exact techniques interviewers expect**, plus code examples.
+
+***
+
+# ✅ **1. High‑Level Strategies**
+
+### **A. Check for Root/Jailbreak Indicators**
+
+Look for:
+
+*   Presence of known root binaries
+*   Suspicious system paths
+*   Ability to write outside app sandbox
+*   Dangerous system APIs working
+*   Elevated permissions
+
+### **B. Check for Tampering Tools**
+
+*   Magisk
+*   SuperSU
+*   Cydia
+*   Frida / objection
+*   Xposed
+
+### **C. Check File System Integrity**
+
+*   Writable system partitions
+*   Suspicious mount points
+*   Unexpected symlinks
+
+### **D. Use OS-Integrity APIs**
+
+*   Google Play Integrity API (replacement for SafetyNet)
+*   Apple DeviceCheck / App Attest
+
+These give **strong signals** about device trust.
+
+### **E. Combine Multiple Signals**
+
+No single check is enough → use a **score-based approach**.
+
+***
+
+# ✅ **2. React Native Libraries**
+
+### **Android + iOS**
+
+✔ `react-native-jailbreak-detect`  
+✔ `react-native-root-detection`
+
+Typical usage:
+
+```ts
+import JailbreakDetector from "react-native-jailbreak-detector";
+
+const isJailbroken = JailbreakDetector.isJailBroken();
+const isTampered = JailbreakDetector.isTampered();
+
+if (isJailbroken || isTampered) {
+  // Block or restrict features
+}
+```
+
+***
+
+# ✅ **3. Common Jailbreak Detection Techniques (iOS)**
+
+### 1️⃣ Check for jailbreak files
+
+*   `/Applications/Cydia.app`
+*   `/Library/MobileSubstrate/MobileSubstrate.dylib`
+*   `/usr/sbin/sshd`
+
+### 2️⃣ Check for writable system paths
+
+Jailbroken devices allow writing to restricted directories.
+
+### 3️⃣ Check for symbolic links
+
+Example `/Applications` symlinked to `/private/var/stash`.
+
+### 4️⃣ Check sandbox escape
+
+Try writing outside app container → should fail.
+
+### 5️⃣ Detect hooking frameworks
+
+*   Cydia Substrate
+*   Check if `dyld` loaded suspicious libraries
+
+***
+
+# ✅ **4. Common Root Detection Techniques (Android)**
+
+### 1️⃣ Check for root binaries
+
+*   `su`
+*   `busybox`
+*   `magisk` path
+
+### 2️⃣ Execute `su` binary
+
+If executable → rooted.
+
+```java
+Runtime.getRuntime().exec("su");
+```
+
+### 3️⃣ Check dangerous system properties
+
+*   `ro.debuggable=1`
+*   `ro.secure=0`
+
+### 4️⃣ Check writable system directories
+
+*   `/system`
+*   `/vendor`
+
+### 5️⃣ Check for tamper frameworks
+
+*   Magisk
+*   Xposed
+*   EdXposed
+
+### 6️⃣ Check SELinux status
+
+*   Enforcing vs Permissive
+
+***
+
+# ✅ **5. Device Integrity APIs (Strongest Security)**
+
+### **A. Google Play Integrity API (Android)**
+
+*   Replaces SafetyNet Attestation
+*   Checks:
+    *   Device integrity
+    *   Bootloader unlock
+    *   Root hiding
+    *   Emulator detection
+
+### **B. Apple DeviceCheck / App Attest (iOS)**
+
+Provides:
+
+*   Jailbreak-resistant signals
+*   Device integrity attestations
+
+> **Best practice:** Use Play Integrity + App Attest + local checks.
+
+***
+
+# ✅ **6. Banking UX Strategy**
+
+When rooted/jailbroken detected:
+
+✔ Show warning  
+✔ Restrict high‑risk features:
+
+*   Payments
+*   Add payee
+*   Change password
+
+✔ Many banks block the app completely  
+→ “Your device does not meet security requirements.”
+
+***
+
+# ✅ **7. React Native Example (Combined Check)**
+
+```ts
+import RootCheck from 'react-native-root-detection';
+import * as DeviceCheck from './deviceAttestation';
+
+export async function isDeviceCompromised() {
+  const rooted = await RootCheck.isDeviceRooted();
+  const emulator = await RootCheck.isEmulator();
+  const tampered = await RootCheck.isHookDetected();
+
+  const integrity = await DeviceCheck.verifyIntegrity(); // server-side
+
+  return rooted || emulator || tampered || !integrity;
+}
+```
+
+***
+
+# ⚡ **20‑Second Interview Summary**
+
+> “I detect rooted/jailbroken devices by combining file‑system checks, permission checks, root binary detection, hooking detection, and sandbox escape attempts.  
+> For strong security, I also use Play Integrity API on Android and App Attest on iOS.  
+> Banking apps then restrict or block access if the device fails integrity checks.”
+
+  </details>
 
 </details>
 
