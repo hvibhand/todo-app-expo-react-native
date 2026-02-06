@@ -6450,21 +6450,1307 @@ end
 <details>
   <summary>Native Modules & Platform APIs (8)</summary>
 
-  <details><summary>31. When do you create a native module? Explain bridging.</summary></details>
+  <details><summary>31. When do you create a native module? Explain bridging.</summary>
 
-  <details><summary>32. How does certificate pinning work in RN?</summary></details>
+Here’s a **short, crisp, interview‑ready answer** with clean examples — perfect for React Native banking app interviews.
 
-  <details><summary>33. How to implement secure biometric authentication (FaceID/TouchID)?</summary></details>
+***
 
-  <details><summary>34. How do you securely store tokens using Keychain/Keystore?</summary></details>
+# ✅ **31. When do you create a Native Module? Explain Bridging.**
 
-  <details><summary>35. How to handle app links/universal links in Android/iOS?</summary></details>
+## 🟦 **When do you create a Native Module?**
 
-  <details><summary>36. How to handle native crashes & symbolication (dSYM/ProGuard)?</summary></details>
+You create a **native module** in React Native when:
 
-  <details><summary>37. How to expose high-performance functions via JSI?</summary></details>
+### **1️⃣ A required feature is NOT available in JavaScript**
 
-  <details><summary>38. What’s Play Integrity / DeviceCheck / App Attest?</summary></details>
+*   Certificate pinning (custom native code)
+*   Root/Jailbreak detection
+*   App Attest / SafetyNet / Play Integrity
+*   Device security checks
+*   Secure keystore/hardware-backed encryption
+
+### **2️⃣ Third‑party native SDK must be integrated**
+
+*   Banking fraud SDKs (ThreatMetrix, LexisNexis, Appdome)
+*   Native analytics SDKs
+*   Custom camera/scanner libraries
+
+### **3️⃣ Need to access low-level platform APIs**
+
+*   Foreground/Background services (Android)
+*   Keychain/Keystore secure operations
+*   Native crypto operations
+
+### **4️⃣ Performance-critical logic is better native**
+
+*   Heavy computation
+*   Image/video processing
+
+**Simple Interview Answer:**
+
+> Create a native module when the functionality you need is not available in React Native JS layer, or when you must integrate native SDKs or platform-specific features.
+
+***
+
+# 🟦 **What is Bridging?**
+
+**Bridging** is the mechanism that lets JavaScript call native code (Objective‑C/Swift/Kotlin/Java) and receive results back.
+
+React Native uses a **JS ↔ Native bridge** to communicate between the JavaScript thread and native modules.
+
+**In short:**
+
+> Bridging connects JavaScript code to native platform functionality.
+
+***
+
+# 🟩 **Simple Example — Creating a Native Module**
+
+## **Android (Kotlin)**
+
+### **1. Create Native Module**
+
+```kotlin
+class SecurityModule(reactContext: ReactApplicationContext) :
+    ReactContextBaseJavaModule(reactContext) {
+
+    override fun getName() = "SecurityModule"
+
+    @ReactMethod
+    fun isDeviceRooted(promise: Promise) {
+        val rooted = RootChecker.isDeviceRooted()
+        promise.resolve(rooted)
+    }
+}
+```
+
+### **2. Register Module**
+
+```kotlin
+class SecurityPackage : ReactPackage {
+    override fun createNativeModules(reactContext: ReactApplicationContext) =
+        listOf(SecurityModule(reactContext))
+
+    override fun createViewManagers(reactContext: ReactApplicationContext) =
+        emptyList<ReactViewManager>()
+}
+```
+
+***
+
+## **JavaScript Side**
+
+```js
+import { NativeModules } from "react-native";
+
+const { SecurityModule } = NativeModules;
+
+const rooted = await SecurityModule.isDeviceRooted();
+console.log("Rooted:", rooted);
+```
+
+This is bridging in action.
+
+***
+
+# 🟦 **iOS (Swift) Example — Minimal**
+
+```swift
+@objc(SecurityModule)
+class SecurityModule: NSObject {
+  
+  @objc
+  func isJailbroken(_ resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+      let jailbroken = JailbreakChecker.isDeviceJailbroken()
+      resolve(jailbroken)
+  }
+}
+```
+
+JS calls it the same way.
+
+***
+
+# ⭐ **Interview-Friendly Summary**
+
+> You create a native module when React Native doesn't provide the required functionality — usually for native SDKs, security APIs, hardware-backed encryption, or performance-heavy features.  
+> Bridging is the process that allows JavaScript to call native code and receive data back using React Native’s JS–Native communication layer.
+
+  </details>
+
+  <details><summary>32. How does certificate pinning work in RN?</summary>
+
+Here’s a **concise, interview‑ready explanation** of **how certificate pinning works in React Native**, with practical steps and code you can quote.
+
+***
+
+## ✅ 32. How does certificate pinning work in React Native?
+
+### What is certificate pinning?
+
+**Certificate pinning** ensures your app only trusts a server if its TLS certificate (or **public key**) matches a value you’ve pre‑approved (“pinned”).  
+This blocks **MITM attacks** even if a device’s trust store is compromised or a malicious proxy is used.
+
+**Two common strategies:**
+
+*   **Certificate pinning**: compare the server’s leaf/intermediate cert to an embedded copy.
+*   **Public Key pinning (SPKI)**: compare the SHA‑256 of the certificate’s public key.  
+    *Preferred in mobile* because it survives CA re-issuance as long as the key pair doesn’t change.
+
+> **Banking rule of thumb:** Pin **SPKI** (public key) and provide **at least one backup pin** to avoid accidental lockouts during certificate rotations.
+
+***
+
+## RN Workflows: What’s supported?
+
+*   **Expo Managed:** ❌ No direct pinning (you can’t patch `NSURLSession`/`OkHttp`). You must eject to **Bare** or use a custom dev client.
+*   **React Native CLI / Expo Bare:** ✅ Full support via native code or libraries (e.g., `@react-native-pinch/pinch`).
+
+***
+
+## Option A — Use a library (simplest)
+
+### Using `@react-native-pinch/pinch` (iOS + Android)
+
+Install (Bare workflow):
+
+```bash
+npm install @react-native-pinch/pinch
+cd ios && pod install && cd ..
+```
+
+**JS usage (axios-like fetch with pinning):**
+
+```js
+import { fetch as pinnedFetch } from "@react-native-pinch/pinch";
+
+async function getSecured() {
+  const resp = await pinnedFetch("https://api.yourbank.com/v1/health", {
+    method: "GET",
+    sslPinning: {
+      // Cert filenames (without extensions) placed in:
+      // iOS: ios/AppName/ (main bundle) or via resources
+      // Android: android/app/src/main/res/raw/
+      certs: ["yourbank_prod"], // e.g., yourbank_prod.cer
+      // or use 'pinnedPublicKeys' (SPKI base64) if supported by your version
+    },
+    timeoutInterval: 10000,
+  });
+  const text = await resp.text();
+  return text;
+}
+```
+
+> You ship the **.cer** (DER) in the app bundle; the library compares the TLS chain with the embedded certificate(s). Many teams prefer **SPKI** pins (if your version supports) to survive reissue.
+
+***
+
+## Option B — Native pinning (maximum control)
+
+### Android (OkHttp with CertificatePinner)
+
+Create a custom **OkHttpClient** with pins and use it in your networking layer (for example, in a native module or when customizing RN’s networking).
+
+```kotlin
+import okhttp3.CertificatePinner
+import okhttp3.OkHttpClient
+
+val pinner = CertificatePinner.Builder()
+  // SPKI pins (base64 SHA-256 of the public key). Include backups!
+  .add("api.yourbank.com",
+      "sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+      "sha256/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=")
+  .build()
+
+val client = OkHttpClient.Builder()
+  .certificatePinner(pinner)
+  .build()
+```
+
+You can then:
+
+*   Replace the default client used by your networking stack,
+*   Or expose a **native module** that uses this client to make calls safely.
+
+### iOS (URLSession with trust evaluation)
+
+Implement a `URLSessionDelegate` to evaluate the server trust and compare **SPKI**:
+
+```swift
+import Foundation
+import Security
+
+final class PinnedSessionDelegate: NSObject, URLSessionDelegate {
+  // Base64(SHA256(SPKI)) pins – include at least one backup
+  let pinnedKeys = [
+    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+    "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB="
+  ]
+
+  func urlSession(_ session: URLSession,
+                  didReceive challenge: URLAuthenticationChallenge,
+                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+
+    guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+          let serverTrust = challenge.protectionSpace.serverTrust,
+          let serverCert = SecTrustGetCertificateAtIndex(serverTrust, 0) else {
+      completionHandler(.cancelAuthenticationChallenge, nil)
+      return
+    }
+
+    // Extract public key (SPKI)
+    guard let serverKey = SecCertificateCopyKey(serverCert),
+          let serverKeyData = SecKeyCopyExternalRepresentation(serverKey, nil) as Data? else {
+      completionHandler(.cancelAuthenticationChallenge, nil)
+      return
+    }
+
+    // Compute SHA256 over SPKI SubjectPublicKeyInfo
+    let spkiHash = sha256Base64(spkiFromRawKey(serverKeyData)) // implement spki wrapper if needed
+
+    if pinnedKeys.contains(spkiHash) {
+      completionHandler(.useCredential, URLCredential(trust: serverTrust))
+    } else {
+      completionHandler(.cancelAuthenticationChallenge, nil)
+    }
+  }
+
+  // Implement `spkiFromRawKey` and `sha256Base64` helpers accordingly.
+}
+```
+
+Create a `URLSession` with this delegate and use it for sensitive calls, exposed via a **native module** to JS.
+
+> Many teams instead embed `.cer` and compare the DER bytes or trust chain; **SPKI** is typically more resilient to cert reissue.
+
+***
+
+## Practical steps to implement pinning (checklist)
+
+1.  **Decide pin type**: Prefer **SPKI** (public key pinning) for longevity; include **2+ pins** (active + backup).
+2.  **Extract the pin**:
+    *   Get the server’s cert:  
+        `openssl s_client -connect api.yourbank.com:443 -servername api.yourbank.com </dev/null 2>/dev/null | openssl x509 -outform der > server.cer`
+    *   Compute SPKI hash (one approach):  
+        `openssl x509 -in server.cer -inform der -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl base64`
+3.  **Add pins** to Android’s `CertificatePinner` and/or iOS trust evaluation—or use a library like `@react-native-pinch/pinch`.
+4.  **Handle rotation**: Ship **multiple pins**; plan a rollout window before changing keys.
+5.  **Fail closed**: If pin validation fails, **block the connection** and surface a user‑friendly error.
+6.  **Test with proxies**: Confirm the app **rejects** traffic via Charles/Fiddler (with their root certificates installed).
+7.  **Logging & telemetry**: Log pin failures (non‑sensitive), alert SRE/SecOps.
+8.  **CI check**: Add scripts to ensure pins in code match security inventory; rotate ahead of expiry.
+
+***
+
+## Common gotchas (banking interviews love these)
+
+*   **Expo Managed**: Pinning **not supported** without Bare/custom dev client.
+*   **Single pin risk**: A single pin can **brick** connectivity during renewals; always add a **backup pin**.
+*   **Pin scope**: Pin by **hostname**; wildcards require each host’s pins if keys differ.
+*   **Leaf vs intermediate**: Pinning an **intermediate** or **SPKI** provides more stability than leaf cert pinning.
+*   **Don’t pin to CA root**: Beats the purpose of pinning.
+*   **Handle CDN/multi‑endpoint**: If using CDNs or multiple backends, each endpoint needs correct pins.
+
+***
+
+## Interview‑friendly one‑liner
+
+> In React Native, certificate pinning is implemented in **Bare** apps by validating the server’s cert or public key (prefer **SPKI**) in **native networking (OkHttp/NSURLSession)** or via a library like `@react-native-pinch/pinch`. Always ship **backup pins**, fail closed, and test against interception proxies.
+
+  </details>
+
+  <details><summary>33. How to implement secure biometric authentication (FaceID/TouchID)?</summary>
+
+Here’s a **clean, interview‑ready answer** on secure biometric authentication in React Native, tailored for **banking/financial apps**. Short, crisp, and includes the minimal code required.
+
+***
+
+# ✅ **33. How to implement secure biometric authentication (Face ID / Touch ID)?**
+
+Biometric authentication in React Native is typically done using:
+
+*   **LocalAuthentication / expo-local-authentication** (Expo Managed)
+*   **react‑native‑keychain** or **react‑native‑biometrics** (Bare CLI, more secure)
+
+For **banking apps**, the recommended approach is:
+
+### ✔ Biometric + Secure Key Storage
+
+### ✔ Hardware-backed encryption (Keystore / Keychain)
+
+### ✔ No storing PIN/password in JS
+
+***
+
+# 🟦 **Approach 1 — Using `react-native-keychain` (Most secure; industry standard)**
+
+### Why it's secure?
+
+*   Stores secrets in **Secure Enclave (iOS)** and **Android Keystore**
+*   Allows **biometric‑protected keys**
+*   Prevents JS layer from reading raw PIN/password
+*   Supports Face ID, Touch ID, BiometricPrompt
+
+***
+
+## 🔐 **Implementation (Bare Workflow / Banking Ready)**
+
+### **1. Install**
+
+```sh
+npm install react-native-keychain
+cd ios && pod install
+```
+
+***
+
+## **2. Set a Biometric-Protected Credential**
+
+(Used after user logs in normally)
+
+```js
+import * as Keychain from "react-native-keychain";
+
+await Keychain.setGenericPassword("username", "session_token", {
+  accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_ANY, 
+  accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
+});
+```
+
+This stores the token in hardware security + locks access with biometrics.
+
+***
+
+## **3. Authenticate using Biometrics**
+
+```js
+const creds = await Keychain.getGenericPassword({
+  authenticationPrompt: {
+    title: "Authenticate",
+    subtitle: "Access your bank account",
+    description: "Use Face ID / Touch ID",
+  },
+});
+
+if (creds) {
+  console.log("Authenticated! Token:", creds.password);
+}
+```
+
+**The token is returned only after successful biometric authentication.**
+
+***
+
+# 🟩 **Approach 2 — Using `react-native-biometrics` (For cryptographic signing)**
+
+Use this when you need **biometric keypairs** for high-security use cases like:
+
+*   Transaction signing
+*   Secure nonce verification
+*   JWT signing with private key inside Secure Enclave
+
+### Example: Generate a biometric keypair
+
+```js
+import ReactNativeBiometrics from 'react-native-biometrics';
+const rnBiometrics = new ReactNativeBiometrics();
+
+const { publicKey } = await rnBiometrics.createKeys();
+console.log("Public key: ", publicKey);
+```
+
+### Sign a payload with biometric prompt:
+
+```js
+const { signature } = await rnBiometrics.createSignature({
+  promptMessage: "Confirm transaction",
+  payload: "transfer_2000_inr",
+});
+```
+
+Server verifies with the stored public key → ensures **non-repudiation**.
+
+***
+
+# 🟦 **Approach 3 — Using Expo Managed (`expo-local-authentication`)**
+
+Less secure (cannot access Secure Enclave/Keystore directly).
+
+```js
+import * as LocalAuthentication from 'expo-local-authentication';
+
+const result = await LocalAuthentication.authenticateAsync({
+  promptMessage: "Login with Face ID",
+});
+```
+
+❌ Cannot store secure tokens in hardware  
+❌ Not recommended for **real banking apps**
+
+***
+
+# ⭐ **Important Security Guidelines for Banking**
+
+### ✔ Never store PIN/password in AsyncStorage or JS
+
+### ✔ Store session tokens only in Keychain / Keystore
+
+### ✔ Tie key usage to biometric auth (ACCESS\_CONTROL)
+
+### ✔ Add fallback to device passcode
+
+### ✔ Use biometric cryptographic keys for transaction signing
+
+### ✔ Use native modules for highest security (RN CLI / Bare)
+
+### ✔ Disable screenshots/screen recording on sensitive screens (Android FLAG\_SECURE)
+
+***
+
+# 🟦 **Interview‑Ready Summary**
+
+> Implement secure biometric auth in React Native using **react-native-keychain** or **react-native-biometrics**. These libraries store secrets in **Secure Enclave / Android Keystore** and require **FaceID/TouchID** to unlock them. Expo’s biometrics can authenticate, but cannot store keys securely, so for banking-level security use RN CLI/Bare workflow with hardware-backed key storage and biometric‑protected access control.
+
+  </details>
+
+  <details><summary>34. How do you securely store tokens using Keychain/Keystore?</summary>
+
+Here’s a **clear, interview‑ready**, security‑focused answer explaining how to **securely store tokens** using **Keychain (iOS)** and **Keystore (Android)** in React Native — ideal for **banking/financial apps**.
+
+***
+
+# ✅ **34. How do you securely store tokens using Keychain / Keystore?**
+
+In banking apps, tokens **must not** be stored in:
+
+*   ❌ AsyncStorage
+*   ❌ Redux persistence
+*   ❌ Filesystem
+*   ❌ JS memory (long‑lived)
+
+Instead, tokens must be kept in **hardware‑backed secure storage**:
+
+*   **iOS → Keychain / Secure Enclave**
+*   **Android → Keystore (TEE / StrongBox)**
+
+React Native provides secure access using:
+
+*   **`react-native-keychain`** (Best & most common)
+*   **`react-native-biometrics`** (for cryptographic signing)
+
+***
+
+# 🟦 **Why Keychain/Keystore?**
+
+Because they provide:
+
+✔ Hardware security (TEE / Secure Enclave)  
+✔ Encrypted at rest  
+✔ OS‑level access controls  
+✔ Optional biometric requirement  
+✔ Protected even if device is rooted (to some degree)  
+✔ Automatic key lifecycle management
+
+***
+
+# 🟩 **Best Practice Flow (Used in Banking Apps)**
+
+### **1. User logs in with username/password**
+
+→ App receives `access_token` + `refresh_token`.
+
+### **2. Store them securely in Keychain/Keystore**
+
+Using **biometric / device passcode protection** if needed.
+
+### **3. Retrieve on next launch only after user authenticates**
+
+(e.g., Face ID → unlock secure storage).
+
+***
+
+# 🟦 **Implementation Using `react-native-keychain`**
+
+## **1. Install**
+
+```sh
+npm install react-native-keychain
+cd ios && pod install
+```
+
+***
+
+# **2. Store tokens securely**
+
+Use **biometric + hardware‑backed** protection:
+
+```js
+import * as Keychain from "react-native-keychain";
+
+await Keychain.setGenericPassword(
+  "auth",
+  JSON.stringify({
+    access: accessToken,
+    refresh: refreshToken,
+  }),
+  {
+    accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_ANY, // Require biometrics to unlock
+    accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
+    securityLevel: Keychain.SECURITY_LEVEL.SECURE_HARDWARE, // Hardware TEE/Enclave required
+  }
+);
+```
+
+### What this does:
+
+*   Stores encrypted data *inside hardware‑backed secure storage*.
+*   Data is only returned after **Face ID / Touch ID / Biometrics**.
+
+***
+
+# **3. Retrieve the token**
+
+```js
+const creds = await Keychain.getGenericPassword({
+  authenticationPrompt: {
+    title: "Authenticate to access your account",
+  },
+});
+
+if (creds) {
+  const { access, refresh } = JSON.parse(creds.password);
+  console.log("Tokens unlocked:", access);
+}
+```
+
+If the user fails biometrics → **no tokens are returned**.
+
+***
+
+# **4. Delete token on logout**
+
+```js
+await Keychain.resetGenericPassword();
+```
+
+***
+
+# 🟩 **Alternative (Stronger) Method — Cryptographic Keys**
+
+Use **`react-native-biometrics`** to generate private keys inside the Secure Enclave/Keystore and **sign tokens** instead of storing them.
+
+### Generate keys:
+
+```js
+import ReactNativeBiometrics from "react-native-biometrics";
+
+const rnBiometrics = new ReactNativeBiometrics();
+
+const { publicKey } = await rnBiometrics.createKeys();
+console.log("Public Key:", publicKey);
+```
+
+### Sign payload with biometric prompt:
+
+```js
+const { signature } = await rnBiometrics.createSignature({
+  promptMessage: "Authorize transaction",
+  payload: "refresh_token_challenge",
+});
+```
+
+The private key **never leaves** the hardware.
+
+***
+
+# 🛡 **Security Best Practices (Interview Gold)**
+
+Banks expect these answers:
+
+### ✔ Never store tokens in AsyncStorage
+
+### ✔ Store tokens only in Keychain/Keystore (hardware enforcement)
+
+### ✔ Use biometric access control (ACCESS\_CONTROL.BIOMETRY\_ANY)
+
+### ✔ Rotate tokens frequently (short‑lived access tokens)
+
+### ✔ Use refresh tokens with binding (device + user)
+
+### ✔ Clear secure storage on:
+
+*   logout
+*   app reinstall
+*   device compromise detected
+
+### ✔ Add device security checks
+
+*   Jailbreak/Root detection
+*   Emulator detection
+*   Debugger attachment detection
+
+***
+
+# ⭐ **Interview‑Ready Summary**
+
+> Tokens must be stored only in **Keychain (iOS)** or **Android Keystore**, which provide hardware‑backed encryption. In React Native, use **react-native-keychain** to store tokens protected by biometrics/device passcode. On retrieval, the OS prompts for FaceID/TouchID and returns the token only after successful authentication. For maximum security, use **react-native-biometrics** to generate Secure Enclave keys and sign tokens instead of storing them.
+
+  </details>
+
+  <details><summary>35. How to handle app links/universal links in Android/iOS?</summary>
+
+Here’s a **short, crisp, interview‑ready explanation** of handling **App Links (Android)** and **Universal Links (iOS)** in React Native — includes code and the exact steps banks expect.
+
+***
+
+# ✅ **35. How to handle App Links / Universal Links in Android & iOS?**
+
+Deep links enable a URL like:
+
+    https://mybank.com/reset-password
+
+to **open the mobile app directly**, not the browser.
+
+In React Native, you handle these links using:
+
+*   **Platform config (App Links on Android, Universal Links on iOS)**
+*   **React Native Linking API** to listen for incoming links
+
+***
+
+# 🟦 **ANDROID — App Links (Digital Asset Links)**
+
+## **Step 1: Add Intent Filter in `AndroidManifest.xml`**
+
+```xml
+<intent-filter android:autoVerify="true">
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data
+        android:scheme="https"
+        android:host="mybank.com"
+        android:pathPrefix="/auth" />
+</intent-filter>
+```
+
+**`android:autoVerify="true"`** enables *verified* app links.
+
+***
+
+## **Step 2: Host Digital Asset Links JSON on your domain**
+
+File must be here:
+
+    https://mybank.com/.well-known/assetlinks.json
+
+Example:
+
+```json
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.mybank.app",
+    "sha256_cert_fingerprints": [
+      "A1:B2:C3:...:ZZ"
+    ]
+ links automatically open the app.
+
+---
+
+# 🟥 **iOS — Universal Links (Associated Domains)**
+
+## **Step 1: Enable Associated Domains in Xcode**
+
+`Signing & Capabilities → + Capability → Associated Domains`
+
+Add:
+
+```
+
+applinks:mybank.com
+
+```
+
+---
+
+## **Step 2: Host `apple-app-site-association` on domain**
+
+Must be placed at:
+
+```
+
+<https://mybank.com/apple-app-site-association>
+
+````
+
+(no `.json` extension, no redirects)
+
+Example:
+
+```json
+{
+  "applinks": {
+    "apps": [],
+    "details": [{
+      "appID": "ABCDE12345.com.mybank.app",
+      "paths": [ "/auth/*", "/reset/*" ]
+    }]
+  }
+}
+````
+
+***
+
+# 🟦 **REACT NATIVE — Handling the link in JS**
+
+Use `Linking` API.
+
+### **On app launch**
+
+```js
+import { Linking } from "react-native";
+
+Linking.getInitialURL().then(url => {
+  if (url) handleDeepLink(url);
+});
+```
+
+### **While app is running**
+
+```js
+useEffect(() => {
+  const sub = Linking.addEventListener("url", ({ url }) => {
+    handleDeepLink(url);
+  });
+
+  return () => sub.remove();
+}, []);
+```
+
+### **Handle the URL**
+
+```js
+function handleDeepLink(url) {
+  const route = url.replace("https://mybank.com/", "");
+
+  if (route.startsWith("reset-password")) {
+    navigation.navigate("ResetPasswordScreen");
+  }
+}
+```
+
+***
+
+# 🟩 **Testing App Links (important in interviews!)**
+
+### **Android**
+
+```sh
+adb shell am start \
+  -a android.intent.action.VIEW \
+  -d "https://mybank.com/auth/reset?id=123"
+```
+
+### **iOS (simulator)**
+
+```sh
+xcrun simctl openurl booted "https://mybank.com/auth/reset?id=123"
+```
+
+***
+
+# 🛡 Banking‑Specific Considerations (recommended answers)
+
+✔ Only enable app links on **HTTPS**  
+✔ Use **short-lived signed links** for sensitive flows (reset password)  
+✔ Expire deep link tokens on server  
+✔ Block link reuse (replay attack prevention)  
+✔ Avoid passing PII in URL  
+✔ Validate token server‑side before navigating
+
+***
+
+# ⭐ **Interview‑Ready Summary**
+
+> Android uses **App Links** with `assetlinks.json`.  
+> iOS uses **Universal Links** with `apple-app-site-association`.  
+> URLs are handled in React Native using the **Linking API** via `getInitialURL()` and event listeners.  
+> Both platforms require hosting a domain file to verify that your domain is linked to your app.
+
+  </details>
+
+  <details><summary>36. How to handle native crashes & symbolication (dSYM/ProGuard)?</summary>
+
+Here’s a **short, interview‑ready**, banking‑grade explanation of **Native Crash Handling & Symbolication** in React Native, covering **iOS (dSYM), Android (ProGuard/R8), and tools like Sentry/Firebase Crashlytics**.
+
+***
+
+# ✅ **36. How to handle native crashes & symbolication (dSYM / ProGuard)?**
+
+In React Native, **JS errors** are easy to debug — but **native crashes** (iOS/Android) require symbolication to convert unreadable crash stacks into meaningful code locations.
+
+Handling native crashes involves:
+
+1.  **Capturing crash reports**
+2.  **Uploading app symbols (dSYM for iOS, mapping.txt for Android)**
+3.  **Viewing human‑readable crash stack traces**
+
+Most teams use:
+
+*   **Sentry**
+*   **Firebase Crashlytics**
+*   **Bugsnag**
+
+***
+
+# 🟥 **iOS — Symbolication using dSYM**
+
+iOS native crashes produce stack traces referencing **memory addresses**, not actual code.
+
+### 🎯 To symbolize crashes, you need:
+
+*   **dSYM files** → Debug Symbol files generated by Xcode/EAS/Fastlane
+*   Upload these to your crash reporter
+
+### 🔧 1. Generate dSYM (Manual / CI / EAS)
+
+If you build with Xcode:
+
+**Xcode → Build Settings → Debug Information Format → DWARF with dSYM File**
+
+dSYM is created at:
+
+    ~/Library/Developer/Xcode/Archives/<date>/<app>.xcarchive/dSYMs/<app>.dSYM
+
+### 🔧 2. Upload to Crashlytics
+
+If using Firebase:
+
+    upload-symbols -gsp GoogleService-Info.plist \
+      -p ios <path-to-dSYM>
+
+### 🔧 3. Upload to Sentry
+
+    sentry-cli upload-dsym <path-to-dSYMs>
+
+### Why banking apps care:
+
+*   Crash symbolication helps track security‑related native code failures
+*   iOS banking apps often use **App Attest**, biometrics, keychain, device integrity checks — these run natively → more native crashes
+
+***
+
+# 🟦 **Android — Symbolication using ProGuard / R8**
+
+Android uses:
+
+*   **ProGuard/R8 obfuscation**
+*   Obfuscated stack traces → unreadable
+
+Symbolication requires **mapping files**.
+
+### 🔧 1. Enable ProGuard/R8 (default for release):
+
+`android/app/build.gradle`
+
+```gradle
+minifyEnabled true
+proguardFiles getDefaultProguardFile("proguard-android.txt"),
+              "proguard-rules.pro"
+```
+
+### 🔧 2. Generate mapping.txt
+
+Created automatically during release builds:
+
+    android/app/build/outputs/mapping/release/mapping.txt
+
+### 🔧 3. Upload to Crashlytics
+
+    firebaseCrashlyticsUploadMappingFileRelease
+
+Or for Sentry:
+
+    sentry-cli upload-proguard --mapping-file mapping.txt
+
+### Native crash logs (NDK)
+
+If your app uses native libraries:
+
+*   Upload **NDK symbols**
+*   Crashlytics supports `upload-native-symbols`
+
+***
+
+# 🟩 **React Native Side — Listening for JS Errors**
+
+Use **Error Boundaries** + **global JS handlers**.
+
+### Example:
+
+```js
+import { setJSExceptionHandler, setNativeExceptionHandler } from "react-native-exception-handler";
+
+setJSExceptionHandler((error, isFatal) => {
+  // log to Sentry
+});
+
+setNativeExceptionHandler((errorString) => {
+  // fallback reporting
+});
+```
+
+**BUT** → Native crash symbolication still requires uploading symbols.
+
+***
+
+# 🟦 **Using Sentry (most popular in enterprise)**
+
+### Install
+
+    npm install @sentry/react-native
+    npx sentry-wizard -i reactNative
+
+### Symbol uploads happen automatically via:
+
+    sentry-cli upload-dsym
+    sentry-cli upload-proguard
+
+Add to CI or EAS Build hooks.
+
+**EAS Build** automatically uploads dSYM unless disabled.
+
+***
+
+# 🛡 Banking‑Specific Best Practices
+
+✔ Always enable obfuscation (R8) for Android to protect code  
+✔ Upload symbols **for every build** (CI/CD automated)  
+✔ Never expose mapping.txt or dSYM publicly  
+✔ Use Sentry/Crashlytics alerts for severe crashes  
+✔ Track native module crashes (biometrics, security SDKs)  
+✔ Keep symbols for **at least 90 days** for audits  
+✔ Redact PII from crash logs (GDPR/PCI compliance)
+
+***
+
+# ⭐ **Interview‑Ready Summary**
+
+> Native crashes in RN require symbolication.  
+> On iOS, upload **dSYM** files; on Android, upload **ProGuard/R8 mapping files**. Tools like Sentry or Crashlytics then convert unreadable crash stacks into human‑readable code. Always automate symbol uploads in CI/CD, especially for banking apps where native security modules often trigger crashes.
+
+  </details>
+
+  <details><summary>37. How to expose high-performance functions via JSI?</summary>
+
+Here’s a **short, crisp, interview‑ready** explanation of **JSI (JavaScript Interface)** and how to expose **high‑performance native functions** to React Native using JSI.  
+This is the modern replacement for the old React Native Bridge (TurboModules).
+
+***
+
+# ✅ **37. How to expose high‑performance functions via JSI?**
+
+JSI (JavaScript Interface) is the **new low‑level communication layer** in React Native that allows **direct, synchronous** access to native code from JavaScript — without the old async bridge and without JSON serialization.
+
+### Why use JSI?
+
+You use JSI when you need:
+
+*   🚀 **High performance** (C++/native speed)
+*   🚀 **Synchronous calls**
+*   🚀 **Low‑latency operations**
+*   🚀 **Memory‑intensive or CPU‑heavy native logic**
+
+**Perfect for:**
+
+*   Cryptography (AES, RSA, hashing)
+*   ML inference
+*   Image/video processing
+*   Data compression
+*   Secure enclave operations
+*   Custom native engine integration
+*   Banking apps requiring fast **HMAC**, **token signing**, **secure random**, etc.
+
+***
+
+# 🟦 **How JSI differs from the React Native Bridge**
+
+| Old Bridge                 | JSI                              |
+| -------------------------- | -------------------------------- |
+| Async                      | Sync **&** async                 |
+| JSON serialization         | Direct memory access             |
+| Queues between JS ↔ Native | Shared C++ runtime               |
+| Slow for large data        | Extremely fast                   |
+| Not suitable for ML/crypto | Ideal for high‑performance tasks |
+
+**One‑liner:**
+
+> JSI lets JS talk to native code at C++ speed with no bridge overhead.
+
+***
+
+# 🟩 **How to expose high-performance native functions using JSI (Minimal Example)**
+
+Below is the **interview‑ready flow**:
+
+***
+
+## **Step 1 — Create a C++ function (high-performance)**
+
+`native-lib.cpp`
+
+```cpp
+#include <jsi/jsi.h>
+
+using namespace facebook;
+
+jsi::Value addNumbers(jsi::Runtime &rt, int a, int b) {
+    return jsi::Value(a + b);
+}
+```
+
+***
+
+## **Step 2 — Expose it as a JSI Host Function**
+
+```cpp
+void installJsiBindings(jsi::Runtime &rt) {
+    auto addFunc = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "addNumbers"),
+        2,
+        jsi::Runtime &rt,
+           const jsi::Value &thisVal,
+           const jsi::Value *args,
+           size_t count -> jsi::Value {
+
+            int a = args[0].asNumber();
+            int b = args[1].asNumber();
+            
+            return jsi::Value(a + b);
+        }
+    );
+
+    rt.global().setProperty(rt, "addNumbers", std::move(addFunc));
+}
+```
+
+***
+
+## **Step 3 — Load the JSI bindings in Android**
+
+`MyModulePackage.java`
+
+```java
+@Override
+public void initialize() {
+    super.initialize();
+    SoLoader.loadLibrary("mynative");
+    MyNativeModule.install(getReactApplicationContext().getJavaScriptContextHolder().get());
+}
+```
+
+Native C++ installer:
+
+```cpp
+void install(long jsContext) {
+    auto runtime = reinterpret_cast<jsi::Runtime *>(jsContext);
+    installJsiBindings(*runtime);
+}
+```
+
+***
+
+## **Step 4 — Call directly in JavaScript**
+
+```js
+const result = global.addNumbers(5, 7);
+console.log(result); // 12
+```
+
+➡ No bridge, no async, no JSON.  
+➡ Immediate C++ speed.
+
+***
+
+# 🟦 Banking‑Grade Example: HMAC SHA‑256 via JSI
+
+JSI is used heavily in secure banking apps:
+
+*   Token signing
+*   HMAC verification
+*   Secure random generation
+*   Hardware key usage
+
+**C++ (performance-critical):**
+
+```cpp
+jsi::Value hmacSha256(jsi::Runtime &rt, std::string key, std::string data) {
+  auto hash = compute_hmac_sha256(key, data); // native crypto
+  return jsi::String::createFromAscii(rt, hash);
+}
+```
+
+JS:
+
+```js
+const signature = global.hmacSha256(secretKey, payload);
+```
+
+Runs **100x faster** than JS or old-bridge solutions.
+
+***
+
+# 🛡 **Why JSI matters for banking apps**
+
+✔ Crypto must run securely + fast  
+✔ Data cannot cross the RN bridge in plaintext  
+✔ JSI allows secure enclave operations  
+✔ Needed for:
+
+*   Device binding
+*   JWT signing
+*   Authentication challenge flows
+*   Fraud detection SDKs
+*   Certificate/key operations
+
+***
+
+# ⭐ **Interview‑Ready Summary**
+
+> JSI enables React Native to call native (C++/Java/Swift) code **synchronously at high speed**, bypassing the old bridge. You expose high‑performance functions by registering C++ host functions using JSI and attaching them to the JS runtime. This is ideal for banking needs like cryptography, ML, and hardware‑backed secure operations.
+
+  </details>
+
+  <details><summary>38. What’s Play Integrity / DeviceCheck / App Attest?</summary>
+
+Here’s a **clean, short, interview‑ready explanation** of **Play Integrity, DeviceCheck, and App Attest** — exactly how they relate to **banking‑grade mobile security**.
+
+***
+
+# ✅ **38. What’s Play Integrity / DeviceCheck / App Attest?**
+
+These are **mobile device integrity APIs** provided by Google and Apple.  
+Banking/financial apps use them to **verify device trust**, detect tampering, prevent fraud, and tie tokens to a real device.
+
+***
+
+# 🟩 **1. Google Play Integrity API (Android)**
+
+### **What it does**
+
+Play Integrity API helps verify:
+
+*   Whether the app install is **legitimate**
+*   Whether the device is **trusted** (not rooted / tampered / emulator)
+*   Whether the Play Store environment is intact
+*   Whether the app binary has been modified
+
+### **Checks returned (important for interviews)**
+
+*   **App integrity** → Is this your genuine signed APK/AAB?
+*   **Device integrity** → Is device rooted, custom ROM, emulator?
+*   **Account integrity** → Is the Google account trustworthy?
+
+### **Why banking apps use it**
+
+✔ Prevents fraudsters using rooted devices/emulators  
+✔ Prevents cloned or modified apps  
+✔ Prevents token replay from untrusted devices  
+✔ Ties authentication to validated device signals
+
+### **RN integration**
+
+Requires a **native module** or backend verification (Common path: call backend → backend verifies integrity token).
+
+***
+
+# 🟦 **2. Apple DeviceCheck (iOS)**
+
+### **What it does**
+
+DeviceCheck provides:
+
+*   A way to assign **two bits** of device state (e.g., “isTrustedDevice”, “fraud\_flag”)
+*   A token to verify device authenticity
+*   Helps track state across reinstallations without storing data on device
+
+### **Common use cases**
+
+*   Mark suspicious devices
+*   Block known fraud devices
+*   Prevent multiple account abuse
+*   Track device lifetime reputation
+
+### **Why banking apps use it**
+
+✔ Detect previously flagged devices  
+✔ Prevent reinstall tricks  
+✔ Tie user reputation to device hardware
+
+### **RN integration**
+
+Needs a **native module** that calls DeviceCheck framework → sends device token to backend → backend uses Apple API to validate.
+
+***
+
+# 🟧 **3. Apple App Attest (Highest-security API on iOS)**
+
+### **What it does**
+
+App Attest protects your app by generating hardware‑backed keys inside the device’s **Secure Enclave**, ensuring:
+
+*   App binary is untampered
+*   App is legitimate, not cloned
+*   Requests are signed using device‑bound keys
+*   Prevents app re-packaging, injection, or automation attacks
+
+### **Key features**
+
+*   Generates a device‑bound private key
+*   Signs requests with Secure Enclave
+*   Server verifies signature + attestation
+
+### **Why banking apps use it**
+
+✔ Prevents app cloning / injection  
+✔ Protects API endpoints with device‑bound signatures  
+✔ Stops session/token replay  
+✔ Highest security level for iOS (TEE-backed)
+
+### **RN integration**
+
+Requires a **JSI/native module** because App Attest uses:
+
+*   Secure Enclave APIs
+*   Hardware key operations
+*   Native attestation flows
+
+***
+
+# 🟦 **Quick Comparison Table**
+
+| Feature                          | Play Integrity (Android) | DeviceCheck (iOS) | App Attest (iOS)               |
+| -------------------------------- | ------------------------ | ----------------- | ------------------------------ |
+| Detect root/jailbreak            | ✔ Yes                    | ❌ No              | ✔ Indirect (tampering)         |
+| Detect tampered APK / cloned app | ✔ Yes                    | ❌ No              | ✔ Yes (strong)                 |
+| Device reputation                | ✔ Account & device       | ✔ 2-bit state     | ❌ Not its purpose              |
+| Hardware-backed security         | ✔ Strong                 | ✔ Some            | ✔✔✔ Strongest (Secure Enclave) |
+| Best for banking                 | ⭐⭐⭐⭐                     | ⭐⭐⭐               | ⭐⭐⭐⭐⭐                          |
+
+***
+
+# ⭐ **Interview‑Ready One-Liner Summary**
+
+> **Play Integrity** verifies the Android device + app authenticity.  
+> **DeviceCheck** lets you track device reputation on iOS.  
+> **App Attest** provides Secure Enclave–backed attestation to ensure the app isn’t tampered and requests come from a trusted device.  
+> Banking apps combine these for fraud prevention, device binding, and anti‑tampering.
+
+  </details>
 
 </details>
 
