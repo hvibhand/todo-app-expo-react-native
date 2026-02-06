@@ -16684,25 +16684,2021 @@ Classify data:
 <details>
   <summary>Performance &amp; Optimization (10)</summary>
 
-  <details><summary>83. How to measure app startup time & TTI?</summary></details>
+  <details><summary>83. How to measure app startup time & TTI?</summary>
 
-  <details><summary>84. Reducing bundle size — practical strategies.</summary></details>
+Here’s a **short, interview‑ready** explanation with **clear steps + code examples** on:
 
-  <details><summary>85. Preventing heavy operations on JS thread.</summary></details>
+## **83. How to measure app startup time & TTI (Time‑to‑Interactive) in React Native?**
 
-  <details><summary>86. Image optimization techniques.</summary></details>
+In React Native, startup performance is mainly about:
 
-  <details><summary>87. Jank-free animations using Reanimated.</summary></details>
+*   **Cold Start Time** → Time from app launch → JS bundle executed + first screen visible
+*   **TTI (Time‑to‑Interactive)** → Time until UI is ready + user actions are responsive
 
-  <details><summary>88. Memory leaks debugging tools (Flipper/Instruments).</summary></details>
+***
 
-  <details><summary>89. Performance budgets & CI enforcement.</summary></details>
+# ✅ **1. Measure Startup Time (Native + JS)**
 
-  <details><summary>90. Avoiding unnecessary re-renders in complex forms.</summary></details>
+## **A) Using JavaScript timestamps (simple & effective)**
 
-  <details><summary>91. List virtualization strategies.</summary></details>
+```js
+// index.js
+global.startTime = Date.now();
 
-  <details><summary>92. Hermes bytecode preloading advantages.</summary></details>
+import { AppRegistry } from 'react-native';
+import App from './App';
+
+AppRegistry.registerComponent(appName, () => App);
+```
+
+Then inside App:
+
+```js
+useEffect(() => {
+  const endTime = Date.now();
+  console.log('Startup Time: ', endTime - global.startTime, 'ms');
+}, []);
+```
+
+👉 Measures **JS bundle load + App component mount**.
+
+***
+
+# ✅ **B) Measure Native Startup Time (Android)**
+
+Use `ReactMarker`:
+
+```java
+@Override
+public void onCreate() {
+    super.onCreate();
+    long start = SystemClock.uptimeMillis();
+    ReactMarker.addListener((name, tag, instanceKey) -> {
+        if (name.toString().equals("CONTENT_APPEARED")) {
+            long total = SystemClock.uptimeMillis() - start;
+            Log.d("StartupTime", "Cold start time: " + total + "ms");
+        }
+    });
+}
+```
+
+👉 More accurate for **Android cold startup**.
+
+***
+
+# ✅ **C) Measure Startup on iOS**
+
+Use built‑in **RCTPerformanceLogger**:
+
+```objc
+#import <React/RCTPerformanceLogger.h>
+
+RCTPerformanceLogger *perfLogger = [bridge performanceLogger];
+NSArray *values = [perfLogger valuesForTags];
+NSLog(@"Startup time: %@", values);
+```
+
+***
+
+# ✔️ **2. Measuring TTI (Time to Interactive)**
+
+TTI = when the app’s first screen is fully rendered + ready for user input.
+
+### Easiest way → Mark when your “ready” UI is interactive
+
+```js
+const ttiStart = global.startTime;
+
+useEffect(() => {
+  requestAnimationFrame(() => {
+    const tti = Date.now() - ttiStart;
+    console.log('TTI: ', tti, 'ms');
+  });
+}, []);
+```
+
+👉 `requestAnimationFrame()` ensures UI has **finished rendering**.
+
+***
+
+# ✔️ **3. Using React Native Performance APIs (New API)**
+
+```js
+import { Performance } from 'react-native';
+
+Performance.mark('app_start');
+
+useEffect(() => {
+  Performance.mark('app_interactive');
+  Performance.measure('TTI', 'app_start', 'app_interactive');
+});
+```
+
+***
+
+# ✔️ **4. Using Flipper Performance Plugin**
+
+Flipper → React Native DevTool  
+Install RN Performance Plugin:
+
+    yarn add rn-perf
+
+Shows:
+
+*   JS thread blocking
+*   Bridge traffic
+*   UI stalls
+*   Component render times
+
+Great for diagnosing slow startup.
+
+***
+
+# ✔️ **5. Why Banking Apps Focus on Startup Time?**
+
+Because:
+
+*   Users expect fast access to their account balance
+*   Security screens (login/OTP) must load instantly
+*   Regulatory UX requirements enforce performance KPIs
+
+***
+
+# **Final Interview‑Ready Answer (Short Version)**
+
+> **Startup time** can be measured by logging timestamps in JS (`Date.now()` from index.js to first render) or using native markers like **ReactMarker (Android)** and **RCTPerformanceLogger (iOS)**.  
+> **TTI** is measured by marking when the screen becomes fully interactive—commonly using `requestAnimationFrame()` or the latest **React Native Performance API**. Tools like **Flipper Performance Plugin** help analyze slow startup.
+
+  </details>
+
+  <details><summary>84. Reducing bundle size — practical strategies.</summary>
+
+Here’s a **short, crisp, interview‑ready** answer with **practical + code‑based strategies** used in real React Native banking apps.
+
+***
+
+# ✅ **84. Reducing Bundle Size — Practical Strategies**
+
+Bundle size impacts **startup time, OTA updates, and memory usage** — critical for banking apps.  
+Here are the **most effective strategies** with short explanations + examples.
+
+***
+
+## **1️⃣ Use Hermes (BIGGEST reduction)**
+
+Hermes produces **smaller bytecode bundles** compared to JS bundles.
+
+**Enable Hermes (RN 0.70+ default)**  
+**Android – `android/app/build.gradle`:**
+
+```gradle
+hermesEnabled: true
+```
+
+**iOS – `ios/Podfile`:**
+
+```ruby
+config = use_native_modules!
+config[:hermes_enabled] = true
+```
+
+📉 Reduces bundle by **20–40%**.
+
+***
+
+## **2️⃣ Remove Unused / Heavy Dependencies**
+
+Run:
+
+    npx depcheck
+
+Examples of **heavy libraries to replace**:
+
+| Heavy                     | Replace With                  |
+| ------------------------- | ----------------------------- |
+| moment.js (300KB)         | dayjs (10KB)                  |
+| lodash full               | lodash-es or specific imports |
+| firebase full sdk         | modular v9+                   |
+| react-native-vector-icons | custom subset / SVG           |
+
+📉 Often saves **200–500KB**.
+
+***
+
+## **3️⃣ Use Named Imports (Tree-Shaking Friendly)**
+
+Bad:
+
+```js
+import _ from "lodash";
+```
+
+Good:
+
+```js
+import debounce from "lodash/debounce";
+```
+
+Same for date-fns, lodash-es, ramda.
+
+***
+
+## **4️⃣ Minify & Shrink Code (Metro + ProGuard)**
+
+### **Android ProGuard**
+
+`android/app/proguard-rules.pro`:
+
+```pro
+-keep class com.facebook.** { *; }
+-dontwarn com.facebook.**
+```
+
+Enable in `android/app/build.gradle`:
+
+```gradle
+minifyEnabled true
+shrinkResources true
+```
+
+📉 Removes unused native Java/Kotlin code.
+
+***
+
+## **5️⃣ Enable Hermes Bytecode Pre-Compilation**
+
+RN 0.71+ supports **precompiled bytecode**, dramatically shrinking JS bundle.
+
+Android:
+
+```gradle
+enableHermesBytecodePrecompilation true
+```
+
+📉 Cuts JS bundle **almost in half**.
+
+***
+
+## **6️⃣ Split Bundles by Environment**
+
+Use env-based dynamic bundling:
+
+```js
+if (__DEV__) {
+  require('./devTools');
+}
+```
+
+Production bundle excludes dev‑only modules.
+
+***
+
+## **7️⃣ Lazy Load Heavy Modules (Code Splitting)**
+
+Example: Load charts/screens only when needed.
+
+```js
+const ChartsScreen = React.lazy(() => import('./ChartsScreen'));
+```
+
+This keeps your **initial bundle very small**.
+
+***
+
+## **8️⃣ Compress Images & Use WebP**
+
+Optimize static assets:
+
+*   Replace PNG/JPG → WebP
+*   Use 1x images + scale via `Image.getSize()`
+*   Offload large images to CDN
+
+Metro config:
+
+```js
+module.exports = {
+  transformer: {
+    assetPlugins: ['expo-asset/tools/hashAssetFiles'],
+  },
+};
+```
+
+📉 Saves **MBs** in asset bundle.
+
+***
+
+## **9️⃣ Use react-native-mmkv Instead of AsyncStorage**
+
+AsyncStorage adds overhead; MMKV is **smaller and faster**.
+
+```js
+import MMKVStorage from "react-native-mmkv-storage";
+```
+
+***
+
+## **🔟 Remove Inline JSON / Move to Remote Config**
+
+Avoid large inline config files:
+
+Bad ❌
+
+```js
+import bigJson from './data.json';
+```
+
+Good ✔️
+
+*   Load via MMKV
+*   Fetch & cache remote JSON
+*   Enforce compression (gzip or brotli)
+
+***
+
+# **📌 Final Interview‑Ready Summary**
+
+> To reduce bundle size in React Native, enable **Hermes**, eliminate unused dependencies, use **named imports**, turn on **ProGuard + resource shrinking**, compress images, and adopt **lazy loading** for heavy modules. Hermes bytecode pre‑compilation + avoiding heavy libraries like moment.js gives the biggest impact.
+
+  </details>
+
+  <details><summary>85. Preventing heavy operations on JS thread.</summary>
+
+Here’s a **concise, interview‑ready** guide with **practical patterns + code** to ensure heavy work doesn’t block the **JS thread** (so gestures, animations, and navigation stay smooth).
+
+***
+
+## **85. Preventing heavy operations on the JS thread**
+
+### 🎯 Goal
+
+Keep the **JS event loop** free for: rendering, handling gestures, and scheduling. Push heavy work to **native/other threads** and make UI work **frame-synced**.
+
+***
+
+## ✅ Core Strategies (what to say in interview)
+
+1.  **Move CPU‑intensive work off JS**
+
+*   Use **JSI/TurboModules** or libraries that run on **native threads** for crypto, compression, parsing, image/video processing.
+*   If you need pure JS off-thread, use **react-native-multithreading** or **react-native-threads**.
+
+2.  **Run animations & gestures on UI thread**
+
+*   Use **React Native Reanimated (worklets)** + **react-native-gesture-handler** so animations run on the **UI thread**, not JS.
+
+3.  **Defer non‑critical work**
+
+*   `InteractionManager.runAfterInteractions`, `requestIdleCallback`, `setTimeout(0)`, or `requestAnimationFrame` to yield back to the event loop.
+
+4.  **Stream and chunk big tasks**
+
+*   Avoid huge `JSON.stringify`, massive loops, or processing large arrays synchronously. **Chunk it** or **stream**.
+
+5.  **Avoid synchronous bridge calls**
+
+*   Don’t do chatty sync calls (e.g., reading hundreds of keys one by one). Batch, use **JSI-backed storage** like **MMKV**, or fetch in bulk.
+
+6.  **Use virtualization & memoization**
+
+*   `FlatList` with proper props (`windowSize`, `getItemLayout`, `removeClippedSubviews`), memoize item rows, throttle expensive callbacks.
+
+7.  **Use background services for I/O**
+
+*   Downloads/uploads, file I/O → native/background (e.g., background fetch, download managers). Only signal completion to JS.
+
+***
+
+## 📦 Library Choices that keep JS thread light
+
+*   **Reanimated 2/3**: UI thread animations via **worklets**
+*   **react-native-gesture-handler**: low-latency gestures off JS
+*   **react-native-mmkv**: JSI storage, very fast & minimal JS involvement
+*   **react-native-multithreading**: run JS functions on worker threads
+*   **TurboModules/JSI**: write your heavy logic in native C++/Kotlin/Swift
+*   **react-native-blob-util** (or native download manager): background file work
+
+***
+
+## 🧩 Code Patterns
+
+### 1) **Defer non‑critical work**
+
+```ts
+import { InteractionManager } from 'react-native';
+
+// Defer until after animations & gestures settle
+InteractionManager.runAfterInteractions(() => {
+  // low priority: preload, warm caches, analytics, etc.
+});
+
+// Yield rendering to next frame
+requestAnimationFrame(() => {
+  // safe to do small work here
+});
+
+// Idle time (polyfilled in many RN setups)
+requestIdleCallback?.(() => {
+  // run only when JS is idle
+});
+```
+
+***
+
+### 2) **Run animations & gestures off JS (Reanimated + RNGH)**
+
+```ts
+import Animated, { useSharedValue, withSpring, useAnimatedStyle } from 'react-native-reanimated';
+
+const x = useSharedValue(0);
+
+const style = useAnimatedStyle(() => ({
+  transform: [{ translateX: x.value }],
+}));
+
+// This runs on UI thread (worklet), not JS thread
+function onDrag(distance: number) {
+  'worklet';
+  x.value = withSpring(distance);
+}
+```
+
+***
+
+### 3) **Move heavy JS to a worker thread (react-native-multithreading)**
+
+```ts
+import { spawnThread } from 'react-native-multithreading';
+
+// Heavy pure JS function
+function expensiveCompute(data: number[]) {
+  'worklet'; // required by multithreading
+  let sum = 0;
+  for (let i = 0; i < data.length; i++) sum += Math.sqrt(data[i]);
+  return sum;
+}
+
+const sumPromise = spawnThread(expensiveCompute, bigArray);
+sumPromise.then(result => setState(result));
+```
+
+> Keeps the **main JS thread** free. Ideal for CPU loops, parsing, transforms.
+
+***
+
+### 4) **Batch/JSI storage instead of chatty bridge**
+
+```ts
+// Bad: multiple async bridge round-trips
+for (const k of keys) {
+  const v = await AsyncStorage.getItem(k);
+  // ...
+}
+
+// Better: MMKV (JSI) – sync & fast without blocking UI
+import { MMKV } from 'react-native-mmkv';
+const storage = new MMKV();
+
+storage.set('session', JSON.stringify(sessionObj));
+const session = JSON.parse(storage.getString('session') ?? '{}');
+```
+
+***
+
+### 5) **Chunk large work to avoid long blocks**
+
+```ts
+// Break 1M operations into time-sliced chunks
+function processInChunks(items: any[], chunk = 500) {
+  let i = 0;
+  function step() {
+    const end = Math.min(i + chunk, items.length);
+    for (; i < end; i++) {
+      // process items[i]
+    }
+    if (i < items.length) {
+      setTimeout(step, 0); // yield back to event loop between chunks
+    }
+  }
+  step();
+}
+```
+
+***
+
+### 6) **Virtualized lists tuned to avoid JS pressure**
+
+```tsx
+<FlatList
+  data={data}
+  renderItem={MemoizedRow}
+  keyExtractor={(item) => item.id}
+  initialNumToRender={8}
+  windowSize={5}
+  maxToRenderPerBatch={8}
+  updateCellsBatchingPeriod={50}
+  removeClippedSubviews
+  getItemLayout={(data, index) => ({ length: ROW_H, offset: ROW_H * index, index })}
+/>
+```
+
+```ts
+const MemoizedRow = React.memo(({ item }) => <Row item={item} />);
+```
+
+***
+
+### 7) **Defer navigation heavy-lifting**
+
+```ts
+// Example: precompute routes after first paint
+useEffect(() => {
+  requestAnimationFrame(() => {
+    // build search indexes, preload icons, etc.
+  });
+}, []);
+```
+
+***
+
+### 8) **Use native modules for crypto/compression/imagery**
+
+*   Prefer native libs (via **TurboModule/JSI**) for:
+    *   **AES/RSA** encryption
+    *   **Gzip/Brotli** compression
+    *   **Image resizing/thumbnailing**
+*   Expose a thin async API to JS; do the heavy CPU work **off the main threads**.
+
+***
+
+## 🚦 What to watch in profiling
+
+*   **Flipper**: JS CPU usage, UI thread stalls, React DevTools “Commit” times
+*   **Hermes Profiling**: sampling profiler to find long JS frames
+*   Long frames (>16ms) → stutters; identify functions creating **>5–10 ms** blocks and move/defer them.
+
+***
+
+## 🧠 Banking‑app specifics
+
+*   OTP/login screens must feel instant → keep JS “cold path” minimal
+*   Masking/formatting on inputs (PAN, account numbers) must be **cheap** → memoize & defer heavy validation
+*   Secure storage reads on launch: use **MMKV**/**Keychain** through native/JSI, batch where possible
+*   Charts/Statements: render summary first; lazy-load heavy charting libs and compute datasets off-thread
+
+***
+
+## 📌 Short summary (to say in interview)
+
+> **Keep the JS thread free** by running animations/gestures on the **UI thread** (Reanimated), offloading CPU work to **native/JSI or worker threads**, deferring non‑critical tasks with **InteractionManager**/**rAF**, chunking large loops, batching storage/bridge calls, and tuning virtualized lists. Profile with **Flipper** and **Hermes** to catch long JS frames and move those operations off the hot path.
+
+  </details>
+
+  <details><summary>86. Image optimization techniques.</summary>
+
+Here’s a **clean, concise, and interview‑ready** answer on:
+
+# **86. Image Optimization Techniques in React Native**
+
+Well‑optimized images improve **performance, memory usage, and startup time**—critical for banking apps that display statements, cards, QR codes, KYC photos, etc.
+
+Below are the **most practical techniques** + short examples you can mention in interviews.
+
+***
+
+# ✅ **1. Use the correct image formats**
+
+| Format   | Best For                | Benefit                       |
+| -------- | ----------------------- | ----------------------------- |
+| **WebP** | UI icons, illustrations | Smaller than PNG/JPG (30–80%) |
+| **PNG**  | Transparent icons       | Lossless clarity              |
+| **JPEG** | Photos                  | Small file • high compression |
+| **SVG**  | Simple icons            | Resolution independent        |
+
+👉 **WebP gives the biggest impact** in RN apps.
+
+```jsx
+<Image source={require('./assets/card.webp')} />
+```
+
+***
+
+# ✅ **2. Resize / compress assets before bundling**
+
+Never include 2000×2000 images when displaying at 200×200.
+
+Use tools like:
+
+*   TinyPNG
+*   Squoosh
+*   ImageMagick
+*   RN asset plugins
+
+> Banking apps often reduce bundle size by **30–50%** by pre‑optimizing icon sets.
+
+***
+
+# ✅ **3. Use `react-native-fast-image`**
+
+FastImage handles:
+
+*   Aggressive caching
+*   Priority loading
+*   Better decoding
+*   Avoids JS‑side delays
+
+```jsx
+import FastImage from 'react-native-fast-image';
+
+<FastImage
+  source={{ uri: imageUrl }}
+  style={{ width: 100, height: 100 }}
+  resizeMode={FastImage.resizeMode.cover}
+/>;
+```
+
+***
+
+# ✅ **4. Use correct `resizeMode`**
+
+Improves performance by reducing unnecessary GPU work.
+
+```jsx
+<Image
+  source={...}
+  resizeMode="contain"   // Avoids extra scaling
+/>
+```
+
+Common optimal choices:
+
+*   **cover** for banners
+*   **contain** for logos
+*   **center** for icons
+
+***
+
+# ✅ **5. Lazy load images (show placeholder first)**
+
+```jsx
+const [loaded, setLoaded] = useState(false);
+
+<Image
+  source={{ uri: url }}
+  onLoadEnd={() => setLoaded(true)}
+  style={{ opacity: loaded ? 1 : 0 }}
+/>
+
+{!loaded && <ActivityIndicator />}
+```
+
+👉 Prevents blocking UI when loading heavy resources.
+
+***
+
+# ✅ **6. Cache remote images**
+
+Use FastImage (best) or manual caching.
+
+FastImage auto-caches:
+
+*   Disk cache
+*   Memory cache
+*   Priority + preload
+
+```jsx
+FastImage.preload([{ uri: userProfilePic }]);
+```
+
+***
+
+# ✅ **7. Use correct image densities (Android/iOS)**
+
+Place images appropriately:
+
+    /android/app/src/main/res/drawable-hdpi
+    /android/app/src/main/res/drawable-xhdpi
+    /ios/Images.xcassets/...
+
+RN auto‑selects the right resolution → prevents scaling cost.
+
+***
+
+# ✅ **8. Use CDN with automatic resizing**
+
+When displaying cards, statements, user photos:
+
+    https://cdn.mybank.com/photo?id=123&width=400&quality=70
+
+Server sends only required resolution → big performance win.
+
+***
+
+# ✅ **9. Avoid inline base64 images**
+
+Why?
+
+*   Adds huge strings to JS bundle
+*   Slower decoding
+*   Blocks JS thread
+
+Bad ❌
+
+```jsx
+<Image source={{ uri: 'data:image/png;base64,...' }} />
+```
+
+Prefer remote URL or asset file.
+
+***
+
+# ✅ **10. Prefetch / preload important images**
+
+Useful for splash → login → dashboard flow.
+
+```jsx
+Image.prefetch('https://....logo.webp');
+```
+
+Or with FastImage:
+
+```jsx
+FastImage.preload([
+  { uri: dashboardImage },
+  { uri: offerBanner },
+]);
+```
+
+***
+
+# 🔥 Bonus: High-Impact Banking Use Cases
+
+### 1) **QR Code images**
+
+Generate via native modules or cached base64 → avoid regenerate on each render.
+
+### 2) **KYC document photos**
+
+*   Compress to **<300 KB**
+*   Downscale on device before upload (RN Image Resizer)
+
+```jsx
+import ImageResizer from 'react-native-image-resizer';
+
+const resized = await ImageResizer.createResizedImage(uri, 1024, 1024, 'JPEG', 80);
+```
+
+### 3) **Card images in dashboard**
+
+*   Serve via CDN at 2–3 separate resolutions (small/medium/large)
+*   Preload on login for smooth scroll
+
+***
+
+# 🎯 **Short Interview‑Ready Summary**
+
+> Use WebP/SVG, compress & resize assets before bundling, use FastImage for caching, lazy-load heavy images, use proper resizeModes, avoid base64 inline images, and downscale KYC/large images using native image manipulation. Also use CDN-resized images to send minimal payload. These techniques significantly reduce memory usage, startup time, and UI jank.
+
+  </details>
+
+  <details><summary>87. Jank-free animations using Reanimated.</summary>
+
+Here’s a **concise, interview‑ready** guide with **practical patterns + code** to build **jank‑free animations** in React Native using **Reanimated (v2/v3)**.
+
+***
+
+## 🎯 Core Principle
+
+Reanimated runs animations on the **UI thread** via **worklets**, keeping them independent of the JS thread. That’s how you avoid dropped frames during heavy JS work.
+
+> TL;DR: **Use shared values + worklets (`'worklet'`) + RNGH** so gestures & animations never wait on JS.
+
+***
+
+## ✅ Key Building Blocks
+
+### 1) **Shared Values** (mutable state on UI thread)
+
+```ts
+import { useSharedValue } from 'react-native-reanimated';
+const progress = useSharedValue(0); // Lives on UI thread
+```
+
+### 2) **Worklets** (code executed on UI thread)
+
+```ts
+function onDrag(dx: number) {
+  'worklet';
+  progress.value = dx; // instant, no JS bridge roundtrip
+}
+```
+
+### 3) **Animated Styles**
+
+```ts
+import { useAnimatedStyle, withSpring } from 'react-native-reanimated';
+
+const style = useAnimatedStyle(() => ({
+  transform: [{ translateX: withSpring(progress.value) }],
+}));
+```
+
+### 4) **Gesture Handler Integration (RNGH)**
+
+```tsx
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+
+const pan = Gesture.Pan()
+  .onChange((e) => {
+    'worklet';
+    progress.value = e.translationX;
+  })
+  .onFinalize(() => {
+    'worklet';
+    progress.value = withSpring(0);
+  });
+
+<GestureDetector gesture={pan}>
+  <Animated.View style={[styles.box, style]} />
+</GestureDetector>
+```
+
+**Why this is jank‑free:** Pan updates and the spring run **entirely on the UI thread**.
+
+***
+
+## 🛠️ Patterns for Smoothness (60 FPS)
+
+### A) Avoid JS work during animations
+
+*   Don’t compute heavy things in React renders or effects that run during gestures.
+*   Keep expensive logic **inside worklets** or **off‑thread** (e.g., parsing on a worker or native).
+
+### B) Eliminate re-renders
+
+*   Keep React component render cheap; move animation logic to **shared values + animated styles**.
+*   Memoize props passed to large animated trees.
+
+```ts
+const MemoizedItem = React.memo(Item); // especially in lists
+```
+
+### C) Use **derived values** for chained animations
+
+```ts
+import { useDerivedValue } from 'react-native-reanimated';
+
+const clamped = useDerivedValue(() => {
+  'worklet';
+  return Math.max(0, Math.min(progress.value, 100));
+});
+```
+
+### D) Use **`withTiming`/`withSpring`/`withDecay`** with proper configs
+
+```ts
+x.value = withSpring(target, {
+  damping: 15,
+  stiffness: 120,
+  mass: 1,
+  overshootClamping: true, // stable feel for banking UIs
+});
+```
+
+### E) Cancel / sequence animations correctly
+
+```ts
+import { cancelAnimation, withSequence } from 'react-native-reanimated';
+
+cancelAnimation(x); // stop ongoing animation if gesture restarts
+x.value = withSequence(
+  withTiming(1, { duration: 120 }),
+  withTiming(0, { duration: 120 })
+);
+```
+
+### F) Use **Layout Animations** for mounts/unmounts
+
+```ts
+import { Layout, FadeIn, FadeOut } from 'react-native-reanimated';
+
+<Animated.View
+  entering={FadeIn.duration(150)}
+  exiting={FadeOut.duration(120)}
+  layout={Layout.springify().damping(15).stiffness(120)}
+/>
+```
+
+Great for list insertions/removals **without JS**.
+
+***
+
+## 📦 Gesture + Physics Example (Bottom Sheet)
+
+```tsx
+const translateY = useSharedValue(HEIGHT);
+
+const pan = Gesture.Pan()
+  .onStart(() => {
+    'worklet';
+    cancelAnimation(translateY);
+  })
+  .onChange((e) => {
+    'worklet';
+    translateY.value = Math.max(0, translateY.value + e.changeY);
+  })
+  .onEnd((e) => {
+    'worklet';
+    const shouldOpen = translateY.value < HEIGHT * 0.4 || e.velocityY < -800;
+    translateY.value = withSpring(shouldOpen ? 0 : HEIGHT, {
+      damping: 18,
+      stiffness: 220,
+      mass: 1,
+      velocity: e.velocityY,
+    });
+  });
+
+const style = useAnimatedStyle(() => ({
+  transform: [{ translateY: translateY.value }],
+}));
+
+return (
+  <GestureDetector gesture={pan}>
+    <Animated.View style={[styles.sheet, style]} />
+  </GestureDetector>
+);
+```
+
+**Notes:**
+
+*   **`cancelAnimation`** avoids fighting springs.
+*   Uses velocity for natural snap.
+
+***
+
+## 🧩 React State ↔ Worklets (Use `runOnJS` sparingly)
+
+Only jump back to JS if absolutely needed (e.g., analytics, React state).
+
+```ts
+import { runOnJS } from 'react-native-reanimated';
+
+function onSnapEndJS(state: 'open' | 'closed') {
+  setSnap(state); // React state
+}
+
+.onEnd(() => {
+  'worklet';
+  const state = translateY.value === 0 ? 'open' : 'closed';
+  runOnJS(onSnapEndJS)(state); // use sparingly; it costs a hop
+});
+```
+
+***
+
+## 🧠 Performance Tips
+
+*   **Keep worklets pure**: no closures over big objects; pass primitives or use **`useSharedValue`**.
+*   **Avoid creating new objects in worklets every frame** (e.g., new arrays). Compute scalars, reuse objects in UI styles cautiously.
+*   **Batch UI updates**: update multiple shared values in a single worklet.
+*   **Throttle gesture callbacks** only if necessary; RNGH+Reanimated is already frame‑synced.
+
+***
+
+## 📈 Profiling & Debugging
+
+*   **Reanimated DevTools**: inspect shared values and animations (enable in Babel plugin if needed).
+*   **Flipper**:
+    *   React DevTools → check commit times.
+    *   Perf monitor → watch FPS (UI/JS). UI should stay \~60.
+*   **Hermes Profiling**: find any long JS frames (those won’t affect UI‑thread animations, but can affect events).
+
+***
+
+## 🛡️ Banking App Specifics
+
+*   Use **snappy, predictable physics** (low overshoot) for money‑related interactions (card carousel, sheet, OTP keypad).
+*   Keep animations subtle and fast (120–200ms timings, or spring damping).
+*   Ensure **accessibility** (reduce motion setting → offer `withTiming` short fades instead of large translations).
+*   Avoid running encryption/network calls in gesture handlers; kick them **after** animations settle.
+
+***
+
+## 🔎 Minimal Template (Card Flip)
+
+```tsx
+const rotate = useSharedValue(0);
+
+const frontStyle = useAnimatedStyle(() => ({
+  transform: [{ rotateY: `${rotate.value}deg` }],
+  backfaceVisibility: 'hidden',
+}));
+
+const backStyle = useAnimatedStyle(() => ({
+  transform: [{ rotateY: `${rotate.value + 180}deg` }],
+  backfaceVisibility: 'hidden',
+}));
+
+const flip = () => {
+  rotate.value = withTiming(rotate.value >= 90 ? 0 : 180, { duration: 180 });
+};
+
+<TouchableOpacity onPress={flip}>
+  <View style={{ width: 300, height: 180 }}>
+    <Animated.View style={[StyleSheet.absoluteFill, frontStyle]}>{/* front */}</Animated.View>
+    <Animated.View style={[StyleSheet.absoluteFill, backStyle]}>{/* back */}</Animated.View>
+  </View>
+</TouchableOpacity>
+```
+
+***
+
+## 📝 Quick Interview Sound‑Bite
+
+> “I use **Reanimated worklets + shared values** with **RNGH** so gestures and animations run on the **UI thread**. I keep React re-renders minimal, use **derived values**, cancel/sequence animations properly, and rely on **Layout Animations** for list transitions. I avoid `runOnJS` except for side effects and profile with **Flipper/Hermes** to ensure 60 FPS.”
+
+  </details>
+
+  <details><summary>88. Memory leaks debugging tools (Flipper/Instruments).</summary>
+
+Here’s a **short, interview‑ready** answer for:
+
+# **88. Memory Leaks Debugging Tools (Flipper / Instruments)**
+
+These are the **two most commonly used** tools to detect and fix memory leaks in React Native apps.
+
+***
+
+# ✅ **A) Flipper – Android & iOS (React Native)**
+
+Flipper gives a **JS + RN + Native** view of memory usage.
+
+## **1. Flipper Debugging Tools for Memory Leaks**
+
+### **1) React DevTools → Profiler**
+
+*   Detects unnecessary renders
+*   Identifies components staying in memory due to closure leaks or stale refs
+
+### **2) Hermes Debugger → Memory Profiling**
+
+(Enable Hermes to get full memory profiling)
+
+You can:
+
+*   Track **JS heap usage**
+*   Take **heap snapshots**
+*   Inspect uncollected objects
+*   Detect closures/memoization leaks
+
+### **3) Flipper “Memory” Plugin**
+
+Shows:
+
+*   Total memory usage over time
+*   Native heap vs JS heap
+*   Leaks when memory **keeps growing after GC**
+
+👉 **What to look for:**
+
+*   JS heap not dropping after navigation (common leak)
+*   Components not unmounted
+*   Event listeners/timers staying alive
+*   Large objects retained by closures
+
+***
+
+## **2. Flipper Workflow (Step-by-Step)**
+
+### **Step 1: Enable Hermes (required for JS heap snapshot)**
+
+`android/app/build.gradle`
+
+```gradle
+hermesEnabled: true
+```
+
+### **Step 2: Open Flipper → “Hermes Debugger” → Memory Graph**
+
+*   Start recording
+*   Navigate screens
+*   Stop recording
+*   Look for "Detached" objects
+*   Inspect references → find what’s holding them
+
+### **Step 3: Check React Render Flamegraph**
+
+Look for:
+
+*   Components re-rendering unintentionally
+*   Props causing re-renders
+*   Missing memoization (`React.memo`, `useCallback`)
+
+***
+
+# 🧠 Examples of issues Flipper helps catch
+
+### ❌ Forgotten timers
+
+```js
+useEffect(() => {
+  const interval = setInterval(fetch, 1000);
+  return () => clearInterval(interval);  // missing cleanup = leak
+}, []);
+```
+
+### ❌ Event listeners never removed
+
+```js
+BackHandler.addEventListener('hardwareBackPress', handler);
+// cleanup needed!
+```
+
+### ❌ Large object inside closure
+
+```js
+useEffect(() => {
+  function doSomething() {
+    console.log(bigObject); // stays in memory
+  }
+}, [bigObject]);
+```
+
+***
+
+# ✅ **B) Instruments (iOS)**
+
+Most accurate tool for iOS native memory leaks.
+
+***
+
+## **1. Useful Instruments Tools**
+
+### **1) Allocations Profiler**
+
+Shows:
+
+*   Memory allocations over time
+*   Leaks
+*   Retain cycles
+*   RN Views, UIKit Views, Images, JS runtime objects
+
+### **2) Leaks Instrument**
+
+Detects:
+
+*   Retain cycles (Objective‑C & Swift)
+*   Native views not released
+*   RN components causing native views to remain mounted
+
+### **3) Time Profiler**
+
+Helps detect:
+
+*   Heavy JS → causing native memory pressure
+*   Long-running UI operations
+
+***
+
+## **2. Instruments Workflow**
+
+### **Step 1: Open Xcode → Product → Profile**
+
+Choose:
+
+*   **Leaks**
+*   **Allocations**
+
+### **Step 2: Capture allocations**
+
+*   Navigate through screens
+*   Check if memory drops after leaving screens
+
+### **Step 3: Fix retain cycles**
+
+Look for:
+
+*   Views held by other views
+*   Event handlers not removed
+*   Objective‑C blocks capturing `self` strongly
+
+***
+
+# 🧪 iOS Example: Retain Cycle in Native Module
+
+```objc
+@property (nonatomic, strong) SomeManager *manager;
+
+self.manager.callback = ^{
+    // capturing self strongly = retain cycle
+};
+```
+
+Fix:
+
+```objc
+__weak typeof(self) weakSelf = self;
+self.manager.callback = ^{
+    typeof(self) strongSelf = weakSelf;
+};
+```
+
+Instruments detects such cycles instantly.
+
+***
+
+# 🚀 Bonus: Common Memory Leaks in React Native Apps
+
+### **1) Uncleaned listeners**
+
+*   AppState
+*   BackHandler
+*   DeviceEventEmitter
+*   Keyboard events
+
+### **2) Navigation leaks**
+
+*   Screens holding large states
+*   Not removing subscriptions when screen unmounts
+
+### **3) Non-disposed animations**
+
+*   Reanimated animations staying alive
+*   Native driver animations without cleanup
+
+### **4) Large images in memory**
+
+*   Full resolution KYC photos
+*   Card images not resized
+
+***
+
+# 🎯 Final Interview‑Ready Summary
+
+> I use **Flipper** to debug JS and RN memory issues—especially JS heap snapshots via Hermes, checking component retain cycles, unmounted screens still in memory, and leaked listeners or timers. For iOS‑native memory debugging, I use **Instruments (Leaks + Allocations)** to detect retain cycles, view leaks, and native modules holding references. Combining Flipper + Instruments gives full visibility into both JS and native memory leaks.
+
+  </details>
+
+  <details><summary>89. Performance budgets & CI enforcement.</summary>
+
+Here’s a **clean, short, interview‑ready** answer for:
+
+# **89. Performance Budgets & CI Enforcement (React Native)**
+
+*with practical examples used in real banking production pipelines.*
+
+***
+
+# ✅ **What are Performance Budgets?**
+
+Performance budgets are **numeric limits** that your app must not exceed — used to prevent regressions.
+
+Common budgets in React Native apps:
+
+| Budget Type            | Typical Values                             |
+| ---------------------- | ------------------------------------------ |
+| **JS bundle size**     | e.g., `< 1.5 MB` (Hermes bytecode)         |
+| **Startup Time (TTI)** | e.g., `< 2.5 seconds` on mid‑range devices |
+| **Memory usage**       | e.g., `< 250 MB` peak for dashboard screen |
+| **FPS/Frame Drops**    | no long (>16ms) UI thread stalls           |
+| **Navigation latency** | screen open < 200–300ms                    |
+| **Network payload**    | compressed API response < 400KB            |
+
+***
+
+# ✅ **Why Banking Apps Use Performance Budgets**
+
+*   Mandatory for **security, compliance & service availability**
+*   Strict performance SLAs (Login, Card List, Statement Viewer must load instantly)
+*   Prevent regressions caused by new features or junior dev changes
+
+***
+
+# ✅ **CI Enforcement — How to Enforce Budgets Automatically**
+
+### 🔥 Most teams enforce budgets in **CI (GitHub Actions / Jenkins / Bitrise)** using scripts that fail the pipeline when limits exceed.
+
+***
+
+## **1) Enforce JS Bundle Size Limit (CI script)**
+
+Example: detect if bundle size grew >10% or crosses threshold.
+
+```bash
+yarn react-native bundle \
+  --platform android \
+  --dev false \
+  --entry-file index.js \
+  --bundle-output build/index.android.bundle
+
+MAX_SIZE=1700000     # 1.7 MB
+
+ACTUAL_SIZE=$(wc -c < build/index.android.bundle)
+
+echo "Bundle Size: $ACTUAL_SIZE bytes"
+
+if [ $ACTUAL_SIZE -gt $MAX_SIZE ]; then
+  echo "❌ Bundle size exceeded budget!"
+  exit 1
+fi
+
+echo "✅ Bundle size within budget."
+```
+
+Add this step into your CI pipeline.
+
+***
+
+## **2) Enforce Startup Time / TTI Budget**
+
+Use **E2E test automation** + performance markers.
+
+### Track startup time (JS):
+
+```ts
+global.performanceStart = Date.now();
+
+// In App.tsx
+useEffect(() => {
+  const tti = Date.now() - global.performanceStart;
+  console.log('TTI:', tti);
+});
+```
+
+### CI script parses logs:
+
+```bash
+TTI=$(adb logcat | grep "TTI:" | awk '{print $3}')
+
+if [ "$TTI" -gt 2500 ]; then
+  echo "❌ Startup time regression!"
+  exit 1
+fi
+```
+
+Used in **BrowserStack / Firebase Test Lab** devices.
+
+***
+
+## **3) Enforce Memory Budgets**
+
+Use `adb shell dumpsys meminfo` in CI:
+
+```bash
+MEM=$(adb shell dumpsys meminfo com.mybank.app | grep "TOTAL" | awk '{print $2}')
+
+if [ $MEM -gt 250000 ]; then
+  echo "❌ Memory budget exceeded!"
+  exit 1
+fi
+```
+
+***
+
+## **4) Enforce FPS / No Jank (UI Thread Budget)**
+
+Use **Flipper Performance Plugin** programmatically:
+
+*   CI collects UI thread frame drops
+*   Threshold example: `< 5 dropped frames during navigation`
+
+Automation tools:
+
+*   Maestro
+*   Detox Performance Plugin
+*   Firebase Test Lab + Traceview
+
+***
+
+## **5) Enforce Network Payload Size**
+
+Add API response size checks:
+
+```ts
+axios.interceptors.response.use(resp => {
+  const bytes = new TextEncoder().encode(JSON.stringify(resp.data)).length;
+  if (bytes > 400000) {
+    throw new Error("Payload exceeds performance budget");
+  }
+  return resp;
+});
+```
+
+Used in **pre-prod builds** only.
+
+***
+
+## **6) Integrate With GitHub Actions (Example)**
+
+```yaml
+name: Performance Budget Check
+
+jobs:
+  perf-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: yarn install
+      - run: ./scripts/check-bundle-size.sh
+      - run: ./scripts/check-startup-time.sh
+      - run: ./scripts/check-memory.sh
+```
+
+Fails PR if budgets exceed.
+
+***
+
+# 🎯 **Real-World Banking Example**
+
+Performance budgets typically enforced:
+
+✔ Login TTI < 2.0 sec  
+✔ Dashboard memory usage < 220MB  
+✔ Bundle size < 1.8 MB  
+✔ Navigation latency < 250ms  
+✔ No JS frame > 20ms  
+✔ No native frame > 16ms
+
+Any breach → CI failure → PR blocked.
+
+***
+
+# 📌 **Short Interview‑Ready Summary**
+
+> Performance budgets define strict limits for bundle size, startup time, memory usage, and frame drops. In CI, we enforce these using bundle size scripts, startup-time log parsing, memory checks, and automated device tests. If any metric exceeds its threshold, CI fails, preventing regressions and ensuring consistent performance—critical for banking apps.
+
+  </details>
+
+  <details><summary>90. Avoiding unnecessary re-renders in complex forms.</summary>
+
+Here’s a **short, crisp, interview‑ready answer** with **practical patterns + code** for:
+
+# **90. Avoiding Unnecessary Re-renders in Complex Forms**
+
+Complex forms (KYC forms, loan applications, onboarding) often suffer from **slow typing, lag, and wasted renders**. The key is to isolate components, avoid prop changes, and prevent React from re-rendering the entire form on each keystroke.
+
+Below are the **most effective strategies** with examples.
+
+***
+
+# ✅ **1. Split Form Into Smaller Memoized Components**
+
+Instead of one giant form, break it into fields or sections:
+
+```tsx
+const TextField = React.memo(({ value, onChange, label }) => {
+  return <TextInput value={value} onChangeText={onChange} placeholder={label} />;
+});
+```
+
+> **React.memo** prevents re-renders unless props change.
+
+***
+
+# ✅ **2. Use `useCallback` for stable handlers**
+
+Without `useCallback`, every keystroke creates a new function → triggers re-renders.
+
+```tsx
+const onNameChange = useCallback((text) => setValue('name', text), []);
+```
+
+***
+
+# ✅ **3. Use `useMemo` for derived values**
+
+Example: validating PAN, Aadhaar, card number.
+
+```tsx
+const isValidPan = useMemo(() => validatePan(values.pan), [values.pan]);
+```
+
+Avoids recomputing expensive logic every render.
+
+***
+
+# ✅ **4. Avoid storing each field in global state**
+
+❌ **Bad**  
+Every keystroke re-renders the entire form:
+
+```tsx
+const [form, setForm] = useState({ name: '', age: '' });
+```
+
+✔️ **Better**  
+Use **multiple independent state slices**:
+
+```tsx
+const [name, setName] = useState('');
+const [age, setAge] = useState('');
+```
+
+✔️ **Best**  
+Use a form library.
+
+***
+
+# ✅ **5. Use a Form Library Built for Performance**
+
+Top pick: **React Hook Form (RHF)** – extremely fast
+
+*   Uses **uncontrolled inputs**
+*   Isolates re-renders
+*   Excellent for large banking/KYC forms
+
+```tsx
+const { control } = useForm();
+
+<Controller
+  control={control}
+  name="email"
+  render={({ field: { onChange, value } }) => (
+    <TextInput value={value} onChangeText={onChange} />
+  )}
+/>
+```
+
+Only the field being edited re-renders — **not the entire form**.
+
+***
+
+# ✅ **6. Use `React.memo` + stable references for dropdowns & lookup data**
+
+```tsx
+const countries = useMemo(() => COUNTRY_LIST, []);
+
+<CountrySelect data={countries} />
+```
+
+***
+
+# ✅ **7. Avoid Inline Functions / Objects / Styles**
+
+Inline objects cause prop changes → re-render.
+
+❌ Bad
+
+```tsx
+<TextInput style={{ margin: 10 }} />
+```
+
+✔️ Good
+
+```tsx
+const styles = StyleSheet.create({
+  input: { margin: 10 },
+});
+```
+
+***
+
+# ✅ **8. Debounce validations / API checks**
+
+Avoid validating on every keypress.
+
+```tsx
+const debouncedValidate = useCallback(
+  debounce((value) => validatePan(value), 400),
+  []
+);
+```
+
+***
+
+# ✅ **9. Use `useRef` for non-rendering state**
+
+For things like timers, flags, previous values:
+
+```tsx
+const panTouchedRef = useRef(false);
+```
+
+Does **not** trigger re-renders.
+
+***
+
+# ✅ **10. Virtualize long dynamic lists**
+
+If your form includes long lists (e.g., transactions, address search suggestions):
+
+Use:
+
+```tsx
+<FlatList ... />
+```
+
+Avoid:
+
+```tsx
+{items.map(...)}
+```
+
+***
+
+# 🚀 Banking App Example — KYC Form Optimization
+
+**Before (slow):**
+
+*   One giant form component
+*   Stored full form object in state
+*   Validations running on every field change
+*   Several dropdowns re-rendering unnecessarily
+
+**After (fast):**
+
+*   Split form into memoized field components
+*   React Hook Form
+*   Lookup lists memoized
+*   PAN & Aadhaar validations debounced
+*   Navigation transitions no longer lagging
+
+Memory usage ↓ | Re-renders ↓ | Fast typing ↑
+
+***
+
+# 🎯 **Short Interview Answer**
+
+> For complex forms, I prevent unnecessary re-renders by splitting the form into memoized components (`React.memo`), using stable handlers (`useCallback`), memoizing heavy computations (`useMemo`), and avoiding inline objects. I use React Hook Form because it isolates re-renders using uncontrolled inputs. I also debounce validations, use refs for non-rendering state, and optimize dropdown/lookup lists with memoization.
+
+  </details>
+
+  <details><summary>91. List virtualization strategies.</summary>
+
+Here’s a **clean, interview‑ready answer** with **practical list virtualization strategies** used in real React Native banking apps (transactions, statements, offers, notifications, etc.).
+
+***
+
+# **91. List Virtualization Strategies**
+
+In React Native, virtualization means **rendering only the items visible on screen**, instead of rendering the entire list. This keeps memory low and prevents jank during scroll.
+
+React Native’s **FlatList**, **SectionList**, and **VirtualizedList** already support this, but you must configure them correctly.
+
+***
+
+# ✅ **1. Use FlatList Instead of ScrollView**
+
+❌ **ScrollView**  
+Renders *everything*, leading to:
+
+*   High memory usage
+*   Slow scroll
+*   Poor performance on long data (like 5,000+ transactions)
+
+✔️ **FlatList**  
+Renders only **visible + buffer** items.
+
+***
+
+# ✅ **2. Key Prop Settings for Virtualization**
+
+Below are the **most impactful props** for performance:
+
+```tsx
+<FlatList
+  data={transactions}
+  renderItem={renderItem}
+  keyExtractor={(item) => item.id}
+  initialNumToRender={10}
+  maxToRenderPerBatch={10}
+  updateCellsBatchingPeriod={50}
+  windowSize={5}
+  removeClippedSubviews={true}
+  getItemLayout={getItemLayout} // when possible
+/>
+```
+
+### Explanation:
+
+*   **initialNumToRender**  
+    render only initial visible items (avoid huge initial loads)
+
+*   **maxToRenderPerBatch**  
+    how many items are rendered per batch when scrolling
+
+*   **updateCellsBatchingPeriod**  
+    delay between render batches → smooth scrolling
+
+*   **windowSize**  
+    how many screens worth of items to keep in memory  
+    e.g., 5 → 2 above, 2 below, 1 visible
+
+*   **removeClippedSubviews**  
+    HUGE win for Android – unmounts off-screen items
+
+*   **getItemLayout**  
+    If all rows have fixed height, provides precise measurement → zero lag.
+
+***
+
+# ✅ **3. Memoize Row Components**
+
+Each row should be **pure** and memoized:
+
+```tsx
+const TransactionRow = React.memo(({ item }) => {
+  return <Row item={item} />;
+});
+```
+
+Also use stable props:
+
+```tsx
+const renderItem = useCallback(({ item }) => {
+  return <TransactionRow item={item} />;
+}, []);
+```
+
+Prevents re-renders when scrolling.
+
+***
+
+# ✅ **4. Avoid Inline Functions & Inline Styles**
+
+Inline props = new objects = re-renders.
+
+✔️ Move to `useCallback` & `StyleSheet.create()`.
+
+***
+
+# ✅ **5. Use `getItemLayout` Where Possible**
+
+If item height is predictable:
+
+```tsx
+const ROW_HEIGHT = 72;
+
+const getItemLayout = (data, index) => ({
+  length: ROW_HEIGHT,
+  offset: ROW_HEIGHT * index,
+  index,
+});
+```
+
+Benefits:
+
+*   Instant scroll-to-index
+*   No measuring
+*   Zero layout calculations during scroll
+
+Perfect for banking transaction rows.
+
+***
+
+# ✅ **6. Use `VirtualizedList` for Fully Dynamic Data**
+
+If you have:
+
+*   Paginated lists
+*   Giant datasets (10k+ rows)
+*   Data not available at once
+
+```tsx
+<VirtualizedList
+  data={data}
+  initialNumToRender={10}
+  getItemCount={() => data.length}
+  getItem={(data, index) => data[index]}
+/>
+```
+
+Allows complete control over virtualization.
+
+***
+
+# ✅ **7. Use Pagination + Infinite Scroll**
+
+Load in chunks rather than entire dataset.
+
+```tsx
+onEndReached={fetchMore}
+onEndReachedThreshold={0.4}
+```
+
+Prevents memory explosion.
+
+***
+
+# ✅ **8. Avoid Heavy RenderItem Logic**
+
+Keep `renderItem` tiny:
+
+*   Precompute expensive values outside list
+*   Cache formatted dates, amounts
+*   Avoid heavy string operations inside row render
+
+***
+
+# ✅ **9. Use RecyclerListView for Extremely Large Lists**
+
+For huge datasets (10k–100k rows), use:
+
+    npm install recyclerlistview
+
+Benefits:
+
+*   Highly optimized recycler
+*   Predictive layout
+*   Lowest memory footprint
+
+Great for:
+
+*   Transaction history
+*   Statements
+*   Messages
+
+***
+
+# ✅ **10. Remove Hidden Items from Memory (Android)**
+
+`removeClippedSubviews` gives a major boost:
+
+```tsx
+removeClippedSubviews={true}
+```
+
+Improves:
+
+*   Memory
+*   Scroll performance
+*   Off-screen cleanup
+
+***
+
+# 🚀 **Banking App Real-World Example: 5,000 Transactions Screen**
+
+**Before** (ScrollView):
+
+*   5–7 seconds load
+*   App froze during scroll
+*   High memory (600MB+)
+
+**After** (Optimized FlatList):
+
+*   Loads instantly (10 rows only)
+*   Smooth scrolling
+*   Memory <200MB
+*   No dropped frames
+
+***
+
+# 🎯 **Short Interview Answer**
+
+> To virtualize lists, I use FlatList/SectionList with correct props like `initialNumToRender`, `windowSize`, `maxToRenderPerBatch`, and `removeClippedSubviews`. I memoize row components, avoid inline functions, and use `getItemLayout` when row sizes are fixed. For huge datasets, I switch to VirtualizedList or RecyclerListView. This ensures smooth, memory-efficient lists even with thousands of items, which is critical in banking apps.
+
+  </details>
+
+  <details><summary>92. Hermes bytecode preloading advantages.</summary>
+
+Here’s a **short, crisp, interview‑ready answer** on:
+
+# **92. Hermes Bytecode Preloading — Advantages**
+
+Hermes bytecode preloading is one of the **biggest React Native performance improvements** introduced in RN 0.70+ and refined in later versions. It dramatically improves **startup time**, **memory usage**, and **bundle efficiency**, especially important for **banking apps**.
+
+***
+
+# ✅ **What is Hermes Bytecode Preloading?**
+
+Normally, React Native ships a **JavaScript bundle (.js)**, and Hermes has to **parse + compile it into bytecode during startup**.
+
+With **bytecode preloading**, Hermes compiles the JS bundle into **.hbc (Hermes ByteCode)** **at build time**, not at runtime.
+
+📌 Result → The app loads precompiled bytecode directly → **no JS parsing during startup**.
+
+***
+
+# 🚀 **Advantages**
+
+## **1️⃣ Huge Reduction in Startup Time (TTI / Cold Start)**
+
+When you preload bytecode:
+
+*   No need to parse JS
+*   No need to compile JS to bytecode
+*   Directly executes bytecode
+
+🔥 Real apps see **20–40% faster cold start**.
+
+For banking apps:
+
+*   Login screen loads instantly
+*   Faster biometrics initialization
+*   Faster dashboard initial render
+
+***
+
+## **2️⃣ Smaller JS Bundle Size**
+
+Hermes bytecode (`.hbc`) is:
+
+*   Smaller than raw `.js` bundles
+*   Better optimized
+*   Often compresses better in APK/IPA
+
+Typical savings: **15–30%**.
+
+Smaller bundle → faster OTA delivery via CodePush or custom OTA.
+
+***
+
+## **3️⃣ Lower Memory Usage**
+
+Hermes bytecode:
+
+*   Has a **smaller in-memory footprint**
+*   Avoids storing both JS source + compiled output
+*   Minimizes JS heap allocation during startup
+
+Particularly useful for:
+
+*   Low-memory Android devices
+*   Older iPhones
+*   Budget devices used in Indian markets
+
+***
+
+## **4️⃣ Faster Execution (Less JIT Overhead)**
+
+Hermes bytecode uses an **ahead-of-time compilation model**, resulting in:
+
+*   Faster function execution
+*   Less interpreter overhead
+*   More deterministic performance
+
+This removes a major performance spike during early screen navigation.
+
+***
+
+## **5️⃣ Reduces "JS Parsing Overload" Spikes**
+
+Without preloading, JS parsing can cause:
+
+*   UI thread pauses
+*   Jank during startup
+*   Unresponsiveness under heavy JS load
+
+With preloading → **zero parsing** → smoother startup.
+
+***
+
+## **6️⃣ Improves CI / Release Reliability**
+
+Precompiled bytecode means:
+
+*   Build-time errors occur earlier
+*   JS syntax errors visible before runtime
+*   Better reproducibility across environments
+
+CI can enforce:
+
+```gradle
+enableHermesBytecodePrecompilation true
+```
+
+***
+
+## **7️⃣ Perfect for CodePush / OTA Updates**
+
+When delivering OTA updates:
+
+*   Bytecode is significantly smaller
+*   Installs faster
+*   No runtime compilation
+
+Delivering faster patches is crucial in banking apps for:
+
+*   Regulatory changes
+*   UPI rule updates
+*   Feature flags and A/B testing
+
+***
+
+# 🧩 **How to Enable Hermes Bytecode Preloading**
+
+### **Android**
+
+```gradle
+project.ext.react = [
+  enableHermes: true,
+  enableHermesBytecodePrecompilation: true
+]
+```
+
+### **iOS (`Podfile`)**
+
+```ruby
+hermes_enabled => true,
+hermes_bytecode_precompile => true
+```
+
+***
+
+# 🎯 **Short Interview Answer**
+
+> Hermes bytecode preloading compiles JS into Hermes bytecode at build time, so the app doesn’t need to parse or compile JS during startup. This results in **much faster cold start**, **smaller bundle size**, **lower memory usage**, and **smoother TTI**. It also improves CI reliability and speeds up OTA updates. It’s one of the most effective performance gains in modern React Native apps, especially for banking-grade applications.
+
+  </details>
 
 </details>
 
